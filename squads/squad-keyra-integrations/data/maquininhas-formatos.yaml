@@ -1,0 +1,145 @@
+# Mapeamento de Formatos por Operadora de Cartão — KEYRA
+# Referência para parsers de extratos de maquininhas
+
+operadoras:
+  - id: stone
+    nome: Stone
+    formatos:
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ","
+        campos:
+          data_venda: "Data da Venda"
+          valor_bruto: "Valor Bruto"
+          taxa: "Taxa"
+          valor_liquido: "Valor Líquido"
+          bandeira: "Bandeira"
+          parcelas: "Parcelas"
+          tipo: "Tipo (Crédito/Débito)"
+          data_recebimento: "Data Pagamento"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+      api:
+        suportado: true
+        notas: "Stone tem API de relatórios"
+
+  - id: pagseguro
+    nome: PagSeguro
+    formatos:
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ";"
+        campos:
+          data_venda: "Data da Transação"
+          valor_bruto: "Valor Bruto"
+          taxa: "Valor da Taxa"
+          valor_liquido: "Valor Líquido"
+          tipo: "Tipo de Pagamento"
+          parcelas: "Parcelas"
+          status: "Status"
+        date_format: "DD/MM/YYYY HH:mm:ss"
+        valor_format: "1234.56"
+        notas: "Usa ponto como decimal no CSV"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: mercado-pago
+    nome: Mercado Pago
+    formatos:
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ","
+        campos:
+          data_venda: "DATE_CREATED"
+          valor_bruto: "TRANSACTION_AMOUNT"
+          taxa: "MARKETPLACE_FEE"
+          valor_liquido: "NET_RECEIVED_AMOUNT"
+          tipo: "PAYMENT_TYPE"
+          parcelas: "INSTALLMENTS"
+          status: "STATUS"
+        date_format: "YYYY-MM-DDTHH:mm:ss"
+        valor_format: "1234.56"
+        notas: "Headers em inglês, formato ISO"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: cielo
+    nome: Cielo
+    formatos:
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ";"
+        campos:
+          data_venda: "Data da Venda"
+          valor_bruto: "Valor Bruto"
+          taxa: "Valor Desconto"
+          valor_liquido: "Valor Líquido"
+          bandeira: "Bandeira"
+          parcelas: "Qtde Parcelas"
+          lote: "Lote"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: rede
+    nome: Rede (Itaú)
+    formatos:
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ";"
+        campos:
+          data_venda: "Data Transação"
+          valor_bruto: "Valor Bruto"
+          taxa: "Taxa Adm"
+          valor_liquido: "Valor Líquido"
+          bandeira: "Bandeira"
+          parcelas: "Parcelas"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+      pdf:
+        suportado: parcial
+        notas: "Alguns relatórios são imagem escaneada"
+
+  - id: sumup
+    nome: SumUp
+    formatos:
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ","
+        campos:
+          data_venda: "Transaction date"
+          valor_bruto: "Amount"
+          taxa: "Fee"
+          valor_liquido: "Net amount"
+          tipo: "Payment type"
+        date_format: "YYYY-MM-DD"
+        valor_format: "1234.56"
+        notas: "Headers em inglês"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: ton
+    nome: Ton (Stone)
+    formatos:
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ","
+        notas: "Mesmo formato da Stone (mesma infraestrutura)"
+      pdf:
+        suportado: true
+        texto_extraível: true

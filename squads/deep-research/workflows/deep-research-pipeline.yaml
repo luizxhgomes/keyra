@@ -1,0 +1,65 @@
+name: deep-research-pipeline
+version: 1.0.0
+description: Pipeline completo de deep research — do escopo ao report final
+trigger: "*deep-research-pipeline"
+
+phases:
+  - id: scope
+    name: Define Scope
+    agent: research-lead
+    task: create-research-prompt
+    elicit: true
+    outputs:
+      - research_prompt
+      - research_questions
+    next: research
+
+  - id: research
+    name: Execute Research
+    agent: source-analyst
+    task: execute-research
+    inputs:
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - raw_findings
+      - source_registry
+    next: validate
+
+  - id: validate
+    name: Validate Sources
+    agent: source-analyst
+    task: validate-sources
+    inputs:
+      - raw_findings: "{{research.raw_findings}}"
+    outputs:
+      - validated_findings
+      - validation_report
+    next: synthesize
+
+  - id: synthesize
+    name: Synthesize Report
+    agent: synthesis-writer
+    task: synthesize-findings
+    inputs:
+      - validated_findings: "{{validate.validated_findings}}"
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - research_report
+    next: quality-gate
+
+  - id: quality-gate
+    name: Quality Gate
+    agent: research-lead
+    checklist: research-quality-gate
+    inputs:
+      - research_report: "{{synthesize.research_report}}"
+      - research_prompt: "{{scope.research_prompt}}"
+    decision:
+      PASS: complete
+      NEEDS_REVISION: synthesize
+      FAIL: research
+
+error_handling:
+  on_phase_error: log-and-continue
+  max_retries: 2
+  escalation: "@analyst"

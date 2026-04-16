@@ -1,0 +1,136 @@
+# Workflow: Story Development Cycle com Gate Financeiro
+# Extensão do SDC padrão adicionando validação de @finance-domain-expert
+
+name: keyra-sdc-com-gate-financeiro
+version: 1.0.0
+description: "SDC customizado para o KEYRA — adiciona gate de validação financeira entre @dev e @qa"
+type: sequential
+extends: story-development-cycle.yaml
+
+trigger:
+  command: "*workflow keyra-sdc"
+  agent: "@aiox-master"
+
+phases:
+
+  # ═══════════════════════════════════════════
+  # FASE 1: CRIAÇÃO DA STORY
+  # ═══════════════════════════════════════════
+
+  - id: criar-story
+    name: "Fase 1 — Criar Story"
+    agent: "@sm"
+    description: "River cria a story a partir do épico"
+    output:
+      - "docs/stories/{epicNum}.{storyNum}.story.md"
+    status_transition: "→ Draft"
+    order: 1
+
+  # ═══════════════════════════════════════════
+  # FASE 2: VALIDAÇÃO DA STORY
+  # ═══════════════════════════════════════════
+
+  - id: validar-story
+    name: "Fase 2 — Validar Story"
+    agent: "@po"
+    description: "Pax valida a story com checklist de 10 pontos"
+    depends_on: [criar-story]
+    decision:
+      GO: "Score >= 7/10 → status Draft → Ready"
+      NO_GO: "Score < 7 → retorna para @sm com correções"
+    status_transition: "Draft → Ready"
+    order: 2
+
+  # ═══════════════════════════════════════════
+  # FASE 3: IMPLEMENTAÇÃO
+  # ═══════════════════════════════════════════
+
+  - id: implementar
+    name: "Fase 3 — Implementar"
+    agent: "@dev"
+    description: "Dex implementa a story seguindo acceptance criteria"
+    depends_on: [validar-story]
+    modes: [yolo, interactive, pre-flight]
+    status_transition: "Ready → InProgress"
+    order: 3
+
+  # ═══════════════════════════════════════════
+  # FASE 3.5: GATE FINANCEIRO (EXCLUSIVO KEYRA)
+  # ═══════════════════════════════════════════
+
+  - id: gate-financeiro
+    name: "Fase 3.5 — Gate Financeiro"
+    agent: "@finance-domain-expert"
+    description: |
+      Valéria valida TODA lógica financeira antes do QA gate.
+      Ativado quando a story envolve cálculos financeiros,
+      DRE, precificação, custos, margem ou transações.
+    depends_on: [implementar]
+    condition:
+      ativar_quando: |
+        A story contém qualquer um dos seguintes:
+        - Cálculos de preço, custo ou margem
+        - Geração de comanda ou transação
+        - DRE ou relatório financeiro
+        - Dashboard com métricas financeiras
+        - Rateio de custos ou reconhecimento de receita
+      pular_quando: |
+        A story é puramente de UI sem lógica financeira,
+        ou é uma task de infraestrutura/devops.
+    decision:
+      APROVADO: "Fórmulas corretas, centavos inteiros, sem divisão por zero → prosseguir para QA"
+      CORREÇÕES: "Problemas encontrados → retorna para @dev com lista de correções"
+    checklist: checklists/checklist-validacao-financeira.md
+    order: 3.5
+
+  # ═══════════════════════════════════════════
+  # FASE 4: QA GATE
+  # ═══════════════════════════════════════════
+
+  - id: qa-gate
+    name: "Fase 4 — QA Gate"
+    agent: "@qa"
+    description: "Quinn executa QA gate com 7 verificações de qualidade"
+    depends_on: [gate-financeiro]
+    decision:
+      PASS: "Tudo OK → aprovado para push"
+      CONCERNS: "Problemas menores → aprovado com observações"
+      FAIL: "Problemas críticos → retorna para @dev"
+      WAIVED: "Problemas aceitos → aprovado com waiver"
+    status_transition: "InProgress → InReview → Done"
+    order: 4
+
+  # ═══════════════════════════════════════════
+  # FASE 4.5: REVISÃO DE COMPLIANCE (POR EPIC)
+  # ═══════════════════════════════════════════
+
+  - id: revisao-compliance
+    name: "Fase 4.5 — Revisão de Compliance"
+    agent: "@compliance-br"
+    description: |
+      Têmis revisa conformidade LGPD e fiscal.
+      Ativado ao final de cada Epic (não por story individual).
+    condition:
+      ativar_quando: "Última story do Epic finalizada"
+    checklist_ref: "compliance-revisar-dados-pessoais.md"
+    order: 4.5
+
+  # ═══════════════════════════════════════════
+  # FASE 5: PUSH E PR
+  # ═══════════════════════════════════════════
+
+  - id: push
+    name: "Fase 5 — Push e PR"
+    agent: "@devops"
+    description: "Gage faz git push e cria PR (operação EXCLUSIVA)"
+    depends_on: [qa-gate]
+    status_transition: "InReview → Done"
+    order: 5
+
+summary: |
+  Fluxo completo:
+  @sm → @po → @dev → @finance-domain-expert (gate) → @qa → @devops
+
+  Diferença do SDC padrão:
+  + Fase 3.5: Gate financeiro obrigatório para stories com lógica financeira
+  + Fase 4.5: Revisão de compliance ao final de cada Epic

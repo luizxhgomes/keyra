@@ -1,0 +1,127 @@
+# Workflow: Inteligência KEYRA — Spec Pipeline + SDC com Gate Financeiro
+# Fórmulas definidas antes de implementar, validadas antes do QA
+
+name: keyra-inteligencia-spec-sdc
+version: 1.0.0
+description: "Workflow para inteligência e precificação: Spec de fórmulas → SDC com gate financeiro obrigatório"
+type: sequential
+
+trigger:
+  command: "*workflow keyra-inteligencia"
+  agent: "@aiox-master"
+
+context:
+  formulas_precificacao: config/formulas-precificacao.md
+  formulas_projecao: config/formulas-projecao.md
+  abordagem_tecnica: config/abordagem-tecnica.md
+  cenarios_teste: data/
+
+phases:
+
+  # ═══════════════════════════════════════════
+  # FASE A: SPEC PIPELINE (fórmulas antes de código)
+  # ═══════════════════════════════════════════
+
+  - id: spec-arquitetura
+    name: "Fase A.1 — Especificar Abordagem Técnica"
+    agent: "@architect"
+    description: |
+      Aria define a abordagem: regras determinísticas v1, ML v2.
+      Especifica motor de precificação e projeções.
+    tasks:
+      - architect-spec-motor-precificacao.md
+      - architect-spec-projecoes-preditivas.md
+    order: 1
+
+  - id: spec-formulas
+    name: "Fase A.2 — Definir Fórmulas"
+    agent: "@finance-domain-expert"
+    description: |
+      Valéria define TODAS as fórmulas com exemplos numéricos.
+      Cada fórmula deve ser validável com cenários de data/.
+    tasks:
+      - finance-definir-formulas-precificacao.md
+      - finance-definir-formulas-projecao.md
+    depends_on: [spec-arquitetura]
+    order: 2
+
+  # ═══════════════════════════════════════════
+  # FASE B: STORY DEVELOPMENT CYCLE
+  # ═══════════════════════════════════════════
+
+  - id: criar-stories
+    name: "Fase B — Criar Stories"
+    agent: "@sm"
+    depends_on: [spec-formulas]
+    order: 3
+
+  - id: validar-stories
+    name: "Fase B.1 — Validar Stories"
+    agent: "@po"
+    depends_on: [criar-stories]
+    order: 4
+
+  - id: implementar
+    name: "Fase C — Implementar"
+    agent: "@dev"
+    description: "Dex implementa usando as fórmulas definidas por Valéria"
+    depends_on: [validar-stories]
+    order: 5
+
+  - id: otimizar-queries
+    name: "Fase C.1 — Otimizar Queries"
+    agent: "@data-engineer"
+    description: |
+      Dara cria materialized views, CTEs e índices para
+      as agregações pesadas (rentabilidade/hora, LTV, projeções).
+    depends_on: [implementar]
+    can_parallel_with: [gate-financeiro]
+    order: 6
+
+  # ═══════════════════════════════════════════
+  # FASE D: GATE FINANCEIRO (OBRIGATÓRIO)
+  # ═══════════════════════════════════════════
+
+  - id: gate-financeiro
+    name: "Fase D — Gate Financeiro"
+    agent: "@finance-domain-expert"
+    description: |
+      Valéria valida TODAS as fórmulas implementadas contra
+      os cenários de teste em data/cenarios-*.yaml.
+      Gate OBRIGATÓRIO — toda story deste squad envolve fórmulas.
+    depends_on: [implementar]
+    checklist: checklists/checklist-formulas-precificacao.md
+    decision:
+      APROVADO: "Fórmulas corretas → prosseguir para QA"
+      CORREÇÕES: "Problemas → retorna para @dev"
+    order: 6
+
+  # ═══════════════════════════════════════════
+  # FASE E: QA + PUSH
+  # ═══════════════════════════════════════════
+
+  - id: qa-gate
+    name: "Fase E — QA Gate"
+    agent: "@qa"
+    depends_on: [gate-financeiro, otimizar-queries]
+    checklist: checklists/checklist-qa-inteligencia.md
+    order: 7
+
+  - id: push
+    name: "Fase F — Push e PR"
+    agent: "@devops"
+    depends_on: [qa-gate]
+    order: 8
+
+summary: |
+  Fluxo completo:
+  @architect (abordagem) → @finance-domain-expert (fórmulas)
+    → @sm → @po → @dev
+    → @data-engineer (queries) + @finance-domain-expert (gate)
+    → @qa → @devops
+
+  Diferenças do SDC padrão:
+  + Spec obrigatória: fórmulas definidas ANTES de implementar
+  + Gate financeiro: TODAS as stories passam (100% são fórmulas)
+  + @data-engineer: otimização de queries de agregação
+  + Cenários de teste numéricos em data/ para validação

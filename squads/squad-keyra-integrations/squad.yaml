@@ -1,0 +1,119 @@
+name: "KEYRA Integrations Squad"
+version: 0.2.0
+description: "Squad para Fase 7 do KEYRA — upload de PDFs, integrações Asaas, WhatsApp Business, NFS-e e compliance de integrações"
+author: "AIOX"
+license: MIT
+
+aiox:
+  minVersion: "2.1.0"
+  type: squad
+
+agents:
+  # Ciclo de desenvolvimento
+  - sm                        # River — Criação de stories do Epic 7
+  - po                        # Pax — Validação de stories
+  - dev                       # Dex — Implementação de integrações
+  - qa                        # Quinn — QA de integrações externas
+  - devops                    # Gage — Infra de filas, webhooks, deploy
+  # Especialistas de arquitetura
+  - architect                 # Aria — Spec de APIs, filas, circuit breakers
+  # Especialistas do domínio KEYRA
+  - document-processor        # Íris — Pipeline OCR, parsing de extratos
+  - finance-domain-expert     # Valéria — Reconciliação financeira
+  - compliance-br             # Têmis — LGPD, NFS-e, dados em trânsito
+
+mission: |
+  Implementar integrações externas do KEYRA (pós-MVP):
+
+  Epic 7 — Integrações:
+
+  7.1 Upload e Parsing de PDFs:
+  - Upload seguro com validação MIME e verificação de vírus
+  - Parsing de extratos bancários (OFX, CSV, PDF)
+  - Parsing de extratos de maquininhas (CSV, PDF)
+  - Reconciliação com transações existentes do KEYRA
+  - Tela de revisão humana para extração com baixa confiança
+
+  7.2 Integração Asaas (Pagamentos):
+  - PIX automático (geração de QR Code)
+  - Cobranças recorrentes (boleto, PIX)
+  - Webhooks de confirmação de pagamento
+  - Régua de cobrança para inadimplência
+
+  7.3 WhatsApp Business API:
+  - Confirmação automática de agendamento
+  - Lembrete de consulta (D-1)
+  - Cobrança instantânea (link de pagamento)
+
+  7.4 NFS-e (Nota Fiscal de Serviço Eletrônica):
+  - Especificação de requisitos por município
+  - Integração com APIs de prefeituras ou intermediadores
+  - Emissão automática após pagamento confirmado
+
+  REGRAS:
+  - @architect (Aria) especifica TODA integração antes de implementar (Spec Pipeline)
+  - @document-processor (Íris) projeta e valida todo pipeline de parsing
+  - @finance-domain-expert (Valéria) valida reconciliação de extratos
+  - @compliance-br (Têmis) garante LGPD e conformidade fiscal em TODAS as integrações
+  - @devops (Gage) gerencia infraestrutura de filas para processamento assíncrono
+
+  Princípios:
+  - OCR é falível — sempre score de confiança + revisão humana
+  - Dados sensíveis (CPF, conta bancária) — NUNCA logar dados brutos
+  - Processamento assíncrono — uploads grandes vão para fila
+  - Idempotência — reenvio do mesmo documento não cria duplicatas
+  - Circuit breakers — APIs externas falham; tratar graciosamente
+
+components:
+  tasks:
+    # Upload e Parsing de PDFs (7.1)
+    - dev-upload-documentos.md
+    - document-pipeline-extratos-bancarios.md
+    - document-pipeline-extratos-maquininhas.md
+    - dev-reconciliacao-extratos.md
+    - dev-revisao-humana-ocr.md
+    # Asaas (7.2)
+    - architect-spec-integracao-asaas.md
+    - dev-integracao-asaas-pix.md
+    - dev-regua-cobranca-inadimplencia.md
+    # WhatsApp (7.3)
+    - architect-spec-integracao-whatsapp.md
+    - dev-whatsapp-agendamento-lembrete.md
+    # NFS-e (7.4)
+    - compliance-spec-nfse.md
+    - dev-emissao-nfse.md
+    # Transversal
+    - finance-validar-reconciliacao.md
+    - compliance-revisar-integracoes.md
+  workflows:
+    - keyra-integracoes-spec-sdc.yaml
+  checklists:
+    - checklist-integracao-api.md
+    - checklist-parsing-documento.md
+    - checklist-compliance-integracao.md
+  config:
+    - apis-externas.md
+    - formatos-documentos.md
+    - retry-policy.md
+  data:
+    - bancos-formatos.yaml
+    - maquininhas-formatos.yaml
+    - asaas-webhooks.yaml
+
+workflow: keyra-integracoes-spec-sdc.yaml
+
+dependencies:
+  - squad-keyra-core   # Transações, pacientes, serviços, estoque necessários
+
+keywords:
+  - integrações
+  - pdf
+  - ocr
+  - asaas
+  - pix
+  - whatsapp
+  - nfse
+  - compliance
+  - extratos
+  - reconciliação
+  - webhooks

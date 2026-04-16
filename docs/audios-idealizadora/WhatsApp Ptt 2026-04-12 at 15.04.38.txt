@@ -1,0 +1,16 @@
+Sim eu quero que ele controle toda a parte de entradas e saídas financeiras
+para que ele faça esse controle que tenha upload de documentos em PDF
+por exemplo o extrato bancário extrato da maquininha de cartão
+qualquer coisa desse gênero que para fazer também a parte de análise
+ele vai levar em consideração os custos e as receitas
+mas também vai fazer projeção de lucro projeção de preço
+projeção de pacotes de serviços enfim que ela vai fazer então é toda uma união
+e aí eu queria um dashboard de acompanhamento
+para que ela pudesse olhar os resultados dela tipo numa única tela.
+Não gosto muito de gráficos propriamente dito.
+Eu queria mais números absolutos sabe números assim
+a quanto você está tendo de receita esse mês frente ao último mês.
+Você está com tanto de diferença frente à meta que a gente projetou para ti
+você está com tanto de diferença sabe sem muitos gráficos
+que eu acho que de um modo geral as pessoas não gostam não gostam não
+elas não sabem ler gráficos.

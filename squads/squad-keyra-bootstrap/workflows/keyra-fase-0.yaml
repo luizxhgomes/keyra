@@ -1,0 +1,169 @@
+# Workflow: Fase 0 do KEYRA — Planejamento Completo
+# Sequência orquestrada de 8 agents para produzir todos os artefatos da Fase 0
+
+name: keyra-fase-0
+version: 1.0.0
+description: "Workflow completo da Fase 0 do KEYRA — do contexto da idealizadora até entregáveis prontos para desenvolvimento"
+type: sequential-with-parallel
+
+trigger:
+  command: "*workflow keyra-fase-0"
+  agent: "@aiox-master"
+
+# Contexto compartilhado entre todas as fases
+context:
+  input_principal: docs/audios-idealizadora/contexto-completo-keyra.md
+  dados_domínio: data/dominio-keyra.yaml
+  tech_stack: config/tech-stack.md
+  coding_standards: config/coding-standards.md
+
+phases:
+
+  # ═══════════════════════════════════════════
+  # FASE 1: FUNDAÇÃO (sequencial)
+  # ═══════════════════════════════════════════
+
+  - id: fase-1-prd
+    name: "Fase 1 — Criar PRD"
+    agent: "@pm"
+    task: tasks/pm-criar-prd-keyra.md
+    input:
+      - contexto_idealizadora: docs/audios-idealizadora/contexto-completo-keyra.md
+      - dados_domínio: data/dominio-keyra.yaml
+    output:
+      - docs/prd/keyra-prd.md
+    validation:
+      checklist: checklists/checklist-revisao-prd.md
+    blocking: true
+    order: 1
+
+  # ═══════════════════════════════════════════
+  # FASE 2: PESQUISA (paralelo ao PRD se possível)
+  # ═══════════════════════════════════════════
+
+  - id: fase-2-pesquisa
+    name: "Fase 2 — Pesquisa Competitiva"
+    agent: "@analyst"
+    task: tasks/analyst-pesquisa-competitiva.md
+    input:
+      - concorrentes: data/dominio-keyra.yaml
+    output:
+      - docs/research/pesquisa-competitiva-keyra.md
+    blocking: false
+    order: 2
+    can_parallel_with: [fase-1-prd]
+
+  # ═══════════════════════════════════════════
+  # FASE 3: ARQUITETURA (depende do PRD)
+  # ═══════════════════════════════════════════
+
+  - id: fase-3-arquitetura
+    name: "Fase 3 — Definir Arquitetura"
+    agent: "@architect"
+    task: tasks/architect-definir-arquitetura-fullstack.md
+    input:
+      - prd: docs/prd/keyra-prd.md
+      - tech_stack: config/tech-stack.md
+    output:
+      - docs/architecture/keyra-architecture.md
+    depends_on: [fase-1-prd]
+    validation:
+      checklist: checklists/checklist-revisao-arquitetura.md
+    blocking: true
+    order: 3
+
+  # ═══════════════════════════════════════════
+  # FASE 4: PARALELO (depende de PRD + Arquitetura)
+  # ═══════════════════════════════════════════
+
+  - id: fase-4a-schema
+    name: "Fase 4a — Projetar Schema"
+    agent: "@data-engineer"
+    task: tasks/data-engineer-projetar-schema.md
+    input:
+      - prd: docs/prd/keyra-prd.md
+      - arquitetura: docs/architecture/keyra-architecture.md
+    output:
+      - docs/architecture/SCHEMA.md
+      - supabase/migrations/
+    depends_on: [fase-3-arquitetura]
+    validation:
+      checklist: checklists/checklist-revisao-schema.md
+    blocking: false
+    order: 4
+
+  - id: fase-4b-wireframes
+    name: "Fase 4b — Wireframes e Design System"
+    agent: "@ux-design-expert"
+    task: tasks/ux-wireframes-dashboard.md
+    input:
+      - prd: docs/prd/keyra-prd.md
+    output:
+      - docs/ux/wireframes-keyra.md
+      - docs/ux/design-system-keyra.md
+    depends_on: [fase-1-prd]
+    blocking: false
+    order: 4
+    can_parallel_with: [fase-4a-schema, fase-4c-financeiro]
+
+  - id: fase-4c-financeiro
+    name: "Fase 4c — Validar Modelo Financeiro"
+    agent: "@finance-domain-expert"
+    task: tasks/finance-validar-modelo-financeiro.md
+    input:
+      - prd: docs/prd/keyra-prd.md
+    output:
+      - docs/architecture/modelo-financeiro-keyra.md
+    depends_on: [fase-1-prd]
+    blocking: false
+    order: 4
+    can_parallel_with: [fase-4a-schema, fase-4b-wireframes]
+
+  # ═══════════════════════════════════════════
+  # FASE 5: ESPECIALISTAS (depende das fases anteriores)
+  # ═══════════════════════════════════════════
+
+  - id: fase-5a-ocr
+    name: "Fase 5a — Definir Pipeline OCR"
+    agent: "@document-processor"
+    task: tasks/document-definir-pipeline-ocr.md
+    input:
+      - prd: docs/prd/keyra-prd.md
+      - arquitetura: docs/architecture/keyra-architecture.md
+    output:
+      - docs/architecture/pipeline-ocr-keyra.md
+    depends_on: [fase-3-arquitetura]
+    blocking: false
+    order: 5
+
+  - id: fase-5b-compliance
+    name: "Fase 5b — Mapear Requisitos LGPD e Fiscal"
+    agent: "@compliance-br"
+    task: tasks/compliance-mapear-requisitos-lgpd.md
+    input:
+      - prd: docs/prd/keyra-prd.md
+      - dados_domínio: data/dominio-keyra.yaml
+    output:
+      - docs/compliance/conformidade-keyra.md
+    depends_on: [fase-1-prd]
+    blocking: false
+    order: 5
+    can_parallel_with: [fase-5a-ocr]
+
+completion:
+  message: |
+    Fase 0 do KEYRA concluída!
+
+    Entregáveis gerados:
+    1. PRD formal — docs/prd/keyra-prd.md
+    2. Pesquisa competitiva — docs/research/pesquisa-competitiva-keyra.md
+    3. Arquitetura fullstack — docs/architecture/keyra-architecture.md
+    4. Schema do banco — docs/architecture/SCHEMA.md
+    5. Wireframes — docs/ux/wireframes-keyra.md
+    6. Modelo financeiro — docs/architecture/modelo-financeiro-keyra.md
+    7. Pipeline OCR — docs/architecture/pipeline-ocr-keyra.md
+    8. Mapa de conformidade — docs/compliance/conformidade-keyra.md
+
+    Próximo passo: Criar épico e stories para a Fase 1 (implementação)
+    Comando: @pm *create-epic
+  next_workflow: story-development-cycle.yaml

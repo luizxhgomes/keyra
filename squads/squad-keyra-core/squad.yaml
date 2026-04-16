@@ -1,0 +1,105 @@
+name: "KEYRA Core Squad"
+version: 0.2.0
+description: "Squad para Fases 2-4 do KEYRA — catálogo, agenda, automação financeira, dashboard e DRE"
+author: "AIOX"
+license: MIT
+
+aiox:
+  minVersion: "2.1.0"
+  type: squad
+
+agents:
+  # Ciclo de desenvolvimento
+  - sm                       # River — Criação de stories dos Epics 2-4
+  - po                       # Pax — Validação de stories antes da implementação
+  - dev                      # Dex — Implementação fullstack
+  - data-engineer            # Dara — Migrations, queries, RLS
+  - qa                       # Quinn — QA gates, testes de lógica financeira
+  - devops                   # Gage — Git push, PRs, CI/CD (EXCLUSIVO)
+  # Especialistas do domínio
+  - finance-domain-expert    # Valéria — Validação de TODA lógica financeira
+  - compliance-br            # Têmis — LGPD, dados sensíveis, regras fiscais
+
+mission: |
+  Implementar o core do KEYRA (MVP):
+
+  Epic 2 — Catálogo + Agenda (Core Operacional):
+  - CRUD de pacientes, serviços (com custo/preço), insumos por serviço
+  - Módulo de agenda (diária/semanal/mensal)
+  - Agendamento: paciente + serviço + profissional
+  - Receita prevista automática ao criar agendamento
+
+  Epic 3 — Automação Financeira ("Toda uma ligação"):
+  - Comanda automática ao marcar atendimento como realizado
+  - Transação financeira automática ao registrar pagamento
+  - Receitas separadas por profissional e centro de custo
+  - Custos fixos vs variáveis
+  - Rateio automático de insumos (estoque)
+  - Fluxo de caixa básico
+
+  Epic 4 — Dashboard + Lucro:
+  - DRE básica e DRE por serviço (diferencial)
+  - Lucro por profissional
+  - Dashboard tela única com números absolutos
+  - Comparativos: mês atual vs anterior, resultado vs meta
+  - Indicadores: ticket médio, serviço mais vendido/lucrativo
+  - Alertas: queda de lucro, baixa margem, alta taxa de faltas
+
+  REGRAS ESPECIAIS:
+  - @finance-domain-expert (Valéria) valida TODA lógica financeira antes do QA gate
+  - @compliance-br (Têmis) revisa tratamento de dados pessoais e regras fiscais
+  - Fluxo: @sm → @po → @dev → @finance-domain-expert → @qa → @devops
+
+  Cadeia de valor: Serviço → Agenda → Comanda → Transação → DRE
+
+components:
+  tasks:
+    # Epic 2 — Catálogo + Agenda
+    - dev-crud-pacientes.md
+    - dev-crud-servicos.md
+    - dev-modulo-agenda.md
+    - data-engineer-migrations-core.md
+    # Epic 3 — Automação Financeira
+    - dev-comanda-automatica.md
+    - dev-transacao-financeira.md
+    - dev-custos-fixos-variaveis.md
+    - dev-rateio-insumos.md
+    - finance-validar-automacao-financeira.md
+    # Epic 4 — Dashboard + Lucro
+    - dev-dre-basica.md
+    - dev-dre-por-servico.md
+    - dev-dashboard-numerico.md
+    - dev-lucro-por-profissional.md
+    - finance-validar-dre-dashboard.md
+    - compliance-revisar-dados-pessoais.md
+  workflows:
+    - keyra-sdc-com-gate-financeiro.yaml
+  checklists:
+    - checklist-validacao-financeira.md
+    - checklist-dre-por-servico.md
+    - checklist-qa-mvp.md
+  config:
+    - tech-stack.md
+    - coding-standards.md
+    - regras-desenvolvimento.md
+  data:
+    - regras-financeiras.yaml
+    - categorias-transacao.yaml
+
+workflow: keyra-sdc-com-gate-financeiro.yaml
+
+dependencies:
+  - squad-keyra-bootstrap   # PRD, arquitetura e schema devem estar prontos
+
+keywords:
+  - core
+  - agenda
+  - financeiro
+  - dashboard
+  - dre
+  - mvp
+  - comanda
+  - estoque
+  - automação
+  - precificação
+  - lgpd

@@ -1,0 +1,140 @@
+# Strategy Frameworks Reference Database
+# Used by strategy-analyst for framework identification and cross-referencing
+
+categories:
+  competitive:
+    - name: "Porter's Five Forces"
+      origin: "Michael Porter"
+      use_case: "Analyze industry competitiveness and attractiveness"
+      dimensions: ["Supplier Power", "Buyer Power", "Competitive Rivalry", "Threat of Substitution", "Threat of New Entry"]
+
+    - name: "Blue Ocean Strategy"
+      origin: "W. Chan Kim & Renee Mauborgne"
+      use_case: "Create uncontested market space"
+      dimensions: ["Eliminate", "Reduce", "Raise", "Create"]
+
+    - name: "Competitive Positioning Map"
+      origin: "Strategic Marketing"
+      use_case: "Visualize market position relative to competitors"
+      dimensions: ["Axis X (customizable)", "Axis Y (customizable)"]
+
+    - name: "SWOT Analysis"
+      origin: "Albert Humphrey"
+      use_case: "Assess internal and external factors"
+      dimensions: ["Strengths", "Weaknesses", "Opportunities", "Threats"]
+
+  business_model:
+    - name: "Business Model Canvas"
+      origin: "Alexander Osterwalder"
+      use_case: "Map complete business model"
+      dimensions: ["Key Partners", "Key Activities", "Value Propositions", "Customer Relationships", "Customer Segments", "Key Resources", "Channels", "Cost Structure", "Revenue Streams"]
+
+    - name: "Lean Canvas"
+      origin: "Ash Maurya"
+      use_case: "Startup-focused business model with risk"
+      dimensions: ["Problem", "Solution", "Key Metrics", "Unique Value Proposition", "Unfair Advantage", "Channels", "Customer Segments", "Cost Structure", "Revenue Streams"]
+
+    - name: "Value Proposition Canvas"
+      origin: "Alexander Osterwalder"
+      use_case: "Deep dive into customer fit"
+      dimensions: ["Customer Jobs", "Pains", "Gains", "Products & Services", "Pain Relievers", "Gain Creators"]
+
+  growth:
+    - name: "AARRR (Pirate Metrics)"
+      origin: "Dave McClure"
+      use_case: "Measure startup growth funnel"
+      dimensions: ["Acquisition", "Activation", "Retention", "Revenue", "Referral"]
+
+    - name: "Growth Loops"
+      origin: "Reforge"
+      use_case: "Design self-reinforcing growth mechanisms"
+      dimensions: ["Input", "Action", "Output", "Reinvestment"]
+
+    - name: "ICE Framework"
+      origin: "Sean Ellis"
+      use_case: "Prioritize growth experiments"
+      dimensions: ["Impact", "Confidence", "Ease"]
+
+    - name: "North Star Framework"
+      origin: "Amplitude"
+      use_case: "Align team around single metric"
+      dimensions: ["North Star Metric", "Input Metrics", "Work Streams"]
+
+  sales:
+    - name: "Sales Funnel (TOFU/MOFU/BOFU)"
+      origin: "Traditional Marketing"
+      use_case: "Map customer journey stages"
+      dimensions: ["Awareness", "Interest", "Consideration", "Intent", "Evaluation", "Purchase"]
+
+    - name: "MEDDPICC"
+      origin: "Jack Napoli"
+      use_case: "Enterprise sales qualification"
+      dimensions: ["Metrics", "Economic Buyer", "Decision Criteria", "Decision Process", "Paper Process", "Implicate the Pain", "Champion", "Competition"]
+
+    - name: "Product-Led Growth"
+      origin: "OpenView Partners"
+      use_case: "Product as primary growth driver"
+      dimensions: ["Freemium/Trial", "Self-Serve", "Time-to-Value", "Natural Expansion", "Viral Loops"]
+
+    - name: "Land and Expand"
+      origin: "Enterprise SaaS"
+      use_case: "Enter small, grow within account"
+      dimensions: ["Entry Point", "Initial Use Case", "Expansion Triggers", "Upsell Path", "Platform Lock-in"]
+
+  positioning:
+    - name: "Category Design"
+      origin: "Play Bigger (Al Ramadan)"
+      use_case: "Create and dominate a new category"
+      dimensions: ["Category Name", "POV", "Lightning Strike", "Ecosystem", "Flywheel"]
+
+    - name: "Positioning Statement (April Dunford)"
+      origin: "April Dunford — Obviously Awesome"
+      use_case: "Clarify market positioning"
+      dimensions: ["Competitive Alternatives", "Unique Attributes", "Value", "Target Customer", "Market Category"]
+
+    - name: "StoryBrand (Donald Miller)"
+      origin: "Donald Miller"
+      use_case: "Brand messaging framework"
+      dimensions: ["Character", "Problem", "Guide", "Plan", "Call to Action", "Success", "Failure"]
+
+    - name: "Jobs To Be Done"
+      origin: "Clayton Christensen"
+      use_case: "Understand real purchase motivation"
+      dimensions: ["Functional Job", "Social Job", "Emotional Job", "Desired Outcome"]
+
+  content:
+    - name: "Content Matrix (Funnel x Format)"
+      origin: "Content Marketing"
+      use_case: "Map content across funnel stages and formats"
+      dimensions: ["Awareness Content", "Consideration Content", "Decision Content", "Retention Content"]
+
+    - name: "Topic Clusters (Hub & Spoke)"
+      origin: "HubSpot"
+      use_case: "SEO-driven content architecture"
+      dimensions: ["Pillar Page", "Cluster Topics", "Internal Links", "Search Intent"]
+
+    - name: "They Ask You Answer"
+      origin: "Marcus Sheridan"
+      use_case: "Trust-based content strategy"
+      dimensions: ["Cost Questions", "Comparison Questions", "Best-of Questions", "Problem Questions", "Review Questions"]
+
+  project_structure:
+    - name: "Wardley Maps"
+      origin: "Simon Wardley"
+      use_case: "Visualize value chain evolution"
+      dimensions: ["User Need", "Value Chain", "Evolution (Genesis → Custom → Product → Commodity)", "Movement"]
+
+    - name: "Architecture Decision Records (ADRs)"
+      origin: "Michael Nygard"
+      use_case: "Document architectural decisions"
+      dimensions: ["Context", "Decision", "Status", "Consequences"]
+
+    - name: "Shape Up"
+      origin: "Basecamp (Ryan Singer)"
+      use_case: "Product development methodology"
+      dimensions: ["Shaping", "Betting", "Building", "Cool-down"]
+
+    - name: "Dual Track Agile"
+      origin: "Jeff Patton / Marty Cagan"
+      use_case: "Parallel discovery and delivery"
+      dimensions: ["Discovery Track", "Delivery Track", "Validated Backlog"]

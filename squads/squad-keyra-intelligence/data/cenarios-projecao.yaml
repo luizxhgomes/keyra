@@ -1,0 +1,95 @@
+# Cenários de Teste — Projeções
+# Usado por @finance-domain-expert para validar fórmulas
+# e por @qa para testes automatizados
+
+cenários:
+
+  # Previsão de lucro — caso normal
+  - nome: "Previsão mensal — agenda 80% cheia"
+    agendamentos: 80
+    receita_prevista_centavos: 1200000    # R$ 12.000,00
+    custo_variável_previsto_centavos: 520000  # R$ 5.200,00
+    custos_fixos_centavos: 380000        # R$ 3.800,00
+    taxa_faltas: 0.08                    # 8%
+    receita_ajustada_centavos: 1104000   # R$ 11.040,00
+    lucro_previsto_centavos: 304000      # R$ 3.040,00
+
+  # Previsão — agenda vazia
+  - nome: "Previsão — sem agendamentos"
+    agendamentos: 0
+    receita_prevista_centavos: 0
+    custo_variável_previsto_centavos: 0
+    custos_fixos_centavos: 380000
+    lucro_previsto_centavos: -380000     # Prejuízo = custos fixos
+    mensagem: "Nenhum agendamento no período — lucro previsto negativo"
+
+  # What-if — aumentar preço 10%
+  - nome: "What-if — preço +10%"
+    situação_atual:
+      preço_centavos: 15000
+      volume: 56
+      custo_variável_centavos: 2300
+      custos_fixos_centavos: 380000
+      lucro_centavos: 331200           # R$ 3.312,00
+    variações:
+      delta_preço: 0.10
+      delta_volume: 0.00
+      delta_custo: 0.00
+    lucro_simulado_centavos: 415200    # R$ 4.152,00
+    impacto_centavos: 84000            # R$ 840,00 a mais
+
+  # What-if — combinado
+  - nome: "What-if — preço +10%, volume -10%"
+    situação_atual:
+      lucro_centavos: 331200
+    variações:
+      delta_preço: 0.10
+      delta_volume: -0.10
+      delta_custo: 0.00
+    lucro_simulado_centavos: 335680
+    impacto_centavos: 4480             # Quase neutro — compensação
+
+  # LTV do cliente
+  - nome: "LTV — cliente frequente"
+    total_gasto_centavos: 378000       # R$ 3.780,00
+    total_visitas: 20
+    meses_como_cliente: 13
+    ticket_médio_esperado_centavos: 18900  # R$ 189,00
+    frequência_esperada: 1.54          # 1,54 visitas/mês
+    vida_média_meses: 18
+    ltv_esperado_centavos: 523908      # R$ 5.239,08
+
+  # LTV — cliente novo (1 visita)
+  - nome: "LTV — cliente novo"
+    total_gasto_centavos: 15000
+    total_visitas: 1
+    meses_como_cliente: 1
+    ticket_médio_esperado_centavos: 15000
+    frequência_esperada: 1.00
+    vida_média_meses: 18
+    ltv_esperado_centavos: 270000      # R$ 2.700,00 (baseado na média)
+
+  # Rentabilidade por hora
+  - nome: "Rentabilidade — manhã vs tarde"
+    faixas:
+      - faixa: "08h-10h"
+        atendimentos: 5
+        lucro_total_centavos: 42500
+        horas: 2
+        lucro_hora_centavos: 21250     # R$ 212,50/hora
+      - faixa: "14h-16h"
+        atendimentos: 3
+        lucro_total_centavos: 18000
+        horas: 2
+        lucro_hora_centavos: 9000      # R$ 90,00/hora
+    insight: "Manhã é 2,4x mais rentável que tarde"
+
+  # Metas
+  - nome: "Meta mensal — R$ 30.000"
+    custos_totais_centavos: 2300000    # R$ 23.000,00
+    lucro_desejado_centavos: 700000    # R$ 7.000,00
+    meta_faturamento_centavos: 3000000 # R$ 30.000,00
+    ticket_médio_centavos: 18900       # R$ 189,00
+    atendimentos_necessários: 159      # ceil(3000000 / 18900)
+    dias_úteis: 20
+    meta_diária: 8                     # ceil(159 / 20)

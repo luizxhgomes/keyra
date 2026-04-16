@@ -1,0 +1,145 @@
+# Workflow: Integrações KEYRA — Spec Pipeline + SDC
+# Cada integração passa por especificação antes de implementar
+
+name: keyra-integracoes-spec-sdc
+version: 1.0.0
+description: "Workflow para integrações externas: Spec Pipeline para definir API/formatos, depois SDC com gates de OCR, financeiro e compliance"
+type: sequential
+
+trigger:
+  command: "*workflow keyra-integracoes"
+  agent: "@aiox-master"
+
+context:
+  apis_externas: config/apis-externas.md
+  formatos: config/formatos-documentos.md
+  retry_policy: config/retry-policy.md
+
+phases:
+
+  # ═══════════════════════════════════════════
+  # FASE A: SPEC PIPELINE (por integração)
+  # ═══════════════════════════════════════════
+
+  - id: spec-integracao
+    name: "Fase A — Especificar Integração"
+    agent: "@architect"
+    description: |
+      Aria especifica a integração: API, formatos, autenticação, webhooks,
+      retry policy, circuit breakers, tratamento de erros.
+    tasks:
+      - architect-spec-integracao-asaas.md
+      - architect-spec-integracao-whatsapp.md
+    output:
+      - docs/architecture/spec-integracao-{nome}.md
+    order: 1
+
+  - id: spec-compliance
+    name: "Fase A.1 — Especificar Compliance"
+    agent: "@compliance-br"
+    description: |
+      Têmis especifica requisitos de LGPD e fiscais para a integração.
+    tasks:
+      - compliance-spec-nfse.md
+    can_parallel_with: [spec-integracao]
+    order: 1
+
+  - id: spec-parsing
+    name: "Fase A.2 — Especificar Pipeline de Parsing"
+    agent: "@document-processor"
+    description: |
+      Íris especifica os parsers necessários para cada banco/maquininha.
+    tasks:
+      - document-pipeline-extratos-bancarios.md
+      - document-pipeline-extratos-maquininhas.md
+    can_parallel_with: [spec-integracao]
+    order: 1
+
+  # ═══════════════════════════════════════════
+  # FASE B: STORY DEVELOPMENT CYCLE
+  # ═══════════════════════════════════════════
+
+  - id: criar-stories
+    name: "Fase B — Criar Stories"
+    agent: "@sm"
+    description: "River cria stories a partir das specs aprovadas"
+    depends_on: [spec-integracao, spec-compliance, spec-parsing]
+    order: 2
+
+  - id: validar-stories
+    name: "Fase B.1 — Validar Stories"
+    agent: "@po"
+    description: "Pax valida as stories"
+    depends_on: [criar-stories]
+    order: 3
+
+  - id: implementar
+    name: "Fase C — Implementar"
+    agent: "@dev"
+    description: "Dex implementa cada integração"
+    depends_on: [validar-stories]
+    order: 4
+
+  # ═══════════════════════════════════════════
+  # FASE D: GATES ESPECIALIZADOS
+  # ═══════════════════════════════════════════
+
+  - id: gate-ocr
+    name: "Fase D.1 — Gate OCR/Parsing"
+    agent: "@document-processor"
+    description: |
+      Íris valida parsers implementados: encoding, formatos,
+      scores de confiança, tratamento de erros.
+    depends_on: [implementar]
+    condition:
+      ativar_quando: "Story envolve parsing de documentos"
+    checklist: checklists/checklist-parsing-documento.md
+    order: 5
+
+  - id: gate-financeiro
+    name: "Fase D.2 — Gate Financeiro"
+    agent: "@finance-domain-expert"
+    description: |
+      Valéria valida reconciliação de extratos com transações KEYRA.
+    depends_on: [implementar]
+    condition:
+      ativar_quando: "Story envolve reconciliação financeira"
+    order: 5
+    can_parallel_with: [gate-ocr]
+
+  - id: qa-gate
+    name: "Fase E — QA Gate"
+    agent: "@qa"
+    description: "Quinn executa QA com foco em integrações externas"
+    depends_on: [gate-ocr, gate-financeiro]
+    checklist: checklists/checklist-integracao-api.md
+    order: 6
+
+  - id: gate-compliance
+    name: "Fase E.1 — Gate Compliance"
+    agent: "@compliance-br"
+    description: |
+      Têmis revisa conformidade LGPD e fiscal de toda integração.
+    depends_on: [qa-gate]
+    checklist: checklists/checklist-compliance-integracao.md
+    order: 7
+
+  - id: push
+    name: "Fase F — Push e PR"
+    agent: "@devops"
+    description: "Gage faz push e cria PR"
+    depends_on: [gate-compliance]
+    order: 8
+
+summary: |
+  Fluxo completo:
+  @architect/@document-processor/@compliance-br (spec em paralelo)
+    → @sm → @po → @dev
+    → @document-processor (gate OCR) + @finance-domain-expert (gate financeiro)
+    → @qa → @compliance-br (gate final) → @devops
+
+  Diferenças do SDC padrão:
+  + Spec Pipeline obrigatório antes de implementar
+  + Gate OCR para validar parsers
+  + Gate financeiro para validar reconciliação
+  + Gate compliance ao final de cada integração

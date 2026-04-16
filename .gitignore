@@ -1,0 +1,52 @@
+
+
+# Environment & Secrets (AIOX)
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# KEYRA Secrets — NEVER commit
+.keyra-secrets/
+!.keyra-secrets/README.md
+!.keyra-secrets/.gitkeep
+.vercel/
+.supabase/
+
+# Direnv (optional)
+.envrc.local
+
+# Dependencies (AIOX)
+node_modules/
+node_modules
+
+# Build & Logs (AIOX)
+dist/
+build/
+*.log
+logs/
+
+# IDE & OS (AIOX)
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+.vscode/
+
+# AI Tooling (configs locais, não compartilhar)
+.agent/
+.codex/
+.cursor/
+.gemini/
+.antigravity/
+
+# Python virtualenvs
+.venv*/
+__pycache__/
+*.pyc
+
+# AIOX Local (AIOX)
+.aiox-core/local/
+.claude/settings.local.json
+.aiox/install-log.txt

@@ -1,0 +1,85 @@
+name: "KEYRA Bootstrap Squad"
+version: 0.2.0
+description: "Squad para a Fase 0 do KEYRA — planejamento, arquitetura, schema, pesquisa, wireframes, validação financeira, parsing de documentos e conformidade brasileira"
+author: "AIOX"
+license: MIT
+
+aiox:
+  minVersion: "2.1.0"
+  type: squad
+
+agents:
+  # Agents genéricos do framework
+  - pm                      # Morgan — PRD, épicos, requisitos
+  - architect               # Aria — Arquitetura fullstack
+  - data-engineer            # Dara — Schema PostgreSQL, RLS
+  - analyst                  # Alex — Pesquisa competitiva
+  - ux-design-expert         # Uma — Wireframes, design system
+  # Agents específicos do KEYRA
+  - finance-domain-expert    # Valéria — DRE, precificação, custos, margem
+  - document-processor       # Íris — OCR, parsing de extratos bancários e maquininhas
+  - compliance-br            # Têmis — LGPD, regras fiscais brasileiras
+
+mission: |
+  Executar a Fase 0 completa do KEYRA:
+  1. @pm: PRD formal a partir da visão da idealizadora (docs/audios-idealizadora/contexto-completo-keyra.md)
+  2. @architect: Arquitetura fullstack (Next.js 15 + Supabase + Vercel)
+  3. @data-engineer: Schema de banco com RLS multi-tenant
+  4. @analyst: Pesquisa competitiva (Conta Azul, Clinicorp, Trinks, Belle Software)
+  5. @ux-design-expert: Wireframes do dashboard numérico e fluxos
+  6. @finance-domain-expert: Validar estrutura de DRE, precificação e custos
+  7. @document-processor: Definir pipeline de OCR para extratos e maquininhas
+  8. @compliance-br: Mapear requisitos LGPD e regras fiscais brasileiras
+
+  Referência de contexto: docs/audios-idealizadora/contexto-completo-keyra.md
+
+  Princípios UX inegociáveis:
+  - Números absolutos, NÃO gráficos
+  - Dashboard de tela única
+  - Simplicidade para não financistas
+
+components:
+  tasks:
+    - pm-criar-prd-keyra.md
+    - architect-definir-arquitetura-fullstack.md
+    - data-engineer-projetar-schema.md
+    - analyst-pesquisa-competitiva.md
+    - ux-wireframes-dashboard.md
+    - finance-validar-modelo-financeiro.md
+    - document-definir-pipeline-ocr.md
+    - compliance-mapear-requisitos-lgpd.md
+  workflows:
+    - keyra-fase-0.yaml
+  checklists:
+    - checklist-revisao-prd.md
+    - checklist-revisao-schema.md
+    - checklist-revisao-arquitetura.md
+  templates:
+    - prd-keyra-tmpl.md
+    - arquitetura-keyra-tmpl.md
+    - pesquisa-competitiva-keyra-tmpl.md
+  config:
+    - tech-stack.md
+    - coding-standards.md
+    - source-tree.md
+  data:
+    - dominio-keyra.yaml
+
+workflow: keyra-fase-0.yaml
+
+dependencies: []
+
+keywords:
+  - bootstrap
+  - planejamento
+  - prd
+  - arquitetura
+  - schema
+  - pesquisa
+  - wireframes
+  - fase-0
+  - financeiro
+  - lgpd
+  - compliance
+  - ocr
+  - precificação

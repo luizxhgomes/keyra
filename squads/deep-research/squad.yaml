@@ -1,0 +1,72 @@
+name: deep-research
+version: 1.0.0
+description: "Squad especializado em deep research — pesquisa profunda, analise de mercado, competitive intelligence, technology assessment e research reports estruturados"
+author: "Synkra AIOX"
+license: MIT
+slashPrefix: deep-research
+
+aiox:
+  minVersion: "2.1.0"
+  type: squad
+
+components:
+  tasks:
+    - create-research-prompt.md
+    - execute-research.md
+    - synthesize-findings.md
+    - validate-sources.md
+    - collect-strategies.md
+    - benchmark-competitors.md
+    - analyze-sales-strategy.md
+    - analyze-positioning.md
+    - reverse-engineer-project.md
+  agents:
+    - research-lead.yaml
+    - source-analyst.yaml
+    - synthesis-writer.yaml
+    - strategy-analyst.yaml
+  workflows:
+    - deep-research-pipeline.yaml
+    - strategic-research-pipeline.yaml
+  checklists:
+    - research-quality-gate.md
+  templates:
+    - research-report-tmpl.md
+    - findings-matrix-tmpl.md
+    - competitive-benchmark-tmpl.md
+    - strategy-catalog-tmpl.md
+  tools: []
+  scripts: []
+
+output:
+  base_path: benchmarking
+  directories:
+    research-prompts: "Prompts de pesquisa gerados"
+    raw-findings: "Findings brutos antes da validacao"
+    validated-findings: "Findings apos validacao"
+    reports: "Reports finais (general research)"
+    benchmarks: "Analises competitivas e matrices"
+    strategies: "Catalogos de frameworks e estrategias"
+    sales: "Analises de estrategia comercial"
+    positioning: "Analises de posicionamento e conteudo"
+    reverse-engineering: "Blueprints reconstruidos"
+    sources: "Source registries consolidados"
+  naming: "{YYYY-MM-DD}-{topic-slug}-{type}.{ext}"
+
+config:
+  extends: extend
+  coding-standards: config/coding-standards.md
+  tech-stack: config/tech-stack.md
+  source-tree: config/source-tree.md
+
+dependencies:
+  node: []
+  python: []
+  squads: []
+
+tags:
+  - research
+  - analysis
+  - competitive-intelligence
+  - market-research
+  - deep-research

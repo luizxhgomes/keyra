@@ -1,0 +1,106 @@
+# Dados de Referência do Domínio KEYRA
+# Usado pelos agents durante a Fase 0 para contexto e consistência
+
+produto:
+  nome: KEYRA
+  significado: KEY (chave) + Receita + Acelerada
+  posicionamento: "O primeiro financeiro operacional para estética"
+  idealizadora: "Mentora financeira para profissionais de estética"
+
+pilares:
+  - nome: Agenda
+    descrição: Origem de todo faturamento — receita nasce do atendimento
+  - nome: Serviços
+    descrição: Monetização — catálogo com preço, custo e margem por serviço
+  - nome: Financeiro
+    descrição: Controle — DRE, fluxo de caixa, contas a receber/pagar
+  - nome: Inteligência
+    descrição: Análise — lucro por serviço, metas, comparativos
+
+módulos:
+  - Agenda
+  - Pacientes (CRM)
+  - Serviços/Catálogo
+  - Comanda automática
+  - Financeiro
+  - Custos/Precificação
+  - DRE
+  - Estoque/Insumos
+  - Upload de PDFs
+  - Dashboard numérico
+  - Inteligência IA
+  - Marketplace de Fornecedores (futuro)
+
+princípios_ux:
+  - regra: "Números absolutos, NÃO gráficos"
+    motivo: "As pessoas não sabem ler gráficos"
+  - regra: "Comparativos textuais"
+    exemplo: "R$ 2.300 a mais que o mês passado"
+  - regra: "Dashboard de tela única"
+    motivo: "Mostrar tudo de uma vez, sem navegação excessiva"
+  - regra: "Simplicidade para não financistas"
+    motivo: "A profissional de estética precisa entender sem ser financista"
+
+monetização:
+  modelo: SaaS por assinatura
+  planos:
+    - nome: Start
+      público: Profissional autônoma
+    - nome: Crescimento
+      público: Clínica pequena (2-5 profissionais)
+    - nome: Autoridade
+      público: Clínica consolidada (5+ profissionais)
+
+concorrentes:
+  diretos:
+    - nome: Conta Azul
+      tipo: ERP financeiro genérico
+      lacuna: Não específico para estética, sem conexão agenda-financeiro
+    - nome: Clinicorp
+      tipo: Gestão para clínicas de estética
+      lacuna: Foco em gestão clínica, financeiro limitado
+    - nome: Trinks
+      tipo: Gestão para salões e estética
+      lacuna: Focado em agendamento, sem DRE ou lucro por serviço
+    - nome: Belle Software
+      tipo: Sistema para estética
+      lacuna: Interface complexa, sem automação financeira
+
+  indiretos:
+    - nome: Nibo
+      tipo: Contabilidade online
+    - nome: Bling
+      tipo: ERP para pequenos negócios
+    - nome: Planilhas manuais
+      tipo: Excel/Google Sheets
+      nota: Principal "concorrente" — é o que a maioria usa hoje
+
+regimes_fiscais:
+  - regime: MEI
+    faturamento_máximo: "R$ 81.000/ano"
+    imposto: "DAS fixo (~R$ 70/mês)"
+    cnae_estética: true
+  - regime: Simples Nacional
+    faturamento_máximo: "R$ 4.800.000/ano"
+    imposto: "DAS variável (6%-33%)"
+    anexos: "Anexo III ou V (depende do fator R)"
+  - regime: Lucro Presumido
+    faturamento_máximo: "Sem limite"
+    imposto: "IRPJ + CSLL + PIS + COFINS + ISS"
+
+bancos_prioritários:
+  - Itaú
+  - Bradesco
+  - Nubank
+  - Inter
+  - Santander
+  - Banco do Brasil
+
+maquininhas_prioritárias:
+  - Stone
+  - PagSeguro
+  - Mercado Pago
+  - Cielo
+  - Rede
+  - SumUp
+  - Ton (Stone)

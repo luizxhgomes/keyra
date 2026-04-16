@@ -1,0 +1,67 @@
+# Webhooks Asaas — Referência para Implementação
+# Eventos relevantes para o KEYRA
+
+eventos_prioritários:
+  - evento: PAYMENT_CONFIRMED
+    descrição: "Pagamento confirmado (PIX, boleto ou cartão)"
+    ação_keyra: "Atualizar transação para status 'confirmada'"
+    prioridade: crítica
+    payload_chave:
+      - payment.id
+      - payment.value
+      - payment.billingType
+      - payment.confirmedDate
+
+  - evento: PAYMENT_RECEIVED
+    descrição: "Pagamento recebido (creditado na conta Asaas)"
+    ação_keyra: "Registrar recebimento no fluxo de caixa"
+    prioridade: alta
+    payload_chave:
+      - payment.id
+      - payment.netValue
+      - payment.creditDate
+
+  - evento: PAYMENT_OVERDUE
+    descrição: "Pagamento vencido (não pago até a data)"
+    ação_keyra: "Iniciar régua de cobrança"
+    prioridade: alta
+    payload_chave:
+      - payment.id
+      - payment.dueDate
+      - payment.value
+
+  - evento: PAYMENT_REFUNDED
+    descrição: "Pagamento estornado"
+    ação_keyra: "Criar transação de estorno no KEYRA"
+    prioridade: média
+    payload_chave:
+      - payment.id
+      - payment.refundedValue
+
+  - evento: PAYMENT_DELETED
+    descrição: "Cobrança cancelada/removida"
+    ação_keyra: "Cancelar transação pendente no KEYRA"
+    prioridade: média
+
+eventos_informativos:
+  - evento: PAYMENT_CREATED
+    descrição: "Cobrança criada"
+    ação_keyra: "Log apenas (cobrança já registrada na criação)"
+
+  - evento: PAYMENT_UPDATED
+    descrição: "Cobrança atualizada"
+    ação_keyra: "Atualizar dados da transação se necessário"
+
+  - evento: PAYMENT_BANK_SLIP_VIEWED
+    descrição: "Boleto visualizado"
+    ação_keyra: "Log informativo"
+
+segurança:
+  validação: "HMAC-SHA256 com webhook access token"
+  header: "asaas-access-token"
+  retry: "Asaas reenvia até 3x se resposta != 200"
+  timeout: "Responder em < 5 segundos (processar async)"
+
+idempotência:
+  estratégia: "Verificar payment.id — se já processado, retornar 200 sem ação"
+  campo_controle: "webhook_processed_at na tabela transactions"

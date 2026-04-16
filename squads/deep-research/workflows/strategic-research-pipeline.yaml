@@ -1,0 +1,133 @@
+name: strategic-research-pipeline
+version: 1.0.0
+description: Pipeline de pesquisa estrategica — benchmarking, estrategias, posicionamento e reverse-engineering
+trigger: "*strategic-research-pipeline"
+
+modes:
+  - id: benchmark
+    name: Competitive Benchmarking
+    description: Analise competitiva completa com benchmarking multi-dimensional
+    phases: [scope, benchmark, validate, synthesize, quality-gate]
+
+  - id: strategy-collection
+    name: Strategy Collection
+    description: Coleta e catalogacao de frameworks e estrategias
+    phases: [scope, collect-strategies, validate, synthesize, quality-gate]
+
+  - id: sales-analysis
+    name: Sales Strategy Analysis
+    description: Decomposicao de estrategia comercial e go-to-market
+    phases: [scope, sales-strategy, validate, synthesize, quality-gate]
+
+  - id: positioning-analysis
+    name: Positioning Analysis
+    description: Analise de conteudo, posicionamento e narrativa
+    phases: [scope, positioning, validate, synthesize, quality-gate]
+
+  - id: reverse-engineering
+    name: Project Reverse Engineering
+    description: Reconstrucao do blueprint de decisoes de um projeto
+    phases: [scope, reverse-engineer, validate, synthesize, quality-gate]
+
+  - id: full
+    name: Full Strategic Research
+    description: Analise completa — benchmark + strategies + positioning + sales
+    phases: [scope, benchmark, collect-strategies, sales-strategy, positioning, validate, synthesize, quality-gate]
+
+phases:
+  - id: scope
+    name: Define Scope
+    agent: research-lead
+    task: create-research-prompt
+    elicit: true
+    outputs:
+      - research_prompt
+    next: "{{mode.phases[1]}}"
+
+  - id: benchmark
+    name: Competitive Benchmarking
+    agent: strategy-analyst
+    task: benchmark-competitors
+    inputs:
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - benchmark_report
+      - competitive_matrix
+    next: validate
+
+  - id: collect-strategies
+    name: Collect Strategies
+    agent: strategy-analyst
+    task: collect-strategies
+    inputs:
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - strategy_catalog
+      - framework_inventory
+    next: validate
+
+  - id: sales-strategy
+    name: Sales Strategy Analysis
+    agent: strategy-analyst
+    task: analyze-sales-strategy
+    inputs:
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - sales_strategy_report
+    next: validate
+
+  - id: positioning
+    name: Positioning Analysis
+    agent: strategy-analyst
+    task: analyze-positioning
+    inputs:
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - positioning_report
+    next: validate
+
+  - id: reverse-engineer
+    name: Reverse Engineer Project
+    agent: strategy-analyst
+    task: reverse-engineer-project
+    inputs:
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - reverse_engineering_report
+      - reconstructed_blueprint
+    next: validate
+
+  - id: validate
+    name: Validate Sources
+    agent: source-analyst
+    task: validate-sources
+    inputs:
+      - raw_findings: "{{previous.outputs}}"
+    outputs:
+      - validated_findings
+    next: synthesize
+
+  - id: synthesize
+    name: Synthesize Report
+    agent: synthesis-writer
+    task: synthesize-findings
+    inputs:
+      - validated_findings: "{{validate.validated_findings}}"
+      - research_prompt: "{{scope.research_prompt}}"
+    outputs:
+      - research_report
+    next: quality-gate
+
+  - id: quality-gate
+    name: Quality Gate
+    agent: research-lead
+    checklist: research-quality-gate
+    decision:
+      PASS: complete
+      NEEDS_REVISION: synthesize
+      FAIL: "{{mode.phases[1]}}"
+
+error_handling:
+  on_phase_error: log-and-continue
+  max_retries: 2
+  escalation: "@analyst"

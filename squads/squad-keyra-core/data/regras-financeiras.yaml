@@ -1,0 +1,93 @@
+# Regras Financeiras do KEYRA
+# Referência centralizada para agents e código — NÃO hardcodar no código
+
+valores_monetários:
+  tipo: centavos_inteiros
+  moeda: BRL
+  casas_decimais_exibição: 2
+  arredondamento: ROUND_HALF_UP
+  proibido: [float, double, real]
+
+dre:
+  regime: competência
+  estrutura:
+    - conta: Receita Bruta de Serviços
+      tipo: receita
+      cálculo: "SUM(transações confirmadas do período)"
+    - conta: Deduções
+      tipo: dedução
+      cálculo: "Receita Bruta × alíquota do regime fiscal"
+    - conta: Receita Líquida
+      tipo: subtotal
+      cálculo: "Receita Bruta - Deduções"
+    - conta: Custos dos Serviços Prestados
+      tipo: custo
+      cálculo: "SUM(insumos consumidos) + SUM(mão de obra direta)"
+    - conta: Lucro Bruto
+      tipo: subtotal
+      cálculo: "Receita Líquida - Custos dos Serviços"
+    - conta: Despesas Operacionais
+      tipo: despesa
+      cálculo: "SUM(custos fixos do período)"
+    - conta: Lucro Operacional
+      tipo: subtotal
+      cálculo: "Lucro Bruto - Despesas Operacionais"
+    - conta: Depreciação e Amortização
+      tipo: despesa
+      cálculo: "Valor configurado"
+    - conta: Resultado Líquido
+      tipo: resultado
+      cálculo: "Lucro Operacional - Depreciação"
+
+precificação:
+  margem:
+    fórmula: "(preço - custo_total) / preço × 100"
+    descrição: "Percentual do preço que é lucro"
+  markup:
+    fórmula: "(preço - custo_total) / custo_total × 100"
+    descrição: "Percentual sobre o custo que forma o preço"
+  preço_mínimo:
+    fórmula: "custo_total / (1 - margem_desejada)"
+    descrição: "Menor preço para atingir a margem desejada"
+
+custos:
+  fixos:
+    rateio:
+      critério: tempo_de_serviço
+      fórmula: "custo_fixo_total × (duração_serviço / tempo_total_disponível)"
+      observação: "Soma dos rateios deve ser igual a 100% do custo fixo"
+  variáveis:
+    associação: direta_ao_serviço
+    cálculo: "SUM(insumo.custo_unitário × insumo.quantidade_por_serviço)"
+
+reconhecimento_de_receita:
+  sessão_avulsa:
+    momento: "Na data do atendimento (competência)"
+  pacote_multissessão:
+    momento: "Proporcional — receita reconhecida por sessão entregue"
+    fórmula: "valor_pacote / total_sessões × sessões_realizadas"
+  parcelamento:
+    dre: "Receita integral na competência do atendimento"
+    fluxo_de_caixa: "Parcelas na data de recebimento"
+
+fluxo_de_caixa:
+  regime: caixa
+  contas_a_receber:
+    aging:
+      - faixa: a_vencer
+        descrição: "Parcelas com vencimento futuro"
+      - faixa: vencido_1_30
+        descrição: "Vencidas há 1-30 dias"
+      - faixa: vencido_31_60
+        descrição: "Vencidas há 31-60 dias"
+      - faixa: vencido_61_mais
+        descrição: "Vencidas há mais de 60 dias"
+
+proteções:
+  divisão_por_zero:
+    obrigatório: true
+    tratamento: "Retornar 0 (margem = 0%) quando divisor = 0"
+  margem_negativa:
+    tratamento: "Exibir com alerta visual, não bloquear"
+  estoque_zero:
+    tratamento: "Alertar, permitir gerar comanda"

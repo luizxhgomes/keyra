@@ -1,0 +1,130 @@
+# Mapeamento de Formatos por Banco — KEYRA
+# Referência para parsers de extratos bancários
+
+bancos:
+  - id: itau
+    nome: Itaú Unibanco
+    formatos:
+      ofx:
+        suportado: true
+        encoding: ISO-8859-1
+        date_format: "YYYYMMDD"
+        notas: "OFX padrão, FITID único por transação"
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ";"
+        header_pattern: "data;lançamento;ag./origem;valor;saldo"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+        layout: "tabular com data, histórico, documento, valor, saldo"
+
+  - id: bradesco
+    nome: Bradesco
+    formatos:
+      ofx:
+        suportado: true
+        encoding: ISO-8859-1
+        date_format: "YYYYMMDD"
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ";"
+        header_pattern: "Data;Histórico;Docto.;Crédito;Débito;Saldo"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+        notas: "Crédito e Débito em colunas separadas"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: nubank
+    nome: Nubank
+    formatos:
+      ofx:
+        suportado: false
+        notas: "Nubank não exporta OFX"
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ","
+        header_pattern: "Data,Valor,Identificador,Descrição"
+        date_format: "YYYY-MM-DD"
+        valor_format: "-1234.56"
+        notas: "Formato internacional, ponto como decimal, negativo=débito"
+      pdf:
+        suportado: true
+        texto_extraível: true
+        notas: "Fatura do cartão em PDF"
+
+  - id: inter
+    nome: Banco Inter
+    formatos:
+      ofx:
+        suportado: false
+      csv:
+        suportado: true
+        encoding: UTF-8
+        separador: ";"
+        header_pattern: "Data Lançamento;Histórico;Descrição;Valor;Saldo"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: santander
+    nome: Santander
+    formatos:
+      ofx:
+        suportado: true
+        encoding: ISO-8859-1
+        date_format: "YYYYMMDD"
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ";"
+        header_pattern: "Data;Dependência Origem;Histórico;Descrição;Número do documento;Valor"
+        date_format: "DD/MM/YYYY"
+        valor_format: "-1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: banco-do-brasil
+    nome: Banco do Brasil
+    formatos:
+      ofx:
+        suportado: true
+        encoding: ISO-8859-1
+        date_format: "YYYYMMDD"
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ","
+        header_pattern: "Data,Histórico,Data do Balancete,Número do documento,Valor"
+        date_format: "DD/MM/YYYY"
+        valor_format: "-1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+
+  - id: caixa
+    nome: Caixa Econômica Federal
+    formatos:
+      ofx:
+        suportado: true
+        encoding: ISO-8859-1
+      csv:
+        suportado: true
+        encoding: ISO-8859-1
+        separador: ";"
+        date_format: "DD/MM/YYYY"
+        valor_format: "1.234,56"
+      pdf:
+        suportado: true
+        texto_extraível: true
+        notas: "Layout mais antigo, pode precisar de OCR em alguns casos"

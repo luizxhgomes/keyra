@@ -1,0 +1,78 @@
+# Cenários de Teste — Precificação
+# Usado por @finance-domain-expert para validar fórmulas
+# e por @qa para testes automatizados
+
+cenários:
+
+  # Caso padrão
+  - nome: "Limpeza de Pele — caso normal"
+    custo_variável_centavos: 2300       # R$ 23,00
+    custo_fixo_rateado_centavos: 4200   # R$ 42,00
+    custo_total_centavos: 6500          # R$ 65,00
+    margem_desejada: 0.40               # 40%
+    preço_mínimo_esperado_centavos: 10834  # R$ 108,34 (ceil)
+    preço_atual_centavos: 15000         # R$ 150,00
+    margem_real_esperada: 56.67         # 56,67%
+    markup_esperado: 130.77             # 130,77%
+
+  # Serviço caro
+  - nome: "Botox — margem alta"
+    custo_variável_centavos: 12000      # R$ 120,00
+    custo_fixo_rateado_centavos: 8000   # R$ 80,00
+    custo_total_centavos: 20000         # R$ 200,00
+    margem_desejada: 0.60               # 60%
+    preço_mínimo_esperado_centavos: 50000  # R$ 500,00
+    preço_atual_centavos: 80000         # R$ 800,00
+    margem_real_esperada: 75.00         # 75%
+
+  # Margem negativa (preço abaixo do custo)
+  - nome: "Depilação — margem negativa"
+    custo_total_centavos: 6800          # R$ 68,00
+    preço_atual_centavos: 5500          # R$ 55,00
+    margem_real_esperada: -23.64        # -23,64%
+    alerta: true
+    mensagem: "Preço abaixo do custo — serviço dá prejuízo"
+
+  # Custo zero (serviço apenas de mão de obra)
+  - nome: "Consultoria — sem insumos"
+    custo_variável_centavos: 0
+    custo_fixo_rateado_centavos: 3000   # R$ 30,00 (rateio de sala/tempo)
+    custo_total_centavos: 3000
+    preço_atual_centavos: 20000         # R$ 200,00
+    margem_real_esperada: 85.00         # 85%
+
+  # Pacote com desconto
+  - nome: "Pacote 5 Limpezas — 10% off"
+    preço_unitário_centavos: 15000      # R$ 150,00
+    sessões: 5
+    desconto: 0.10                      # 10%
+    preço_pacote_esperado_centavos: 67500  # R$ 675,00
+    receita_por_sessão_centavos: 13500  # R$ 135,00
+    custo_total_serviço_centavos: 6500  # R$ 65,00
+    margem_por_sessão_esperada: 51.85   # 51,85%
+
+  # Pacote com desconto excessivo (margem negativa)
+  - nome: "Pacote com desconto perigoso"
+    preço_unitário_centavos: 10000      # R$ 100,00
+    sessões: 10
+    desconto: 0.50                      # 50% off
+    preço_pacote_esperado_centavos: 50000  # R$ 500,00
+    receita_por_sessão_centavos: 5000   # R$ 50,00
+    custo_total_serviço_centavos: 6500  # R$ 65,00
+    margem_por_sessão_esperada: -30.00  # -30% → ALERTA
+    alerta: true
+
+  # Ponto de equilíbrio
+  - nome: "Break-even — custos fixos R$ 8.800"
+    custos_fixos_totais_centavos: 880000  # R$ 8.800,00
+    mc_unitária_centavos: 12700         # R$ 127,00 (MC da Limpeza)
+    pe_quantidade_esperada: 70          # 70 atendimentos (ceil)
+    preço_unitário_centavos: 15000
+    pe_reais_esperado_centavos: 1050000 # R$ 10.500,00
+
+  # Margem = 100% (divisão por zero)
+  - nome: "Edge case — margem 100%"
+    custo_total_centavos: 5000
+    margem_desejada: 1.00
+    preço_mínimo_esperado: "ERRO"
+    mensagem: "Margem de 100% resulta em preço infinito"

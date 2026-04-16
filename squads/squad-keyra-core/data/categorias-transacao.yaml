@@ -1,0 +1,111 @@
+# Categorias de Transação — KEYRA
+# Categorias padrão para classificação financeira
+
+receitas:
+  - id: receita-servicos
+    nome: Receita de Serviços
+    descrição: Receita gerada pela prestação de serviços de estética
+    automática: true
+    origem: comanda
+
+  - id: receita-produtos
+    nome: Venda de Produtos
+    descrição: Receita de venda de produtos para clientes
+    automática: false
+
+  - id: receita-outras
+    nome: Outras Receitas
+    descrição: Receitas diversas não vinculadas a serviços
+    automática: false
+
+custos_variáveis:
+  - id: custo-insumos
+    nome: Insumos Consumidos
+    descrição: Materiais e produtos usados na prestação de serviços
+    automática: true
+    origem: comanda
+
+  - id: custo-mao-obra-direta
+    nome: Mão de Obra Direta
+    descrição: Salário/comissão do profissional que prestou o serviço
+    automática: false
+
+custos_fixos:
+  - id: custo-aluguel
+    nome: Aluguel
+    descrição: Aluguel do espaço da clínica
+    periodicidade: mensal
+
+  - id: custo-energia
+    nome: Energia e Água
+    descrição: Contas de energia elétrica e água
+    periodicidade: mensal
+
+  - id: custo-funcionarios
+    nome: Funcionários (fixos)
+    descrição: Salários e encargos de funcionários fixos
+    periodicidade: mensal
+
+  - id: custo-marketing
+    nome: Marketing
+    descrição: Investimento em marketing e divulgação
+    periodicidade: mensal
+
+  - id: custo-software
+    nome: Software e Sistemas
+    descrição: Assinaturas de software (incluindo KEYRA)
+    periodicidade: mensal
+
+  - id: custo-manutenção
+    nome: Manutenção e Equipamentos
+    descrição: Manutenção de equipamentos e espaço
+    periodicidade: mensal
+
+  - id: custo-contabilidade
+    nome: Contabilidade
+    descrição: Honorários contábeis
+    periodicidade: mensal
+
+  - id: custo-outros-fixos
+    nome: Outros Custos Fixos
+    descrição: Custos fixos não categorizados
+    periodicidade: mensal
+
+despesas_operacionais:
+  - id: despesa-administrativa
+    nome: Despesas Administrativas
+    descrição: Material de escritório, telefone, internet
+    periodicidade: mensal
+
+  - id: despesa-impostos
+    nome: Impostos sobre Receita
+    descrição: ISS, PIS, COFINS, IRPJ, CSLL (conforme regime)
+    automática: true
+    observação: "Alíquota configurável por regime fiscal"
+
+formas_pagamento:
+  - id: dinheiro
+    nome: Dinheiro
+    recebimento: imediato
+    taxa: 0
+
+  - id: pix
+    nome: PIX
+    recebimento: imediato
+    taxa: 0
+
+  - id: debito
+    nome: Cartão de Débito
+    recebimento: "D+1"
+    taxa_padrão: 1.5
+
+  - id: credito-avista
+    nome: Cartão de Crédito à Vista
+    recebimento: "D+30"
+    taxa_padrão: 3.5
+
+  - id: credito-parcelado
+    nome: Cartão de Crédito Parcelado
+    recebimento: "D+30, D+60, ..."
+    taxa_padrão: 5.0
+    parcelas_máximas: 12

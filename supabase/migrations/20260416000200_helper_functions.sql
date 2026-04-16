@@ -36,41 +36,8 @@ $$;
 COMMENT ON FUNCTION public.current_org_id() IS
   'KEYRA ADR-012: returns org_id from JWT custom claim. Returns NULL if missing -> RLS denies.';
 
--- -----------------------------------------------------------------------------
--- is_org_member(org_id, required_role) — checks if the current auth.uid() is
--- a member of the given org with at least the required role (role hierarchy:
--- owner > admin > professional > viewer).
--- -----------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.is_org_member(
-  target_org_id uuid,
-  min_role text DEFAULT 'viewer'
-)
-  RETURNS boolean
-  LANGUAGE sql
-  STABLE
-  SECURITY DEFINER
-  SET search_path = public, pg_temp
-AS $$
-  WITH role_hierarchy AS (
-    SELECT unnest(ARRAY['viewer','professional','admin','owner']) AS role,
-           generate_series(1, 4) AS rank
-  ),
-  min_rank AS (
-    SELECT rank FROM role_hierarchy WHERE role = min_role
-  )
-  SELECT EXISTS (
-    SELECT 1
-      FROM public.memberships m
-      JOIN role_hierarchy rh ON rh.role = m.role
-     WHERE m.user_id = auth.uid()
-       AND m.org_id = target_org_id
-       AND m.deleted_at IS NULL
-       AND rh.rank >= (SELECT rank FROM min_rank)
-  );
-$$;
-
-COMMENT ON FUNCTION public.is_org_member(uuid, text) IS
-  'KEYRA: Returns true if auth.uid() is a member of target_org with at least min_role.';
+-- NOTE: is_org_member(uuid, text) é definida em 20260416000300_organizations.sql
+--       (depende da tabela `memberships` criada lá).
 
 -- -----------------------------------------------------------------------------
 -- set_updated_at() — generic BEFORE UPDATE trigger for updated_at columns.
@@ -110,16 +77,16 @@ COMMENT ON FUNCTION public.enforce_org_id_immutability() IS
   'KEYRA ADR-011: prevents any UPDATE from changing org_id. Defense-in-depth vs RLS bypass.';
 
 -- -----------------------------------------------------------------------------
--- decimal_round_half_even(value, precision) — banker's rounding for financial
+-- decimal_round_half_even(value, digits) — banker's rounding for financial
 -- values. NFR-FI-01 mandates HALF_EVEN rounding.
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.round_half_even(value numeric, precision integer DEFAULT 2)
+CREATE OR REPLACE FUNCTION public.round_half_even(value numeric, digits integer DEFAULT 2)
   RETURNS numeric
   LANGUAGE plpgsql
   IMMUTABLE
 AS $$
 DECLARE
-  multiplier numeric := power(10::numeric, precision);
+  multiplier numeric := power(10::numeric, digits);
   scaled     numeric := value * multiplier;
   floored    numeric := floor(scaled);
   diff       numeric := scaled - floored;

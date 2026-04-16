@@ -47,14 +47,16 @@ Serviço → Agenda → Comanda → Transação → DRE → Decisão
 
 ## Status
 
-🚀 Greenfield — **Fase 0: 6/6 stories concluídas (100%)**. Pronto para Fase 1.
+🚀 Greenfield — **Fase 0: 6/6 stories concluídas (100%)** + **schema aplicado no banco real**. Pronto para Fase 1.
+
+> **Single source of truth de implementação:** [`docs/IMPLEMENTATION-MAP.md`](docs/IMPLEMENTATION-MAP.md) — matriz viva feature × tela × tabela × ADR × story.
 
 | Story | Entregável | Status |
 |-------|-----------|--------|
 | 0.1 | Environment bootstrap (GitHub + Vercel + Supabase + domínio) | ✅ concluído |
 | 0.2 | PRD formal (66 FRs / 27 NFRs / 27 CONs) | ✅ concluído |
 | 0.3 | Arquitetura fullstack (20 ADRs) | ✅ concluído |
-| 0.4 | Schema PostgreSQL + RLS (21 tabelas, 100% RLS, 18 migrations) | ✅ concluído |
+| 0.4 | Schema PostgreSQL + RLS (21 tabelas, 100% RLS, 19 migrations **aplicadas no remoto**) | ✅ concluído |
 | 0.5 | Wireframes (8 arquivos, paleta terracota, 1 gráfico) | ✅ concluído |
 | 0.6 | Pesquisa competitiva (Conta Azul, Gestek, Kamino) | ✅ concluído |
 
@@ -69,6 +71,14 @@ Serviço → Agenda → Comanda → Transação → DRE → Decisão
 
 > Snapshot operacional vivo: [`docs/INFRA-STATUS.md`](docs/INFRA-STATUS.md)
 > Setup de credenciais isoladas: [`docs/setup/CREDENTIALS.md`](docs/setup/CREDENTIALS.md)
+> Mapa de implementação completo: [`docs/IMPLEMENTATION-MAP.md`](docs/IMPLEMENTATION-MAP.md)
+> Schema do banco: [`docs/architecture/SCHEMA.md`](docs/architecture/SCHEMA.md)
+
+## Próximos bloqueadores manuais (antes da Phase 1)
+
+1. **Ativar Auth Hook** `public.custom_access_token_hook` no [Supabase Dashboard](https://supabase.com/dashboard/project/oapdfhivzojyahvphebs/auth/hooks)
+2. Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel (encrypt CPF)
+3. Validar 3 perguntas UX com a idealizadora (paleta terracota, split de pagamento, formato de comparativo)
 
 ---
 

@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.professionals (
   specialty                text NULL,
   color                    text NULL,          -- agenda color (hex)
   phone                    text NULL,
-  email                    citext NULL,
+  email                    extensions.citext NULL,
   default_commission_rate  numeric(5,4) NOT NULL DEFAULT 0 CHECK (default_commission_rate >= 0 AND default_commission_rate <= 1),
   active                   boolean NOT NULL DEFAULT true,
   created_at               timestamptz NOT NULL DEFAULT now(),

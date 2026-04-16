@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.customers (
   org_id            uuid NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
   full_name         text NOT NULL CHECK (char_length(full_name) BETWEEN 1 AND 200),
   phone             text NULL,                 -- E.164 preferred (+55...)
-  email             citext NULL,
+  email             extensions.citext NULL,
   birth_date        date NULL,
   notes             text NULL,                 -- free-form notes (no clinical data — see CON-ES-07)
   cpf_encrypted     bytea NULL,                -- pgp_sym_encrypt (ADR-017)

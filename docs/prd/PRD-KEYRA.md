@@ -1,11 +1,12 @@
 # KEYRA — Product Requirements Document (PRD)
 
-> **Documento:** PRD Formal v1.1 (Story 0.2 do EPIC-0)
+> **Documento:** PRD Formal v1.3 (Story 0.2 do EPIC-0)
 > **Autor:** @pm (Morgan)
 > **Data:** 2026-04-16
-> **Status:** Draft (aguarda validacao da idealizadora e @po)
+> **Status:** Draft (aguarda validacao da idealizadora e @po) — **infraestrutura, schema e wireframes ja implementados**
 > **Constitution:** Article IV (No Invention) — todo FR/NFR/CON rastreia para visao da idealizadora ou EPIC-0
 > **Modo de elaboracao:** YOLO autonomo (decisoes documentadas como `[AUTO-DECISION]`)
+> **Matriz viva de implementacao:** [`IMPLEMENTATION-MAP.md`](../IMPLEMENTATION-MAP.md) (ler para saber exatamente o que ja foi entregue por feature/tela/tabela/story)
 
 ---
 
@@ -37,10 +38,12 @@
 | # | Documento | Relacao |
 |---|-----------|---------|
 | 10 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) | Arquitetura fullstack (20 ADRs) — **consome** este PRD; cada ADR rastreia para FR/NFR/CON aqui |
-| 11 | [EPIC-0 Master Plan](../stories/EPIC-0-KEYRA-IMPLEMENTATION.md) | Roadmap mestre de 8 fases — este PRD e Story 0.2 do epic |
-| 12 | [INFRA-STATUS.md](../INFRA-STATUS.md) | Snapshot vivo da infraestrutura provisionada (GitHub, Vercel, Supabase, dominio) |
-| 13 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Estrutura de credenciais isoladas do projeto |
-| 14 | [README.md](../../README.md) | Visao geral do projeto |
+| 11 | [SCHEMA.md](../architecture/SCHEMA.md) | DDL detalhado das 21 tabelas; mapeamento entidade -> FR — implementa ADR-013 |
+| 12 | [EPIC-0 Master Plan](../stories/EPIC-0-KEYRA-IMPLEMENTATION.md) | Roadmap mestre de 8 fases — este PRD e Story 0.2 do epic |
+| 13 | **[IMPLEMENTATION-MAP.md](../IMPLEMENTATION-MAP.md)** | **Matriz viva** feature × tela × tabela × ADR × story × status — single source of truth para "o que foi feito / falta fazer" |
+| 14 | [INFRA-STATUS.md](../INFRA-STATUS.md) | Snapshot vivo da infraestrutura provisionada (GitHub, Vercel, Supabase, dominio) |
+| 15 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Estrutura de credenciais isoladas do projeto |
+| 16 | [README.md](../../README.md) | Visao geral do projeto |
 
 ### Squads e Workflows AIOX
 
@@ -55,6 +58,7 @@
 
 ## Sumario
 
+0. Status de Implementacao (snapshot)
 1. Visao e Posicionamento
 2. Personas
 3. Problema Central
@@ -69,6 +73,57 @@
 12. Anexo A — Rastreabilidade (FR/NFR/CON -> Fonte)
 13. Anexo B — Decisoes Autonomas
 14. Change Log
+
+---
+
+## 0. Status de Implementacao (snapshot 2026-04-16)
+
+> **Source of truth detalhado:** [`IMPLEMENTATION-MAP.md`](../IMPLEMENTATION-MAP.md). Esta secao e um snapshot resumido.
+
+### O que ja foi feito
+
+| Camada | Estado | Detalhe |
+|--------|--------|---------|
+| **Infra** | ✅ 100% | GitHub `luizxhgomes/keyra`, Vercel `keyra` (Hobby), Supabase `keyra-br` (sa-east-1, Free), dominio `keyra.app` (verified) |
+| **Schema banco (Story 0.4)** | ✅ APLICADO | 19 migrations no remoto, 21 tabelas, 21/21 RLS, 6 views (DRE + KPIs), 15 funcoes, 2 triggers de automacao |
+| **Wireframes (Story 0.5)** | ✅ entregue | 8 docs em `docs/ux/wireframes/`, paleta terracota, 1 grafico permitido, 10 componentes canonicos |
+| **Documentacao Phase 0** | ✅ completa | PRD (este) + ARCHITECTURE (20 ADRs) + SCHEMA + EPIC-0 + INFRA-STATUS + CREDENTIALS + IMPLEMENTATION-MAP |
+
+### O que falta fazer (Phase 1+)
+
+| Camada | Estado | Proxima acao |
+|--------|--------|--------------|
+| **Codigo de aplicacao** | ❌ 0% | Story 1.1 — scaffold Next.js 16 + Supabase clients |
+| **Auth/Multi-tenant UI** | ⏸️ aguarda 1.1 e 1.2 | login, criar org, switcher de org |
+| **Cadastros (Pilar 1-2)** | ⏸️ aguarda 2.1-2.3 | CRUD pacientes, servicos, insumos |
+| **Agenda funcional** | ⏸️ aguarda 2.4-2.7 | FullCalendar + agendamento + receita prevista |
+| **Automacao financeira** | 🟡 schema pronto / UI faltando | Stories 3.1-3.8 — UI consome triggers e views ja prontos |
+| **Dashboard tela unica** | 🟡 views prontas / UI faltando | Stories 4.1-4.9 |
+| **Pos-MVP (Phases 5-7)** | ⏸️ planejado | precificacao, projecoes, integracoes |
+
+### Bloqueadores manuais antes da Phase 1
+
+1. 🔴 **Ativar Auth Hook** `public.custom_access_token_hook` no Supabase Dashboard (sem isso JWT nao tem `org_id` e RLS nega tudo)
+2. 🔴 Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel (encrypt CPF de customers)
+3. ⏳ Validar com idealizadora: paleta terracota, split de pagamento, formato comparativo textual
+
+### Como cada feature **sera** implementada (padrao operacional)
+
+```
+Story criada por @sm -> validada por @po -> implementada por @dev
+  -> CodeRabbit review (max 2 iter) -> QA gate por @qa (7 checks)
+  -> push por @devops -> Vercel auto-deploy -> keyra.app -> story Done
+  -> atualizar IMPLEMENTATION-MAP
+```
+
+Padroes tecnicos (todos rastreados em ADRs da arquitetura):
+- Server Actions como API primaria + validacao Zod (ADR-007)
+- Dual Supabase client server/browser (ADR-008)
+- `numeric(14,2)` no DB + Decimal.js no app (ADR-005, NFR-FI-01)
+- shadcn/ui copiado no repo (ADR-002)
+- TanStack Query para fetching client-side
+- Sentry desde dia 1 (ADR-015)
+- Inngest para jobs assincronos a partir da Phase 4 (ADR-009)
 
 ---
 
@@ -800,6 +855,7 @@ Documentacao das decisoes tomadas autonomamente durante a elaboracao deste PRD (
 | 2026-04-16 | 1.0 | Criacao inicial do PRD (Story 0.2 do EPIC-0) — modo YOLO autonomo | @pm (Morgan) |
 | 2026-04-16 | 1.1 | Atualizacao Story 0.1 — infraestrutura provisionada (GitHub + Vercel + Supabase sa-east-1 + dominio keyra.app). Marcos M0 e M1 antecipados. Roadmap section 11.1 e 11.3 atualizados. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
 | 2026-04-16 | 1.2 | Adicionado bloco **Companion Documents** no header (18 docs relacionados linkados). Anexo A com hyperlinks Markdown clicaveis. | @aiox-master (Orion) |
+| 2026-04-16 | 1.3 | Story 0.4 (schema) e 0.5 (wireframes) entregues; schema aplicado no banco real `oapdfhivzojyahvphebs`. Adicionada Secao 0 "Status de Implementacao" com snapshot por camada. Companion Documents expandido com SCHEMA.md e IMPLEMENTATION-MAP.md (matriz viva). Bloqueadores manuais documentados. | @aiox-master (Orion) |
 
 ---
 

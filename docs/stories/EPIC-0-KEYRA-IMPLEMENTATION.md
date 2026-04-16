@@ -32,10 +32,11 @@
 |---|-----------|--------------|--------|
 | 7 | [PRD-KEYRA.md](../prd/PRD-KEYRA.md) | Story 0.2 | ✅ entregue |
 | 8 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) | Story 0.3 | ✅ entregue |
-| 9 | `supabase/migrations/*.sql` | Story 0.4 | ⏸️ proximo |
-| 10 | `docs/ux/wireframes/` | Story 0.5 | ⏸️ proximo |
+| 9 | [SCHEMA.md](../architecture/SCHEMA.md) + [migrations/](../../supabase/migrations/) | Story 0.4 | ✅ aplicado |
+| 10 | [wireframes/](../ux/wireframes/) | Story 0.5 | ✅ entregue |
 | 11 | [INFRA-STATUS.md](../INFRA-STATUS.md) | Story 0.1 | ✅ entregue |
 | 12 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Story 0.1 (suporte) | ✅ entregue |
+| 13 | [IMPLEMENTATION-MAP.md](../IMPLEMENTATION-MAP.md) | consolidador (pos Phase 0) | ✅ matriz viva |
 
 ### Squads AIOX
 
@@ -154,7 +155,7 @@ KEYRA resolve: financeiro gerado automaticamente a partir da operacao.
 | 0.1 | Environment bootstrap (git, GitHub, Supabase, Vercel, dominio) | @devops/Orion | [x] ✅ 2026-04-16 | [INFRA-STATUS.md](../INFRA-STATUS.md) |
 | 0.2 | PRD formal | @pm | [x] ✅ 2026-04-16 | [PRD-KEYRA.md](../prd/PRD-KEYRA.md) (66 FRs + 27 NFRs + 27 CONs) |
 | 0.3 | Arquitetura fullstack | @architect | [x] ✅ 2026-04-16 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (20 ADRs) |
-| 0.4 | Schema de banco com RLS | @data-engineer | [x] ✅ 2026-04-16 | [SCHEMA.md](../architecture/SCHEMA.md) + [migrations/](../../supabase/migrations/) (18 arquivos, 21 tabelas, 100% RLS) + [tests/](../../supabase/tests/) |
+| 0.4 | Schema de banco com RLS | @data-engineer | [x] ✅ 2026-04-16 (**aplicado no remoto**) | [SCHEMA.md](../architecture/SCHEMA.md) + [migrations/](../../supabase/migrations/) (19 arquivos: 18 + hotfix audit org, 21 tabelas, 100% RLS, 6 views) + [tests/](../../supabase/tests/) |
 | 0.5 | Wireframes dashboard numerico | @ux-design-expert | [x] ✅ 2026-04-16 | [wireframes/](../ux/wireframes/) (8 arquivos, paleta terracota, 1 gráfico permitido) |
 | 0.6 | Pesquisa competitiva | @analyst | [x] ✅ 2026-04-12 | [Conta Azul](../research/2026-04-12-conta-azul-reverse-engineering.md) · [Gestek](../research/2026-04-12-gestek-reverse-engineering.md) · [Kamino](../research/2026-04-12-kamino-reverse-engineering.md) |
 
@@ -170,18 +171,23 @@ KEYRA resolve: financeiro gerado automaticamente a partir da operacao.
 
 ---
 
-### Fase 1 — Fundacao Tecnica (Semanas 3-4)
+### Fase 1 — Fundacao Tecnica (Sprint 1, ~5-7 dias)
 **Workflow:** SDC (Story Development Cycle)
+**Pre-condicoes:**
+- ✅ Phase 0 completa
+- ✅ Schema aplicado no `keyra-br` (sa-east-1)
+- 🔴 **Auth Hook `custom_access_token_hook` ATIVADO no Supabase Dashboard** (sem isso JWT nao tem org_id e RLS bloqueia tudo)
+- 🔴 `COLUMN_ENCRYPTION_KEY` provisionada no Vercel (encrypt CPF customers)
 
-| Story | Descricao | Agente |
-|-------|-----------|--------|
-| 1.1 | Setup Next.js 15 + Supabase + Auth | @dev |
-| 1.2 | CRUD organizacoes (studio/clinica) | @dev |
-| 1.3 | Gestao de profissionais (roles: dono, profissional) | @dev |
-| 1.4 | RLS policies para isolamento multi-tenant | @data-engineer |
-| 1.5 | Layout base + navegacao + design system | @dev + @ux-design-expert |
+| Story | Descricao | Agente | Artefato esperado |
+|-------|-----------|--------|------------------|
+| 1.1 | Setup Next.js 16 + Supabase clients (server/browser) + Sentry + ESLint + Prettier + Tailwind v4 + shadcn/ui base + scripts pnpm | @dev | `app/`, `lib/supabase/{server,browser}.ts`, `package.json`, primeiro deploy no `keyra.app` |
+| 1.2 | Login (email + magic link) + middleware de auth + onboarding criar 1ª organizacao | @dev | `app/(auth)/login`, `app/(onboarding)/new-org`, Server Actions |
+| 1.3 | Gestao de profissionais (CRUD + roles) + convidar membro por email | @dev | `app/(app)/team`, `organization_invites` flow |
+| 1.4 | Rodar `rls_isolation.test.sql` + suite de testes RLS automatizada (Vitest + Supabase local opcional) | @qa | `supabase/tests/` validado, badge no README |
+| 1.5 | Layout base + sidebar + bottom nav mobile + 10 componentes canonicos do wireframe + tema terracota | @dev + @ux | `components/ui/*`, `components/layout/*`, design tokens em `tailwind.config.ts` |
 
-**Criterio:** Login funcional, org criada, RLS testado (org A nao ve org B).
+**Criterio:** Login funcional, 1ª org criada, RLS testado (org A nao ve org B), `keyra.app` mostra dashboard skeleton autenticado.
 
 ---
 

@@ -1,9 +1,10 @@
 # KEYRA — Fullstack Architecture Document
 
-> **Status:** v1.2 — Foundational design + Story 0.1 (infra) implementada + Companion Documents
+> **Status:** v1.3 — Foundational design + Stories 0.1, 0.4 implementadas (infra + schema vivo)
 > **Author:** @architect (Aria)
 > **Date:** 2026-04-16
 > **Scope:** Phases 1–4 (MVP) of EPIC-0, with explicit migration paths for Phases 5–7
+> **Implementation status:** ver [`docs/IMPLEMENTATION-MAP.md`](../IMPLEMENTATION-MAP.md) para matriz viva.
 
 ---
 
@@ -33,8 +34,10 @@
 | # | Documento | Relação |
 |---|-----------|---------|
 | 8 | [INFRA-STATUS.md](../INFRA-STATUS.md) | **Snapshot vivo** — estado real de GitHub, Vercel, Supabase, domínio |
-| 9 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Estrutura de credenciais isoladas |
-| 10 | [README.md](../../README.md) | Visão geral do projeto |
+| 9 | [SCHEMA.md](SCHEMA.md) | DDL detalhado: 21 tabelas, ER, mapeamento entidade → FR — implementação do ADR-013 |
+| 10 | [IMPLEMENTATION-MAP.md](../IMPLEMENTATION-MAP.md) | **Matriz viva** feature × tela × tabela × ADR × story × status |
+| 11 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Estrutura de credenciais isoladas |
+| 12 | [README.md](../../README.md) | Visão geral do projeto |
 
 ### Squads AIOX (consumidores diretos por fase)
 
@@ -953,6 +956,7 @@ apps/web/src/
 | 2026-04-16 | 1.0 | Documento inicial — ADRs 001–020 cobrindo Phases 1–7 | @architect (Aria) |
 | 2026-04-16 | 1.1 | Story 0.1 implementada: Vercel Hobby + GitHub repo + Supabase sa-east-1 + domínio `keyra.app` provisionados. D1 fechado (Hobby). Seção 14 atualizada com URLs reais. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
 | 2026-04-16 | 1.2 | Bloco **Companion Documents** adicionado no header (14 docs em 4 grupos: produto, pesquisa, operacionais, squads). Substitui linha "Companion docs:" simples. | @aiox-master (Orion) |
+| 2026-04-16 | 1.3 | Story 0.4 entregue: schema aplicado no banco real (`oapdfhivzojyahvphebs` sa-east-1). 19 migrations, 21 tabelas, 21/21 RLS, 6 views, 2 triggers de automação. SCHEMA.md adicionado ao Companion Documents. Cross-link com IMPLEMENTATION-MAP.md (matriz viva). | @aiox-master (Orion) |
 
 ---
 

@@ -19,7 +19,7 @@
 CREATE TABLE IF NOT EXISTS public.organizations (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name             text NOT NULL CHECK (char_length(name) BETWEEN 1 AND 120),
-  slug             citext UNIQUE,                    -- optional pretty URL / invite key
+  slug             extensions.citext UNIQUE,                    -- optional pretty URL / invite key
   cnpj             text NULL,                        -- optional (MEI may not have)
   legal_name       text NULL,
   timezone         text NOT NULL DEFAULT 'America/Sao_Paulo',
@@ -90,7 +90,7 @@ CREATE TRIGGER memberships_enforce_org_id
 CREATE TABLE IF NOT EXISTS public.organization_invites (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id       uuid NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
-  email        citext NOT NULL,
+  email        extensions.citext NOT NULL,
   role         text NOT NULL CHECK (role IN ('owner','admin','professional','viewer')),
   token        text NOT NULL UNIQUE DEFAULT encode(gen_random_bytes(24), 'hex'),
   invited_by   uuid NULL REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -111,3 +111,39 @@ CREATE INDEX IF NOT EXISTS organization_invites_token_idx ON public.organization
 CREATE TRIGGER organization_invites_set_updated_at
   BEFORE UPDATE ON public.organization_invites
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+-- -----------------------------------------------------------------------------
+-- is_org_member(target_org_id, min_role) — definida AQUI (e não em 002) porque
+-- depende da tabela `memberships` criada acima.
+-- LANGUAGE sql resolve nomes em definição → tabela precisa existir.
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.is_org_member(
+  target_org_id uuid,
+  min_role text DEFAULT 'viewer'
+)
+  RETURNS boolean
+  LANGUAGE sql
+  STABLE
+  SECURITY DEFINER
+  SET search_path = public, pg_temp
+AS $$
+  WITH role_hierarchy AS (
+    SELECT unnest(ARRAY['viewer','professional','admin','owner']) AS role,
+           generate_series(1, 4) AS rank
+  ),
+  min_rank AS (
+    SELECT rank FROM role_hierarchy WHERE role = min_role
+  )
+  SELECT EXISTS (
+    SELECT 1
+      FROM public.memberships m
+      JOIN role_hierarchy rh ON rh.role = m.role
+     WHERE m.user_id = auth.uid()
+       AND m.org_id = target_org_id
+       AND m.deleted_at IS NULL
+       AND rh.rank >= (SELECT rank FROM min_rank)
+  );
+$$;
+
+COMMENT ON FUNCTION public.is_org_member(uuid, text) IS
+  'KEYRA: Returns true if auth.uid() is a member of target_org with at least min_role.';

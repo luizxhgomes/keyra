@@ -54,11 +54,31 @@
 | **Project name** | `keyra-br` |
 | **Project ref** | `oapdfhivzojyahvphebs` |
 | **URL** | https://oapdfhivzojyahvphebs.supabase.co |
+| **Studio** | https://supabase.com/dashboard/project/oapdfhivzojyahvphebs |
 | **Região** | **`sa-east-1` (São Paulo)** |
 | **Postgres** | 17 |
 | **Plano** | Free (500 MB DB, 1 GB storage, 2 GB bandwidth/mês, 50K MAU, **pausa após 1 semana sem requests**) |
 | **CLI link** | ✅ `supabase/config.toml` linkado |
-| **Migrations dir** | `supabase/migrations/` (vazio até Story 0.4) |
+| **search_path** | `public, extensions, pg_catalog` (database default + 4 roles) |
+
+### Schema aplicado (2026-04-16)
+
+| Métrica | Valor |
+|---------|-------|
+| Migrations no remoto | **19** (`20260416000100` → `20260416001900`) |
+| Tabelas (`public`) | **21** |
+| Tabelas com RLS habilitado | **21/21 (100%)** |
+| Views (DRE + KPIs) | **6** (`v_dre_monthly`, `v_dre_by_service`, `v_dre_by_professional`, `v_cashflow_daily`, `v_dashboard_kpis`, `v_receitas_previstas`) |
+| Funções | **15** (helpers, triggers, hook auth, audit) |
+| Triggers críticos de automação | **2** ativos (`trg_appointments_done_to_command`, `trg_payments_to_transaction`) |
+| Audit log | universal append-only + dedicado para `organizations` (migration 019) |
+
+### Bloqueadores manuais pendentes (Supabase Dashboard)
+
+| # | Ação | Onde | Tempo |
+|---|------|------|-------|
+| 1 | **Ativar Auth Hook** `public.custom_access_token_hook` | https://supabase.com/dashboard/project/oapdfhivzojyahvphebs/auth/hooks → Custom Access Token | 1 min |
+| 2 | Confirmar JWT contém `org_id` claim após login real (test após 1) | Supabase Studio → Auth → Users → JWT decoder | 1 min |
 
 ### Projeto antigo (descomissionado)
 

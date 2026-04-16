@@ -154,11 +154,11 @@ KEYRA resolve: financeiro gerado automaticamente a partir da operacao.
 | 0.1 | Environment bootstrap (git, GitHub, Supabase, Vercel, dominio) | @devops/Orion | [x] ✅ 2026-04-16 | [INFRA-STATUS.md](../INFRA-STATUS.md) |
 | 0.2 | PRD formal | @pm | [x] ✅ 2026-04-16 | [PRD-KEYRA.md](../prd/PRD-KEYRA.md) (66 FRs + 27 NFRs + 27 CONs) |
 | 0.3 | Arquitetura fullstack | @architect | [x] ✅ 2026-04-16 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (20 ADRs) |
-| 0.4 | Schema de banco com RLS | @data-engineer | [ ] **PROXIMO** | `supabase/migrations/*.sql` (a criar) |
-| 0.5 | Wireframes dashboard numerico | @ux-design-expert | [ ] **PROXIMO** | `docs/ux/wireframes/` (a criar) |
+| 0.4 | Schema de banco com RLS | @data-engineer | [x] ✅ 2026-04-16 | [SCHEMA.md](../architecture/SCHEMA.md) + [migrations/](../../supabase/migrations/) (18 arquivos, 21 tabelas, 100% RLS) + [tests/](../../supabase/tests/) |
+| 0.5 | Wireframes dashboard numerico | @ux-design-expert | [x] ✅ 2026-04-16 | [wireframes/](../ux/wireframes/) (8 arquivos, paleta terracota, 1 gráfico permitido) |
 | 0.6 | Pesquisa competitiva | @analyst | [x] ✅ 2026-04-12 | [Conta Azul](../research/2026-04-12-conta-azul-reverse-engineering.md) · [Gestek](../research/2026-04-12-gestek-reverse-engineering.md) · [Kamino](../research/2026-04-12-kamino-reverse-engineering.md) |
 
-**Status:** 4/6 entregues. Faltam 0.4 e 0.5 — ambas independentes, podem rodar em paralelo.
+**Status:** ✅ **6/6 entregues** — Phase 0 COMPLETA em 2026-04-16 (1 dia, contra 2 sem planejadas).
 
 **Infraestrutura provisionada:**
 - GitHub: https://github.com/luizxhgomes/keyra (private, branch main)

@@ -47,15 +47,15 @@ Serviço → Agenda → Comanda → Transação → DRE → Decisão
 
 ## Status
 
-🚧 Greenfield — **Fase 0: 4/6 stories concluídas (67%)**.
+🚀 Greenfield — **Fase 0: 6/6 stories concluídas (100%)**. Pronto para Fase 1.
 
 | Story | Entregável | Status |
 |-------|-----------|--------|
 | 0.1 | Environment bootstrap (GitHub + Vercel + Supabase + domínio) | ✅ concluído |
 | 0.2 | PRD formal (66 FRs / 27 NFRs / 27 CONs) | ✅ concluído |
 | 0.3 | Arquitetura fullstack (20 ADRs) | ✅ concluído |
-| 0.4 | Schema PostgreSQL + RLS multi-tenant | ⏸️ próximo |
-| 0.5 | Wireframes dashboard numérico | ⏸️ próximo |
+| 0.4 | Schema PostgreSQL + RLS (21 tabelas, 100% RLS, 18 migrations) | ✅ concluído |
+| 0.5 | Wireframes (8 arquivos, paleta terracota, 1 gráfico) | ✅ concluído |
 | 0.6 | Pesquisa competitiva (Conta Azul, Gestek, Kamino) | ✅ concluído |
 
 ## Infraestrutura

@@ -21,6 +21,7 @@ SEC=$(read_or_empty supabase-secret.key)
 SBP=$(read_or_empty supabase.token)
 VC=$(read_or_empty vercel.token)
 GH=$(read_or_empty github.token)
+CEK=$(read_or_empty column-encryption-key.txt)
 
 URL=""
 [[ -n "${REF}" ]] && URL="https://${REF}.supabase.co"
@@ -39,6 +40,9 @@ SUPABASE_SERVICE_ROLE_KEY=${SR}
 SUPABASE_SECRET_KEY=${SEC}
 SUPABASE_PROJECT_REF=${REF}
 SUPABASE_ACCESS_TOKEN=${SBP}
+
+# ---- Application secrets ----
+COLUMN_ENCRYPTION_KEY=${CEK}
 
 # ---- Vercel ----
 VERCEL_TOKEN=${VC}

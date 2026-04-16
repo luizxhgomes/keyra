@@ -43,6 +43,7 @@
 | `SUPABASE_PROJECT_REF` | plain |
 | `SUPABASE_SERVICE_ROLE_KEY` | encrypted |
 | `SUPABASE_SECRET_KEY` | encrypted |
+| `COLUMN_ENCRYPTION_KEY` | encrypted (256-bit hex, para `pgp_sym_encrypt` em CPF — ADR-017) |
 
 ---
 
@@ -73,12 +74,13 @@
 | Triggers críticos de automação | **2** ativos (`trg_appointments_done_to_command`, `trg_payments_to_transaction`) |
 | Audit log | universal append-only + dedicado para `organizations` (migration 019) |
 
-### Bloqueadores manuais pendentes (Supabase Dashboard)
+### Bloqueadores manuais — RESOLVIDOS
 
-| # | Ação | Onde | Tempo |
-|---|------|------|-------|
-| 1 | **Ativar Auth Hook** `public.custom_access_token_hook` | https://supabase.com/dashboard/project/oapdfhivzojyahvphebs/auth/hooks → Custom Access Token | 1 min |
-| 2 | Confirmar JWT contém `org_id` claim após login real (test após 1) | Supabase Studio → Auth → Users → JWT decoder | 1 min |
+| # | Ação | Status |
+|---|------|--------|
+| 1 | Ativar Auth Hook `public.custom_access_token_hook` | ✅ ENABLED 2026-04-16 |
+| 2 | Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel | ✅ encrypted, 3 targets, 2026-04-16 |
+| 3 | Confirmar JWT contém `org_id` após login real | ⏸️ validar quando 1º user logar (Story 1.2) |
 
 ### Projeto antigo (descomissionado)
 

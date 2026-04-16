@@ -27,6 +27,7 @@ ANON=$(read_token supabase-anon.key)
 PUB=$(read_token supabase-publishable.key)
 SR=$(read_token supabase-service-role.key)
 SEC=$(read_token supabase-secret.key)
+CEK=$(read_token column-encryption-key.txt)
 
 env_args=()
 [[ -n "${GH}" ]]   && env_args+=("GH_TOKEN=${GH}" "GITHUB_TOKEN=${GH}")
@@ -37,5 +38,6 @@ env_args=()
 [[ -n "${PUB}" ]]  && env_args+=("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUB}")
 [[ -n "${SR}" ]]   && env_args+=("SUPABASE_SERVICE_ROLE_KEY=${SR}")
 [[ -n "${SEC}" ]]  && env_args+=("SUPABASE_SECRET_KEY=${SEC}")
+[[ -n "${CEK}" ]]  && env_args+=("COLUMN_ENCRYPTION_KEY=${CEK}")
 
 exec env "${env_args[@]}" "$@"

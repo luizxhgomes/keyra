@@ -54,6 +54,9 @@ load_var "supabase-publishable.key"   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
 load_var "supabase-service-role.key"  "SUPABASE_SERVICE_ROLE_KEY"
 load_var "supabase-secret.key"        "SUPABASE_SECRET_KEY"
 
+# Application secret
+load_var "column-encryption-key.txt"  "COLUMN_ENCRYPTION_KEY"
+
 export KEYRA_ROOT
 export KEYRA_ENV_LOADED=1
 

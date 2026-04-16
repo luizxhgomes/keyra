@@ -1,8 +1,56 @@
 # EPIC-0: KEYRA — Plano de Implementacao Completo
 
 > Epic geral que mapeia todas as fases de construcao do KEYRA do zero.
-> Contexto completo: `docs/audios-idealizadora/contexto-completo-keyra.md`
-> Data: 2026-04-12
+> **Versao:** 1.1 (atualizada 2026-04-16 com status real Phase 0)
+> **Data inicial:** 2026-04-12
+
+---
+
+## Companion Documents
+
+> Documentos relacionados — este epic e o "centro" do roadmap; outros artefatos derivam dele ou alimentam-no.
+
+### Fontes (input para este epic)
+
+| # | Documento | Conteudo |
+|---|-----------|----------|
+| 1 | [contexto-completo-keyra.md](../audios-idealizadora/contexto-completo-keyra.md) | Visao da idealizadora — fonte primaria das 8 fases |
+| 2 | [visao-keyra-idealizadora.md](../audios-idealizadora/visao-keyra-idealizadora.md) | Visao narrativa estrategica |
+| 3 | [Transcricoes WhatsApp (4 arquivos)](../audios-idealizadora/) | Audios brutos da idealizadora (12/abr/2026) |
+
+### Pesquisa Competitiva (Story 0.6)
+
+| # | Documento | Conteudo |
+|---|-----------|----------|
+| 4 | [Conta Azul reverse engineering](../research/2026-04-12-conta-azul-reverse-engineering.md) | ERP financeiro generico — referencia anti-padrao |
+| 5 | [Gestek reverse engineering](../research/2026-04-12-gestek-reverse-engineering.md) | Concorrente vertical estetica |
+| 6 | [Kamino reverse engineering](../research/2026-04-12-kamino-reverse-engineering.md) | Concorrente vertical estetica |
+
+### Documentos Derivados (entregaveis das stories Phase 0)
+
+| # | Documento | Story origem | Status |
+|---|-----------|--------------|--------|
+| 7 | [PRD-KEYRA.md](../prd/PRD-KEYRA.md) | Story 0.2 | ✅ entregue |
+| 8 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) | Story 0.3 | ✅ entregue |
+| 9 | `supabase/migrations/*.sql` | Story 0.4 | ⏸️ proximo |
+| 10 | `docs/ux/wireframes/` | Story 0.5 | ⏸️ proximo |
+| 11 | [INFRA-STATUS.md](../INFRA-STATUS.md) | Story 0.1 | ✅ entregue |
+| 12 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Story 0.1 (suporte) | ✅ entregue |
+
+### Squads AIOX
+
+| # | Documento | Fases que executa |
+|---|-----------|-------------------|
+| 13 | [squad-keyra-bootstrap](../../squads/squad-keyra-bootstrap/squad.yaml) | Phase 0 |
+| 14 | [squad-keyra-core](../../squads/squad-keyra-core/squad.yaml) | Phases 2–4 (MVP) |
+| 15 | [squad-keyra-intelligence](../../squads/squad-keyra-intelligence/squad.yaml) | Phases 5–6 (pos-MVP) |
+| 16 | [squad-keyra-integrations](../../squads/squad-keyra-integrations/squad.yaml) | Phase 7 (integracoes) |
+
+### Visao geral
+
+| Documento | Funcao |
+|-----------|--------|
+| [README.md](../../README.md) | Entrada do projeto |
 
 ---
 
@@ -103,12 +151,12 @@ KEYRA resolve: financeiro gerado automaticamente a partir da operacao.
 
 | # | Entregavel | Agente | Status | Artefato |
 |---|-----------|--------|--------|----------|
-| 0.1 | Environment bootstrap (git, GitHub, Supabase, Vercel, dominio) | @devops/Orion | [x] ✅ 2026-04-16 | `docs/INFRA-STATUS.md` |
-| 0.2 | PRD formal | @pm | [x] ✅ 2026-04-16 | `docs/prd/PRD-KEYRA.md` (66 FRs + 27 NFRs + 27 CONs) |
-| 0.3 | Arquitetura fullstack | @architect | [x] ✅ 2026-04-16 | `docs/architecture/ARCHITECTURE.md` (20 ADRs) |
-| 0.4 | Schema de banco com RLS | @data-engineer | [ ] **PROXIMO** | `supabase/migrations/*.sql` |
-| 0.5 | Wireframes dashboard numerico | @ux-design-expert | [ ] **PROXIMO** | `docs/ux/wireframes/` |
-| 0.6 | Pesquisa competitiva | @analyst | [x] ✅ 2026-04-12 | `docs/research/2026-04-12-*.md` (Conta Azul, Gestek, Kamino) |
+| 0.1 | Environment bootstrap (git, GitHub, Supabase, Vercel, dominio) | @devops/Orion | [x] ✅ 2026-04-16 | [INFRA-STATUS.md](../INFRA-STATUS.md) |
+| 0.2 | PRD formal | @pm | [x] ✅ 2026-04-16 | [PRD-KEYRA.md](../prd/PRD-KEYRA.md) (66 FRs + 27 NFRs + 27 CONs) |
+| 0.3 | Arquitetura fullstack | @architect | [x] ✅ 2026-04-16 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) (20 ADRs) |
+| 0.4 | Schema de banco com RLS | @data-engineer | [ ] **PROXIMO** | `supabase/migrations/*.sql` (a criar) |
+| 0.5 | Wireframes dashboard numerico | @ux-design-expert | [ ] **PROXIMO** | `docs/ux/wireframes/` (a criar) |
+| 0.6 | Pesquisa competitiva | @analyst | [x] ✅ 2026-04-12 | [Conta Azul](../research/2026-04-12-conta-azul-reverse-engineering.md) · [Gestek](../research/2026-04-12-gestek-reverse-engineering.md) · [Kamino](../research/2026-04-12-kamino-reverse-engineering.md) |
 
 **Status:** 4/6 entregues. Faltam 0.4 e 0.5 — ambas independentes, podem rodar em paralelo.
 

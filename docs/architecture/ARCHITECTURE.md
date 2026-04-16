@@ -1,10 +1,49 @@
 # KEYRA — Fullstack Architecture Document
 
-> **Status:** v1.1 — Foundational design + Story 0.1 (infra) implementada
+> **Status:** v1.2 — Foundational design + Story 0.1 (infra) implementada + Companion Documents
 > **Author:** @architect (Aria)
 > **Date:** 2026-04-16
 > **Scope:** Phases 1–4 (MVP) of EPIC-0, with explicit migration paths for Phases 5–7
-> **Companion docs:** `docs/audios-idealizadora/contexto-completo-keyra.md`, `docs/research/2026-04-12-conta-azul-reverse-engineering.md`, `docs/stories/EPIC-0-KEYRA-IMPLEMENTATION.md`, [`docs/INFRA-STATUS.md`](../INFRA-STATUS.md)
+
+---
+
+## Companion Documents
+
+> Documentos relacionados que contextualizam, complementam ou consomem este documento de arquitetura.
+
+### Documentos de Produto (fontes / inputs)
+
+| # | Documento | Relação |
+|---|-----------|---------|
+| 1 | [PRD-KEYRA.md](../prd/PRD-KEYRA.md) | **PRD formal** — cada ADR aqui rastreia para FR/NFR/CON deste documento |
+| 2 | [EPIC-0 Master Plan](../stories/EPIC-0-KEYRA-IMPLEMENTATION.md) | Roadmap de 8 fases — esta arquitetura cobre Phases 1–7 |
+| 3 | [contexto-completo-keyra.md](../audios-idealizadora/contexto-completo-keyra.md) | Visão da idealizadora — fonte dos princípios UX inegociáveis (P2, P8) |
+| 4 | [visao-keyra-idealizadora.md](../audios-idealizadora/visao-keyra-idealizadora.md) | Documento narrativo da visão estratégica |
+
+### Pesquisa Competitiva (referências de stack/UX)
+
+| # | Documento | Uso na arquitetura |
+|---|-----------|--------------------|
+| 5 | [Conta Azul reverse engineering](../research/2026-04-12-conta-azul-reverse-engineering.md) | Anti-padrão: ERP genérico com lançamento manual — arquitetura aqui inverte isso |
+| 6 | [Gestek reverse engineering](../research/2026-04-12-gestek-reverse-engineering.md) | Referência de pricing baixo + agenda-first |
+| 7 | [Kamino reverse engineering](../research/2026-04-12-kamino-reverse-engineering.md) | Referência de régua de cobrança e fluxo financeiro automatizado |
+
+### Documentos Operacionais (consumidores / suporte)
+
+| # | Documento | Relação |
+|---|-----------|---------|
+| 8 | [INFRA-STATUS.md](../INFRA-STATUS.md) | **Snapshot vivo** — estado real de GitHub, Vercel, Supabase, domínio |
+| 9 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Estrutura de credenciais isoladas |
+| 10 | [README.md](../../README.md) | Visão geral do projeto |
+
+### Squads AIOX (consumidores diretos por fase)
+
+| # | Documento | Fase EPIC-0 |
+|---|-----------|-------------|
+| 11 | [squad-keyra-bootstrap](../../squads/squad-keyra-bootstrap/squad.yaml) | Phase 0 — entregou arquitetura, schema, wireframes |
+| 12 | [squad-keyra-core](../../squads/squad-keyra-core/squad.yaml) | Phases 2–4 — implementam ADR-007 a ADR-016 |
+| 13 | [squad-keyra-intelligence](../../squads/squad-keyra-intelligence/squad.yaml) | Phases 5–6 — pricing engine + projeções |
+| 14 | [squad-keyra-integrations](../../squads/squad-keyra-integrations/squad.yaml) | Phase 7 — ADR-014 OCR + Asaas + WhatsApp |
 
 ---
 
@@ -913,6 +952,7 @@ apps/web/src/
 |------|--------|---------|-------|
 | 2026-04-16 | 1.0 | Documento inicial — ADRs 001–020 cobrindo Phases 1–7 | @architect (Aria) |
 | 2026-04-16 | 1.1 | Story 0.1 implementada: Vercel Hobby + GitHub repo + Supabase sa-east-1 + domínio `keyra.app` provisionados. D1 fechado (Hobby). Seção 14 atualizada com URLs reais. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
+| 2026-04-16 | 1.2 | Bloco **Companion Documents** adicionado no header (14 docs em 4 grupos: produto, pesquisa, operacionais, squads). Substitui linha "Companion docs:" simples. | @aiox-master (Orion) |
 
 ---
 

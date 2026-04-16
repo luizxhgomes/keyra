@@ -47,16 +47,28 @@ Serviço → Agenda → Comanda → Transação → DRE → Decisão
 
 ## Status
 
-🚧 Greenfield — Fase 0 em execução.
+🚧 Greenfield — **Fase 0: 4/6 stories concluídas (67%)**.
 
 | Story | Entregável | Status |
 |-------|-----------|--------|
-| 0.1 | Environment bootstrap | 🟡 em andamento |
-| 0.2 | PRD formal | ✅ concluído |
-| 0.3 | Arquitetura fullstack | ✅ concluído |
-| 0.4 | Schema + RLS | ⏸️ próximo |
-| 0.5 | Wireframes | ⏸️ próximo |
-| 0.6 | Pesquisa competitiva | ✅ concluído |
+| 0.1 | Environment bootstrap (GitHub + Vercel + Supabase + domínio) | ✅ concluído |
+| 0.2 | PRD formal (66 FRs / 27 NFRs / 27 CONs) | ✅ concluído |
+| 0.3 | Arquitetura fullstack (20 ADRs) | ✅ concluído |
+| 0.4 | Schema PostgreSQL + RLS multi-tenant | ⏸️ próximo |
+| 0.5 | Wireframes dashboard numérico | ⏸️ próximo |
+| 0.6 | Pesquisa competitiva (Conta Azul, Gestek, Kamino) | ✅ concluído |
+
+## Infraestrutura
+
+| Recurso | URL / Identificador |
+|---------|---------------------|
+| Repositório | [github.com/luizxhgomes/keyra](https://github.com/luizxhgomes/keyra) (private) |
+| Domínio | [keyra.app](https://keyra.app) |
+| Vercel project | `keyra` (Hobby plan, auto-deploy de `main`) |
+| Supabase project | `keyra-br` (sa-east-1 / São Paulo, Postgres 17, Free plan) |
+
+> Snapshot operacional vivo: [`docs/INFRA-STATUS.md`](docs/INFRA-STATUS.md)
+> Setup de credenciais isoladas: [`docs/setup/CREDENTIALS.md`](docs/setup/CREDENTIALS.md)
 
 ---
 

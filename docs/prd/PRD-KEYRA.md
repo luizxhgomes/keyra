@@ -624,13 +624,13 @@ A idealizadora deve testar e aprovar:
 ### 11.1 Visao Geral (referencia ao EPIC-0)
 
 ```
-[Fase 0] Fundacao e Planejamento (Sem 1-2)   ← AGORA (este PRD = Story 0.2)
-   ├─ 0.1 Environment bootstrap (devops)
-   ├─ 0.2 PRD formal (pm)        [DELIVERABLE deste documento]
-   ├─ 0.3 Arquitetura fullstack (architect)
-   ├─ 0.4 Schema com RLS (data-engineer)
-   ├─ 0.5 Wireframes (ux-design-expert)
-   └─ 0.6 Pesquisa competitiva (analyst)
+[Fase 0] Fundacao e Planejamento (Sem 1-2)   ← 4/6 CONCLUIDAS (67%)
+   ├─ 0.1 Environment bootstrap (devops)        [x] ✅ GitHub + Vercel + Supabase sa-east-1 + dominio keyra.app
+   ├─ 0.2 PRD formal (pm)                       [x] ✅ este documento
+   ├─ 0.3 Arquitetura fullstack (architect)     [x] ✅ docs/architecture/ARCHITECTURE.md (20 ADRs)
+   ├─ 0.4 Schema com RLS (data-engineer)        [ ] ← PROXIMO
+   ├─ 0.5 Wireframes (ux-design-expert)         [ ] ← PROXIMO (paralelo com 0.4)
+   └─ 0.6 Pesquisa competitiva (analyst)        [x] ✅ Conta Azul, Gestek, Kamino
 
 [Fase 1] Fundacao Tecnica (Sem 3-4)
    └─ Auth + Multi-tenant + Layout base
@@ -667,15 +667,24 @@ A idealizadora deve testar e aprovar:
 
 ### 11.3 Marcos (Milestones)
 
-| Marco | Data alvo | Criterio |
-|-------|-----------|----------|
-| M0: PRD aprovado | 2026-04-30 | Idealizadora + @po validam este documento |
-| M1: Arquitetura aprovada | 2026-05-15 | @architect entrega doc + @qa valida |
-| M2: Fundacao tecnica pronta | 2026-05-31 | Fase 1 EPIC-0 completa |
-| M3: MVP feature-complete | 2026-08-15 | Fases 2-4 EPIC-0 completas |
-| M4: MVP em piloto (5 clinicas) | 2026-08-31 | Onboarding + uso real |
-| M5: Lancamento comercial | 2026-10-01 | Pricing ativo + cadastros publicos |
-| M6: 50 clinicas em uso ativo | 2026-12-31 | Validacao de PMF |
+> **Atualizacao 2026-04-16:** marcos M0 e M1 foram acelerados — PRD e arquitetura entregues no mesmo dia do bootstrap. Datas-alvo posteriores realinhadas com base em ritmo realista solo-dev + agentes AIOX.
+
+| Marco | Data original | Data revisada | Status | Criterio |
+|-------|--------------|---------------|--------|----------|
+| **M0:** PRD aprovado | 2026-04-30 | 2026-04-16 | ✅ entregue | Idealizadora + @po validam este documento |
+| **M1:** Arquitetura aprovada | 2026-05-15 | 2026-04-16 | ✅ entregue | @architect entregou (20 ADRs); revisao por @qa pendente |
+| **M1.5:** Schema + Wireframes (Fase 0 completa) | — | 2026-04-23 | ⏸️ proximo | Stories 0.4 e 0.5 entregues e aprovadas |
+| **M2:** Fundacao tecnica pronta | 2026-05-31 | 2026-05-07 | 🔜 | Fase 1 EPIC-0 completa (Auth + Multi-tenant + Layout) |
+| **M3:** MVP feature-complete | 2026-08-15 | 2026-07-15 | 🔜 | Fases 2-4 EPIC-0 completas |
+| **M4:** MVP em piloto (5 clinicas) | 2026-08-31 | 2026-08-01 | 🔜 | Onboarding + uso real |
+| **M5:** Lancamento comercial | 2026-10-01 | 2026-09-15 | 🔜 | Pricing ativo + cadastros publicos |
+| **M6:** 50 clinicas em uso ativo | 2026-12-31 | 2026-12-31 | 🔜 | Validacao de PMF |
+
+**Infraestrutura provisionada (Story 0.1, ver `docs/INFRA-STATUS.md`):**
+- Repo: `luizxhgomes/keyra` (private)
+- Dominio: `keyra.app`
+- Vercel: project `keyra` (Hobby — upgrade para Pro antes do M5)
+- Supabase: project `keyra-br` em `sa-east-1` (Free — upgrade Pro provavel no M3)
 
 ---
 
@@ -739,6 +748,7 @@ Documentacao das decisoes tomadas autonomamente durante a elaboracao deste PRD (
 | Data | Versao | Descricao | Autor |
 |------|--------|-----------|-------|
 | 2026-04-16 | 1.0 | Criacao inicial do PRD (Story 0.2 do EPIC-0) — modo YOLO autonomo | @pm (Morgan) |
+| 2026-04-16 | 1.1 | Atualizacao Story 0.1 — infraestrutura provisionada (GitHub + Vercel + Supabase sa-east-1 + dominio keyra.app). Marcos M0 e M1 antecipados. Roadmap section 11.1 e 11.3 atualizados. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
 
 ---
 

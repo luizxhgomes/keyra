@@ -1,10 +1,10 @@
 # KEYRA — Fullstack Architecture Document
 
-> **Status:** v1.0 — Foundational design (EPIC-0 / Story 0.3)
+> **Status:** v1.1 — Foundational design + Story 0.1 (infra) implementada
 > **Author:** @architect (Aria)
 > **Date:** 2026-04-16
 > **Scope:** Phases 1–4 (MVP) of EPIC-0, with explicit migration paths for Phases 5–7
-> **Companion docs:** `docs/audios-idealizadora/contexto-completo-keyra.md`, `docs/research/2026-04-12-conta-azul-reverse-engineering.md`, `docs/stories/EPIC-0-KEYRA-IMPLEMENTATION.md`
+> **Companion docs:** `docs/audios-idealizadora/contexto-completo-keyra.md`, `docs/research/2026-04-12-conta-azul-reverse-engineering.md`, `docs/stories/EPIC-0-KEYRA-IMPLEMENTATION.md`, [`docs/INFRA-STATUS.md`](../INFRA-STATUS.md)
 
 ---
 
@@ -770,12 +770,14 @@ apps/web/src/
 
 ## 14. CI/CD & Environments
 
-| Environment | URL | Branch | DB |
-|-------------|-----|--------|----|
-| Local | http://localhost:3000 | working branch | Supabase local (Docker) |
-| Preview | auto Vercel preview | every PR | Supabase Preview Branch (Phase 2) |
-| Staging | staging.keyra.app | `main` | Supabase Project `keyra-staging` |
-| Production | app.keyra.app | tag `v*` | Supabase Project `keyra-prod` |
+> **Estado atual (2026-04-16):** ambiente Production já provisionado. Staging e Preview-DB virão na Phase 5. Detalhes operacionais vivos em [`docs/INFRA-STATUS.md`](../INFRA-STATUS.md).
+
+| Environment | URL | Branch | DB | Status |
+|-------------|-----|--------|----|--------|
+| Local | http://localhost:3000 | working branch | Supabase local (Docker) ou projeto remoto via env | Pendente Story 1.1 |
+| Preview | auto Vercel preview (`keyra-*.vercel.app`) | every PR | **Phase 1-4: usa o mesmo projeto remoto Supabase**; Branches dedicados na Phase 5 | ✅ provisionado, deploy disparará no 1º push de código Next.js |
+| Production | `keyra.app` | `main` | Supabase project `keyra-br` (`oapdfhivzojyahvphebs`, sa-east-1) | ✅ provisionado |
+| Staging | `staging.keyra.app` | `main` (futuro) | Supabase Project `keyra-staging` (criar Phase 5) | ⏸️ não provisionado |
 
 **Pipeline (GitHub Actions):**
 1. `lint` (ESLint + Prettier check)
@@ -849,7 +851,7 @@ apps/web/src/
 
 | # | Decisão | Opções | Recomendação Aria | Bloqueia |
 |---|---------|--------|-------------------|----------|
-| **D1** | Vercel Pro desde dia 1? | Hobby (grátis) vs Pro ($20/mês) | **Pro** (preview deploys ilimitados, log drains, observability) | Story 1.1 |
+| ~~**D1**~~ | ~~Vercel Pro desde dia 1?~~ | ~~Hobby (grátis) vs Pro ($20/mês)~~ | **DECIDIDO 2026-04-16: Hobby (Free)**. Upgrade para Pro quando atingir 70% de bandwidth ou aceitar 1º pagante (commercial-use license obriga). | — |
 | **D2** | FullCalendar Standard vs Schedule-X? | FullCalendar (maduro, MIT) vs Schedule-X (newer, lighter) | **FullCalendar Standard** (zero risco, comunidade grande) | Story 2.4 |
 | **D3** | Inngest desde Phase 4 ou adiar para Phase 5? | Inngest now vs DRE on-demand inicial | **Inngest na Phase 4** (Free tier suficiente, evita refator) | Story 4.1 |
 | **D4** | OCR: Document AI ou GPT-4o-mini? | $0.30/pág vs $0.005/PDF | **PoC paralela na Phase 7** | Story 7.1 |
@@ -910,6 +912,7 @@ apps/web/src/
 | Data | Versão | Mudança | Autor |
 |------|--------|---------|-------|
 | 2026-04-16 | 1.0 | Documento inicial — ADRs 001–020 cobrindo Phases 1–7 | @architect (Aria) |
+| 2026-04-16 | 1.1 | Story 0.1 implementada: Vercel Hobby + GitHub repo + Supabase sa-east-1 + domínio `keyra.app` provisionados. D1 fechado (Hobby). Seção 14 atualizada com URLs reais. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
 
 ---
 

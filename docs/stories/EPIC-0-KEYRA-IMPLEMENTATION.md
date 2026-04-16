@@ -101,14 +101,22 @@ KEYRA resolve: financeiro gerado automaticamente a partir da operacao.
 **Squad:** `squad-keyra-bootstrap`
 **Workflow:** `greenfield-fullstack.yaml`
 
-| # | Entregavel | Agente | Status |
-|---|-----------|--------|--------|
-| 0.1 | Environment bootstrap (git, GitHub, Supabase, Vercel) | @devops | [ ] |
-| 0.2 | PRD formal | @pm | [ ] |
-| 0.3 | Arquitetura fullstack | @architect | [ ] |
-| 0.4 | Schema de banco com RLS | @data-engineer | [ ] |
-| 0.5 | Wireframes dashboard numerico | @ux-design-expert | [ ] |
-| 0.6 | Pesquisa competitiva | @analyst | [ ] |
+| # | Entregavel | Agente | Status | Artefato |
+|---|-----------|--------|--------|----------|
+| 0.1 | Environment bootstrap (git, GitHub, Supabase, Vercel, dominio) | @devops/Orion | [x] ✅ 2026-04-16 | `docs/INFRA-STATUS.md` |
+| 0.2 | PRD formal | @pm | [x] ✅ 2026-04-16 | `docs/prd/PRD-KEYRA.md` (66 FRs + 27 NFRs + 27 CONs) |
+| 0.3 | Arquitetura fullstack | @architect | [x] ✅ 2026-04-16 | `docs/architecture/ARCHITECTURE.md` (20 ADRs) |
+| 0.4 | Schema de banco com RLS | @data-engineer | [ ] **PROXIMO** | `supabase/migrations/*.sql` |
+| 0.5 | Wireframes dashboard numerico | @ux-design-expert | [ ] **PROXIMO** | `docs/ux/wireframes/` |
+| 0.6 | Pesquisa competitiva | @analyst | [x] ✅ 2026-04-12 | `docs/research/2026-04-12-*.md` (Conta Azul, Gestek, Kamino) |
+
+**Status:** 4/6 entregues. Faltam 0.4 e 0.5 — ambas independentes, podem rodar em paralelo.
+
+**Infraestrutura provisionada:**
+- GitHub: https://github.com/luizxhgomes/keyra (private, branch main)
+- Vercel project: `keyra` (Hobby plan, Next.js, auto-deploy linkado ao repo)
+- Dominio: `keyra.app` (verified)
+- Supabase: `keyra-br` em `sa-east-1` (Free plan, Postgres 17)
 
 **Criterio de aceitacao:** PRD aprovado pela idealizadora, schema com RLS validado, wireframes alinhados com principios UX (numeros absolutos, tela unica).
 

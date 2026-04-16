@@ -1,11 +1,55 @@
 # KEYRA — Product Requirements Document (PRD)
 
-> **Documento:** PRD Formal v1.0 (Story 0.2 do EPIC-0)
+> **Documento:** PRD Formal v1.1 (Story 0.2 do EPIC-0)
 > **Autor:** @pm (Morgan)
 > **Data:** 2026-04-16
 > **Status:** Draft (aguarda validacao da idealizadora e @po)
 > **Constitution:** Article IV (No Invention) — todo FR/NFR/CON rastreia para visao da idealizadora ou EPIC-0
 > **Modo de elaboracao:** YOLO autonomo (decisoes documentadas como `[AUTO-DECISION]`)
+
+---
+
+## Companion Documents
+
+> Documentos relacionados que contextualizam, complementam ou sao consumidos por este PRD.
+
+### Fontes Originarias (visao bruta da idealizadora)
+
+| # | Documento | Conteudo |
+|---|-----------|----------|
+| 1 | [contexto-completo-keyra.md](../audios-idealizadora/contexto-completo-keyra.md) | Sintese estruturada das transcricoes de audio (visao + 4 pilares + 12 modulos + principios UX) — **fonte primaria deste PRD** |
+| 2 | [visao-keyra-idealizadora.md](../audios-idealizadora/visao-keyra-idealizadora.md) | Documento de visao narrativo da idealizadora |
+| 3 | [WhatsApp Ptt 2026-04-12 at 15.04.38.txt](../audios-idealizadora/WhatsApp%20Ptt%202026-04-12%20at%2015.04.38.txt) | Transcricao bruta — audio 1/4 |
+| 4 | [WhatsApp Ptt 2026-04-12 at 15.05.44.txt](../audios-idealizadora/WhatsApp%20Ptt%202026-04-12%20at%2015.05.44.txt) | Transcricao bruta — audio 2/4 |
+| 5 | [WhatsApp Ptt 2026-04-12 at 15.06.42.txt](../audios-idealizadora/WhatsApp%20Ptt%202026-04-12%20at%2015.06.42.txt) | Transcricao bruta — audio 3/4 |
+| 6 | [WhatsApp Ptt 2026-04-12 at 15.07.59.txt](../audios-idealizadora/WhatsApp%20Ptt%202026-04-12%20at%2015.07.59.txt) | Transcricao bruta — audio 4/4 |
+
+### Pesquisa Competitiva (benchmark)
+
+| # | Documento | Conteudo |
+|---|-----------|----------|
+| 7 | [Conta Azul reverse engineering](../research/2026-04-12-conta-azul-reverse-engineering.md) | ERP financeiro generico — referencia de pricing alto e fluxo manual a evitar |
+| 8 | [Gestek reverse engineering](../research/2026-04-12-gestek-reverse-engineering.md) | Concorrente direto vertical estetica — pricing baixo, agenda-first |
+| 9 | [Kamino reverse engineering](../research/2026-04-12-kamino-reverse-engineering.md) | Concorrente vertical estetica — referencia de regua de cobranca e UX |
+
+### Documentos Tecnicos (consumidores deste PRD)
+
+| # | Documento | Relacao |
+|---|-----------|---------|
+| 10 | [ARCHITECTURE.md](../architecture/ARCHITECTURE.md) | Arquitetura fullstack (20 ADRs) — **consome** este PRD; cada ADR rastreia para FR/NFR/CON aqui |
+| 11 | [EPIC-0 Master Plan](../stories/EPIC-0-KEYRA-IMPLEMENTATION.md) | Roadmap mestre de 8 fases — este PRD e Story 0.2 do epic |
+| 12 | [INFRA-STATUS.md](../INFRA-STATUS.md) | Snapshot vivo da infraestrutura provisionada (GitHub, Vercel, Supabase, dominio) |
+| 13 | [CREDENTIALS.md](../setup/CREDENTIALS.md) | Estrutura de credenciais isoladas do projeto |
+| 14 | [README.md](../../README.md) | Visao geral do projeto |
+
+### Squads e Workflows AIOX
+
+| # | Documento | Conteudo |
+|---|-----------|----------|
+| 15 | [squad-keyra-bootstrap](../../squads/squad-keyra-bootstrap/squad.yaml) | Squad da Fase 0 (PM, architect, data-engineer, analyst, ux, finance, document-processor, compliance) |
+| 16 | [squad-keyra-core](../../squads/squad-keyra-core/squad.yaml) | Squad das Fases 2-4 (MVP) |
+| 17 | [squad-keyra-intelligence](../../squads/squad-keyra-intelligence/squad.yaml) | Squad das Fases 5-6 (pos-MVP) |
+| 18 | [squad-keyra-integrations](../../squads/squad-keyra-integrations/squad.yaml) | Squad da Fase 7 (integracoes) |
 
 ---
 
@@ -702,13 +746,19 @@ A idealizadora deve testar e aprovar:
 ### Fontes Validas (Article IV — No Invention)
 
 Toda especificacao neste PRD rastreia para:
-1. **Audios da idealizadora** — `docs/audios-idealizadora/contexto-completo-keyra.md` (secoes 1-12)
-2. **EPIC-0 Master Plan** — `docs/stories/EPIC-0-KEYRA-IMPLEMENTATION.md` (Fases 0-8)
-3. **Research Conta Azul** — `docs/research/2026-04-12-conta-azul-reverse-engineering.md` (benchmark)
-4. **Research Gestek** — `docs/research/2026-04-12-gestek-reverse-engineering.md` (benchmark)
-5. **Research Kamino** — `docs/research/2026-04-12-kamino-reverse-engineering.md` (benchmark)
+1. **Audios da idealizadora** — [`contexto-completo-keyra.md`](../audios-idealizadora/contexto-completo-keyra.md) (secoes 1-12) + [transcricoes brutas WhatsApp](../audios-idealizadora/) (4 arquivos `.txt`)
+2. **EPIC-0 Master Plan** — [`EPIC-0-KEYRA-IMPLEMENTATION.md`](../stories/EPIC-0-KEYRA-IMPLEMENTATION.md) (Fases 0-8)
+3. **Research Conta Azul** — [`2026-04-12-conta-azul-reverse-engineering.md`](../research/2026-04-12-conta-azul-reverse-engineering.md) (benchmark)
+4. **Research Gestek** — [`2026-04-12-gestek-reverse-engineering.md`](../research/2026-04-12-gestek-reverse-engineering.md) (benchmark)
+5. **Research Kamino** — [`2026-04-12-kamino-reverse-engineering.md`](../research/2026-04-12-kamino-reverse-engineering.md) (benchmark)
+6. **Visao narrativa** — [`visao-keyra-idealizadora.md`](../audios-idealizadora/visao-keyra-idealizadora.md)
 
 **Verificacao de invencao:** zero requisitos foram criados sem rastreamento documental. Quando a inspiracao veio de research (ex: regua de cobranca da Kamino, plano de contas pre-configurado do Conta Azul), a fonte e citada explicitamente.
+
+**Documentos consumidores deste PRD** (nao sao fontes mas dependem dele):
+- [`ARCHITECTURE.md`](../architecture/ARCHITECTURE.md) — cada ADR rastreia para FR/NFR/CON deste PRD
+- Stories futuras em `docs/stories/` — derivacao direta dos FRs por @sm
+- Lista completa de documentos relacionados: ver [Companion Documents](#companion-documents) no inicio deste PRD.
 
 ### Distribuicao por Pilar
 
@@ -749,6 +799,7 @@ Documentacao das decisoes tomadas autonomamente durante a elaboracao deste PRD (
 |------|--------|-----------|-------|
 | 2026-04-16 | 1.0 | Criacao inicial do PRD (Story 0.2 do EPIC-0) — modo YOLO autonomo | @pm (Morgan) |
 | 2026-04-16 | 1.1 | Atualizacao Story 0.1 — infraestrutura provisionada (GitHub + Vercel + Supabase sa-east-1 + dominio keyra.app). Marcos M0 e M1 antecipados. Roadmap section 11.1 e 11.3 atualizados. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
+| 2026-04-16 | 1.2 | Adicionado bloco **Companion Documents** no header (18 docs relacionados linkados). Anexo A com hyperlinks Markdown clicaveis. | @aiox-master (Orion) |
 
 ---
 

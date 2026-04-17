@@ -28,8 +28,11 @@
 | **Project name** | `keyra` |
 | **Framework** | Next.js |
 | **Production branch** | `main` |
-| **Production domain** | `keyra.app` (verified) |
-| **Preview default** | `keyra-eight.vercel.app` |
+| **Production URL (em uso)** | **`usekeyra.vercel.app`** ✅ HTTP 200 |
+| **Domínio custom (pendente DNS)** | `keyra.app` — Cloudflare aponta para parking; ajustar A record para `76.76.21.21` |
+| **Default Vercel** | `keyra-eight.vercel.app` ✅ HTTP 200 |
+| **Alias alternativo** | `keyra-app.vercel.app` ✅ HTTP 200 |
+| **Deployment protection** | desabilitada (público) |
 | **Plano** | Hobby (Free) — *upgrade para Pro ($20/mês) avaliar quando passar de 100 GB bandwidth/mês ou precisar de log drains* |
 | **DNS** | Cloudflare (NS: `edna.ns.cloudflare.com`, `theo.ns.cloudflare.com`) → IPs Vercel |
 

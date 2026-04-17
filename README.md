@@ -65,7 +65,8 @@ Serviço → Agenda → Comanda → Transação → DRE → Decisão
 | Recurso | URL / Identificador |
 |---------|---------------------|
 | Repositório | [github.com/luizxhgomes/keyra](https://github.com/luizxhgomes/keyra) (private) |
-| Domínio | [keyra.app](https://keyra.app) |
+| **Aplicação (produção)** | **[usekeyra.vercel.app](https://usekeyra.vercel.app)** |
+| Domínio custom (pendente DNS) | [keyra.app](https://keyra.app) — Cloudflare precisa apontar A record para `76.76.21.21` |
 | Vercel project | `keyra` (Hobby plan, auto-deploy de `main`) |
 | Supabase project | `keyra-br` (sa-east-1 / São Paulo, Postgres 17, Free plan) |
 

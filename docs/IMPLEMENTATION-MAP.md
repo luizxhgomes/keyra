@@ -10,7 +10,7 @@
 
 | Camada | Estado | Detalhe |
 |--------|--------|---------|
-| **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra`, Vercel `keyra` (Hobby), Supabase `keyra-br` (sa-east-1, Free), domínio `keyra.app` (verified) |
+| **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra`, Vercel `keyra` (Hobby) rodando em [usekeyra.vercel.app](https://usekeyra.vercel.app), Supabase `keyra-br` (sa-east-1, Free). Custom `keyra.app` pendente ajuste DNS Cloudflare |
 | **Banco de Dados** | ✅ 100% schema aplicado | 21 tabelas, 21/21 RLS, 6 views, 15 funções, 19 migrations no remoto |
 | **Documentação** | ✅ Phase 0 completa | PRD v1.3 + ARCHITECTURE v1.3 + 8 wireframes + SCHEMA + INFRA-STATUS |
 | **Código aplicação** | 🟡 ~10% | Story 1.1 entregue: scaffold Next.js + design system + Supabase clients + AppShell + componentes canônicos KEYRA. Auth e features ainda pendentes. |

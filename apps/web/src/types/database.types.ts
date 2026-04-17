@@ -1658,6 +1658,10 @@ export type Database = {
         Args: { p_command_id: string; p_created_by: string; p_org_id: string }
         Returns: undefined
       }
+      create_organization_with_owner: {
+        Args: { p_cnpj?: string; p_name: string }
+        Returns: string
+      }
       current_org_id: { Args: never; Returns: string }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       is_org_member: {

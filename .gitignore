@@ -70,3 +70,6 @@ __pycache__/
 
 # Claude Code session locks (local)
 .claude/scheduled_tasks.lock
+
+# TypeScript incremental build
+*.tsbuildinfo

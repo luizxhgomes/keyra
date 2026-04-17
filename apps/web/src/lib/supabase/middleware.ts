@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient as createSSRClient, type CookieOptions } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { env } from '@/lib/env';
 import type { Database } from '@/types/database.types';
@@ -46,7 +47,7 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
         },
       },
     },
-  );
+  ) as unknown as SupabaseClient<Database>;
 
   // Touch the session — triggers refresh if access token is near expiry.
   // We intentionally ignore the user payload here; auth gating lives in

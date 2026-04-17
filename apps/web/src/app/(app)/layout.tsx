@@ -1,13 +1,19 @@
 import { AppShell } from '@/components/layout/AppShell';
+import { requireAuth } from '@/lib/auth/require-auth';
 
 /**
  * Authenticated route group layout.
  *
- * Auth guards are intentionally out of scope for Story 1.1 — the marketing
- * landing + login placeholders cover the public surface. Story 1.2 will add
- * a server-side check (Supabase session + active org membership) here, redirecting
- * unauthenticated visitors to /login.
+ * `requireAuth()` handles the auth gate:
+ *   - No session → redirect('/login')
+ *   - Session but no org → redirect('/onboarding/nova-organizacao')
+ *
+ * Middleware (`middleware.ts`) catches most cases earlier, but we still
+ * enforce at the layout level because Next caches route segments and the
+ * middleware could miss edge cases (e.g. membership deleted mid-session).
  */
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user } = await requireAuth();
+
+  return <AppShell userEmail={user.email ?? 'você'}>{children}</AppShell>;
 }

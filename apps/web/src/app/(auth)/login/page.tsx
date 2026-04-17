@@ -1,24 +1,45 @@
+import Link from 'next/link';
+import type { Metadata } from 'next';
+
+import { LoginForm } from './login-form';
+
+export const metadata: Metadata = {
+  title: 'Entrar',
+  description: 'Acesse sua conta KEYRA com um link mágico enviado por e-mail.',
+};
+
 /**
- * Login placeholder.
+ * Login screen — magic link flow (ADR-010).
  *
- * TODO (Story 1.2): implementar fluxo email + senha + magic link com Supabase Auth
- * (ADR-010). Validação react-hook-form + Zod. Empty/error/loading states obrigatórios
- * conforme `00-design-principles.md` §9.
+ * Server Component shell. The form itself is a Client Component so we can
+ * drive the two-phase UX (email input → "confira seu e-mail") without
+ * round-tripping the full page.
  */
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-card p-8 shadow-sm">
-        <h1 className="text-2xl font-semibold text-foreground">Entrar no KEYRA</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Tela de login será implementada na Story 1.2 (Supabase Auth + email + magic link).
-        </p>
-        <div
-          aria-live="polite"
-          className="mt-6 rounded-md border border-dashed border-border bg-muted px-4 py-6 text-center text-sm text-muted-foreground"
-        >
-          Em breve: formulário com email, senha e link mágico.
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 flex flex-col items-center gap-2 text-center">
+          <Link href="/" className="text-3xl font-bold tracking-tight text-primary">
+            KEYRA
+          </Link>
+          <p className="text-sm text-muted-foreground">
+            Entre no seu financeiro operacional.
+          </p>
         </div>
+
+        <div className="rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8">
+          <LoginForm />
+        </div>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          <Link
+            href="/"
+            className="underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Voltar para a página inicial
+          </Link>
+        </p>
       </div>
     </main>
   );

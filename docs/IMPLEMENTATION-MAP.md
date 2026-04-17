@@ -1,6 +1,6 @@
 # KEYRA — Mapa de Implementação (source of truth)
 
-> **Última atualização:** 2026-04-16 (Story 1.1 entregue — scaffold Next.js)
+> **Última atualização:** 2026-04-16 (Story 1.2 entregue — auth + onboarding)
 > **Propósito:** matriz viva que cruza **features × telas × tabelas × ADRs × stories × status**.
 > **Quando atualizar:** sempre que uma story for entregue, um ADR mudar, ou uma feature ganhar novo escopo.
 
@@ -13,8 +13,8 @@
 | **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra`, Vercel `keyra` (Hobby) rodando em [usekeyra.vercel.app](https://usekeyra.vercel.app), Supabase `keyra-br` (sa-east-1, Free). Custom `keyra.app` pendente ajuste DNS Cloudflare |
 | **Banco de Dados** | ✅ 100% schema aplicado | 21 tabelas, 21/21 RLS, 6 views, 15 funções, 19 migrations no remoto |
 | **Documentação** | ✅ Phase 0 completa | PRD v1.3 + ARCHITECTURE v1.3 + 8 wireframes + SCHEMA + INFRA-STATUS |
-| **Código aplicação** | 🟡 ~10% | Story 1.1 entregue: scaffold Next.js + design system + Supabase clients + AppShell + componentes canônicos KEYRA. Auth e features ainda pendentes. |
-| **Auth & Multi-tenant** | 🟡 50% | Schema pronto + `lib/supabase/{server,browser,admin,middleware}` criados; Auth Hook ativado; UI de login/signup/org-switcher pendente (Story 1.2-1.5) |
+| **Código aplicação** | 🟡 ~18% | Story 1.1 (scaffold) + Story 1.2 (auth + onboarding + org switcher + user menu) entregues. Features de pilar (agenda, pacientes, etc) ainda pendentes. |
+| **Auth & Multi-tenant** | ✅ ~90% | Schema + `lib/supabase/*` + Auth Hook + login magic link + callback + middleware guards + onboarding 1ª org + switcher ≥ 2 orgs + sign-out implementados. Falta convite de membro (Story 1.3). |
 | **Features MVP (Pilares 1-4)** | ⏸️ 0% código | Schema pronto; UI/Server Actions a criar |
 
 ---
@@ -45,6 +45,32 @@
 | README completo | `apps/web/README.md` (versões reais, estrutura, decisões de fallback) | ✅ |
 
 **Não validado ainda (sandbox bloqueou):** `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm build`. Validação manual + commit fica para o passo seguinte (Luiz roda local antes do push).
+
+---
+
+## 1.2 Story 1.2 — Autenticação + Onboarding (entregue 2026-04-16)
+
+| Entregável | Path | Status |
+|-----------|------|--------|
+| Login com magic link | `app/(auth)/login/page.tsx` + `login-form.tsx` + `actions.ts` | ✅ |
+| Callback handler OAuth/OTP | `app/auth/callback/route.ts` | ✅ (exchangeCodeForSession + route por membership) |
+| Middleware guards | `src/middleware.ts` (protege /dashboard, /agenda, /pacientes, etc; bounce /login se logado) | ✅ |
+| Onboarding criar 1ª org | `app/onboarding/nova-organizacao/page.tsx` + `onboarding-form.tsx` + `actions.ts` | ✅ (3-step com compensating delete) |
+| Org switcher (≥ 2 orgs) | `components/layout/OrgSwitcher.tsx` | ✅ (dropdown com checkmark na ativa; nome texto se só 1 org) |
+| User menu com logout | `components/layout/UserMenu.tsx` + `app/actions/sign-out.ts` | ✅ |
+| Helpers de auth server-side | `lib/auth/{get-current-user,require-auth}.ts` | ✅ (JWT claim + fallback user_preferences) |
+| Server Actions compartilhadas | `app/actions/{sign-out,switch-organization,get-user-organizations}.ts` | ✅ |
+| DropdownMenu (shadcn) | `components/ui/dropdown-menu.tsx` | ✅ (copiado do shadcn; sem dep nova) |
+| AppShell atualizado | `components/layout/AppShell.tsx` + `(app)/layout.tsx` com `requireAuth()` | ✅ |
+| ESLint config Next 16 | `eslint.config.mjs` (flat config direto, sem FlatCompat) | ✅ (corrige bug de `next lint` removido) |
+| `next.config.ts` Next 16 compat | `typedRoutes` fora de `experimental` | ✅ |
+| Database types stub | `src/types/database.types.ts` (hand-rolled para 3 tabelas) | 🟡 **rodar `pnpm typegen` local** para popular 21 tabelas |
+
+**Validado:** `pnpm typecheck` ✅, `pnpm lint` ✅, `pnpm build` ✅ (5 rotas geradas). Dev server não rodado (sandbox bloqueou) — Luiz deve rodar `pnpm dev` e validar fluxo end-to-end.
+
+**Warnings conhecidos:**
+- Next 16 deprecou `middleware.ts` em favor de `proxy.ts` — rename fica para Story 1.3 (TODO em `next.config.ts`).
+- `@supabase/ssr@0.5.2` tem mismatch de generics com `@supabase/supabase-js@2.103`. Mitigado via cast em `lib/supabase/{server,browser,middleware}.ts`. Revisitar quando ssr publicar major compatível.
 
 ---
 
@@ -137,11 +163,11 @@
 
 | Feature | Tela | Tabelas | ADR | Story | Status |
 |---------|------|---------|-----|-------|--------|
-| Login email + magic link | (a criar) | `auth.users` (Supabase) | ADR-010 | 1.2 | ⏸️ (placeholder em `/login` — Story 1.1) |
-| Criar organização (1ª) | onboarding | `organizations`, `memberships` | ADR-011 | 1.2 | ⏸️ |
+| Login email + magic link | `/login` + `/auth/callback` | `auth.users` (Supabase) | ADR-010 | 1.2 | ✅ |
+| Criar organização (1ª) | `/onboarding/nova-organizacao` | `organizations`, `memberships`, `user_preferences` | ADR-011 | 1.2 | ✅ |
 | Convidar membro por email | (config) | `organization_invites` | ADR-011 | 1.3 | ⏸️ |
-| Trocar org ativa (multi-org) | header switcher | `user_preferences` | ADR-012 | 1.5 | ⏸️ (placeholder no AppShell header — Story 1.1) |
-| Roles (owner/admin/professional/viewer) | (config) | `memberships.role` | ADR-011 | 1.3 | ⏸️ |
+| Trocar org ativa (multi-org) | header `OrgSwitcher` | `user_preferences` | ADR-012 | 1.2 | ✅ |
+| Roles (owner/admin/professional/viewer) | (config) | `memberships.role` | ADR-011 | 1.3 | ⏸️ (owner atribuído no onboarding; UI pendente) |
 | **Auth Hook custom_access_token (org_id no JWT)** | — | função SQL `custom_access_token_hook` ✅ | ADR-012 | 1.1 | ✅ ativo no Supabase |
 | RLS isolamento cross-tenant | — | policies em 21 tabelas ✅ | ADR-011 | 1.4 | ✅ ativo (testar c/ rls_isolation.test.sql) |
 

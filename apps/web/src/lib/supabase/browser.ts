@@ -1,4 +1,5 @@
 import { createBrowserClient as createSSRBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { env } from '@/lib/env';
 import type { Database } from '@/types/database.types';
@@ -11,10 +12,12 @@ import type { Database } from '@/types/database.types';
  * Prefer Server Actions + `createServerClient()` whenever possible. Use this
  * sparingly: realtime subscriptions, file uploads with progress, drag/drop
  * agenda updates.
+ *
+ * NOTE: see `server.ts` for the generic-order cast rationale.
  */
-export function createBrowserClient() {
+export function createBrowserClient(): SupabaseClient<Database> {
   return createSSRBrowserClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  ) as unknown as SupabaseClient<Database>;
 }

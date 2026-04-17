@@ -1,20 +1,23 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { FlatCompat } from '@eslint/eslintrc';
+import nextConfig from 'eslint-config-next';
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
+import nextTypescript from 'eslint-config-next/typescript';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
+/**
+ * KEYRA ESLint flat config.
+ *
+ * Next 16 ships `eslint-config-next` as native flat-config arrays — no
+ * FlatCompat shim needed (and in fact FlatCompat chokes on the v16 configs
+ * due to a circular-refs issue when serializing plugins).
+ *
+ * Article VI (Absolute Imports) — we ban deep relative imports so contributors
+ * always reach for `@/...`.
+ */
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...nextConfig,
+  ...nextCoreWebVitals,
+  ...nextTypescript,
   {
     rules: {
-      // KEYRA-specific overrides go here.
-      // Article VI (Absolute Imports) — disallow deep relative imports.
       'no-restricted-imports': [
         'error',
         {
@@ -30,7 +33,7 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts'],
+    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', '*.tsbuildinfo'],
   },
 ];
 

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { createServerClient as createSSRClient, type CookieOptions } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { env } from '@/lib/env';
 import type { Database } from '@/types/database.types';
@@ -13,8 +14,18 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
  * every query, enabling RLS-based tenant isolation (ADR-008 + ADR-011/012).
  *
  * Always `await` this in async server contexts. Never import in client files.
+ *
+ * NOTE on generics: `@supabase/ssr@0.5.x` declares its return as
+ * `SupabaseClient<Database, SchemaName, Schema>` using the OLD 3-arg
+ * generic order, but `@supabase/supabase-js@2.103` has a NEW 5-arg order
+ * where slot 2 is `SchemaNameOrClientOptions`. The mismatch collapses the
+ * derived Schema to `never`, so `.from('table')` calls lose their Insert
+ * types. We cast to the 2-arg SupabaseClient form, which lets the library
+ * fill the remaining slots with their correct defaults (SchemaName='public',
+ * Schema=Database['public']). Revisit once ssr ships a 2.103-compatible
+ * major version.
  */
-export async function createServerClient() {
+export async function createServerClient(): Promise<SupabaseClient<Database>> {
   const cookieStore = await cookies();
 
   return createSSRClient<Database>(
@@ -37,5 +48,5 @@ export async function createServerClient() {
         },
       },
     },
-  );
+  ) as unknown as SupabaseClient<Database>;
 }

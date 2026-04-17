@@ -1,18 +1,26 @@
-import { ChevronDown } from 'lucide-react';
-
 import { BottomNav } from '@/components/layout/BottomNav';
+import { OrgSwitcher } from '@/components/layout/OrgSwitcher';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { UserMenu } from '@/components/layout/UserMenu';
 
 /**
  * Authenticated app shell — sidebar + top bar + content area.
  *
- * Story 1.2 will inject:
- *  - Real org switcher (multi-tenant)
- *  - User menu with sign-out
- *  - Notifications
- * Until then, header shows static placeholders so the layout is visible.
+ * The parent `(app)/layout.tsx` (a Server Component) resolves the current
+ * user via `requireAuth()` and passes the email down so we can render the
+ * user menu without a client-side Supabase fetch.
+ *
+ * OrgSwitcher hydrates its own data client-side (Server Action). Keeping
+ * it a Client Component lets the dropdown animate + update locally on
+ * switch without re-rendering the full shell.
  */
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  userEmail,
+}: {
+  children: React.ReactNode;
+  userEmail: string;
+}) {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -20,22 +28,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur">
           <div className="flex items-center gap-3">
-            {/* TODO (Story 1.5 multi-org): trocar por <OrgSwitcher /> real */}
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
-              disabled
-            >
-              <span>Sua clínica</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            </button>
+            <OrgSwitcher />
           </div>
 
           <div className="flex items-center gap-3">
-            {/* TODO (Story 1.2): notificações + perfil */}
-            <span className="text-xs text-muted-foreground">
-              KEYRA · pré-MVP (scaffold Story 1.1)
-            </span>
+            <UserMenu email={userEmail} />
           </div>
         </header>
 

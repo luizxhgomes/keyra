@@ -68,16 +68,9 @@ export function Sidebar() {
       </nav>
 
       <div className="border-t border-border p-4">
-        {/* TODO (Story 1.2): user menu (avatar + dropdown sair/perfil) */}
-        <div className="flex items-center gap-3 rounded-md px-2 py-2 text-sm text-muted-foreground">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase">
-            ?
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="text-foreground">Convidada</span>
-            <span className="text-xs">Story 1.2 ativa login</span>
-          </div>
-        </div>
+        <p className="px-2 text-xs text-muted-foreground">
+          Org switcher e menu da conta estão no topo direito.
+        </p>
       </div>
     </aside>
   );

@@ -4,6 +4,9 @@
 .env
 .env.local
 .env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
 *.key
 *.pem
 
@@ -20,6 +23,20 @@
 # Dependencies (AIOX)
 node_modules/
 node_modules
+**/node_modules/
+
+# Next.js / Turborepo build outputs
+.next/
+**/.next/
+.turbo/
+**/.turbo/
+out/
+**/out/
+next-env.d.ts
+**/next-env.d.ts
+
+# pnpm
+.pnpm-store/
 
 # Build & Logs (AIOX)
 dist/
@@ -50,3 +67,6 @@ __pycache__/
 .aiox-core/local/
 .claude/settings.local.json
 .aiox/install-log.txt
+
+# Claude Code session locks (local)
+.claude/scheduled_tasks.lock

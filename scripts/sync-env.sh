@@ -7,6 +7,9 @@ set -euo pipefail
 KEYRA_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SECRETS="${KEYRA_ROOT}/.keyra-secrets"
 ENV_FILE="${KEYRA_ROOT}/.env.local"
+# Next.js lê env vars de apps/web/.env.local (cwd da Next app).
+# Mantemos a raiz como fonte da verdade e espelhamos para a app.
+APP_ENV_FILE="${KEYRA_ROOT}/apps/web/.env.local"
 
 read_or_empty() {
   local f="${SECRETS}/$1"
@@ -54,3 +57,11 @@ EOF
 
 chmod 600 "${ENV_FILE}"
 echo "✓ ${ENV_FILE} regenerado (chmod 600)"
+
+# Espelha para apps/web/ se a pasta existir (pós Story 1.1)
+if [[ -d "$(dirname "${APP_ENV_FILE}")" ]]; then
+  # Filtra vars sensíveis que a Next app não precisa (tokens Vercel/GH/Supabase admin CLI)
+  grep -Ev '^(VERCEL_TOKEN|GH_TOKEN|GITHUB_TOKEN|SUPABASE_ACCESS_TOKEN)=' "${ENV_FILE}" > "${APP_ENV_FILE}"
+  chmod 600 "${APP_ENV_FILE}"
+  echo "✓ ${APP_ENV_FILE} espelhado (chmod 600)"
+fi

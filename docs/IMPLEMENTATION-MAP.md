@@ -1,6 +1,6 @@
 # KEYRA — Mapa de Implementação (source of truth)
 
-> **Última atualização:** 2026-04-16
+> **Última atualização:** 2026-04-16 (Story 1.1 entregue — scaffold Next.js)
 > **Propósito:** matriz viva que cruza **features × telas × tabelas × ADRs × stories × status**.
 > **Quando atualizar:** sempre que uma story for entregue, um ADR mudar, ou uma feature ganhar novo escopo.
 
@@ -13,9 +13,38 @@
 | **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra`, Vercel `keyra` (Hobby), Supabase `keyra-br` (sa-east-1, Free), domínio `keyra.app` (verified) |
 | **Banco de Dados** | ✅ 100% schema aplicado | 21 tabelas, 21/21 RLS, 6 views, 15 funções, 19 migrations no remoto |
 | **Documentação** | ✅ Phase 0 completa | PRD v1.3 + ARCHITECTURE v1.3 + 8 wireframes + SCHEMA + INFRA-STATUS |
-| **Código aplicação** | ❌ 0% | Sem Next.js scaffold ainda — Story 1.1 |
-| **Auth & Multi-tenant** | 🟡 50% | Schema pronto; falta ativar Auth Hook + criar UI |
+| **Código aplicação** | 🟡 ~10% | Story 1.1 entregue: scaffold Next.js + design system + Supabase clients + AppShell + componentes canônicos KEYRA. Auth e features ainda pendentes. |
+| **Auth & Multi-tenant** | 🟡 50% | Schema pronto + `lib/supabase/{server,browser,admin,middleware}` criados; Auth Hook ativado; UI de login/signup/org-switcher pendente (Story 1.2-1.5) |
 | **Features MVP (Pilares 1-4)** | ⏸️ 0% código | Schema pronto; UI/Server Actions a criar |
+
+---
+
+## 1.1 Story 1.1 — Scaffold Next.js (entregue 2026-04-16)
+
+| Entregável | Path | Status |
+|-----------|------|--------|
+| Workspace pnpm | `/pnpm-workspace.yaml`, `/package.json`, `/.npmrc` | ✅ |
+| Next.js app | `apps/web/` (Next 15.1 — fallback documentado para Next 16) | ✅ |
+| TypeScript estrito | `apps/web/tsconfig.json` (`strict` + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`) | ✅ |
+| Tailwind v3.4 + design tokens KEYRA | `tailwind.config.ts` + `src/app/globals.css` (paleta terracota + sálvia) | ✅ (v4 fallback documentado) |
+| shadcn/ui base | `components.json` + `components/ui/{button,card,input,label,badge}.tsx` | ✅ |
+| Componentes canônicos KEYRA | `components/keyra/{KPICard,ComparativoTexto,AlertCard,StatusBadge}.tsx` | ✅ funcional + barrel export |
+| Layout autenticado | `components/layout/{Sidebar,BottomNav,AppShell}.tsx` + `app/(app)/layout.tsx` | ✅ (sidebar 240px desktop + bottom nav 5 itens mobile) |
+| Supabase clients (ADR-008) | `lib/supabase/{server,browser,middleware,admin}.ts` | ✅ (admin importa `'server-only'`) |
+| Middleware Next.js | `src/middleware.ts` (refresh session) | ✅ |
+| Sentry (ADR-015) | `instrumentation.ts` + `instrumentation-client.ts` | ✅ (auto-init se `SENTRY_DSN` definido) |
+| Money helpers (ADR-005) | `lib/money.ts` (Decimal.js + `ROUND_HALF_EVEN` + `formatBRL`) | ✅ |
+| Date helpers | `lib/date.ts` (date-fns + ptBR) | ✅ |
+| Env validation (Zod) | `lib/env.ts` (fail-fast no boot) | ✅ |
+| ESLint flat + Article VI enforce | `eslint.config.mjs` (banimento de imports relativos profundos) | ✅ |
+| Prettier + Tailwind plugin | `.prettierrc.json` + `.prettierignore` | ✅ |
+| Sync env script atualizado | `scripts/sync-env.sh` agora espelha para `apps/web/.env.local` | ✅ |
+| Landing pública | `app/page.tsx` (placeholder honest "em construção") | ✅ |
+| Login placeholder | `app/(auth)/login/page.tsx` (TODO Story 1.2) | ✅ |
+| Dashboard placeholder | `app/(app)/dashboard/page.tsx` (showcase dos componentes canônicos) | ✅ |
+| README completo | `apps/web/README.md` (versões reais, estrutura, decisões de fallback) | ✅ |
+
+**Não validado ainda (sandbox bloqueou):** `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm build`. Validação manual + commit fica para o passo seguinte (Luiz roda local antes do push).
 
 ---
 
@@ -108,12 +137,12 @@
 
 | Feature | Tela | Tabelas | ADR | Story | Status |
 |---------|------|---------|-----|-------|--------|
-| Login email + magic link | (a criar) | `auth.users` (Supabase) | ADR-010 | 1.1 | ⏸️ |
+| Login email + magic link | (a criar) | `auth.users` (Supabase) | ADR-010 | 1.2 | ⏸️ (placeholder em `/login` — Story 1.1) |
 | Criar organização (1ª) | onboarding | `organizations`, `memberships` | ADR-011 | 1.2 | ⏸️ |
 | Convidar membro por email | (config) | `organization_invites` | ADR-011 | 1.3 | ⏸️ |
-| Trocar org ativa (multi-org) | header switcher | `user_preferences` | ADR-012 | 1.5 | ⏸️ |
+| Trocar org ativa (multi-org) | header switcher | `user_preferences` | ADR-012 | 1.5 | ⏸️ (placeholder no AppShell header — Story 1.1) |
 | Roles (owner/admin/professional/viewer) | (config) | `memberships.role` | ADR-011 | 1.3 | ⏸️ |
-| **Auth Hook custom_access_token (org_id no JWT)** | — | função SQL `custom_access_token_hook` ✅ | ADR-012 | 1.1 | 🔴 **CRIADO mas FALTA ATIVAR no Supabase Dashboard** |
+| **Auth Hook custom_access_token (org_id no JWT)** | — | função SQL `custom_access_token_hook` ✅ | ADR-012 | 1.1 | ✅ ativo no Supabase |
 | RLS isolamento cross-tenant | — | policies em 21 tabelas ✅ | ADR-011 | 1.4 | ✅ ativo (testar c/ rls_isolation.test.sql) |
 
 ### Compliance & Segurança
@@ -184,14 +213,15 @@
 
 ## 4. Dependências críticas a desbloquear ANTES da Phase 1
 
-| # | Bloqueador | Owner | Tempo |
-|---|-----------|-------|-------|
-| 1 | **Ativar Auth Hook `public.custom_access_token_hook`** no Supabase Dashboard → Authentication → Hooks (sem isso JWT não tem `org_id` e RLS nega tudo) | Luiz (manual) | 1 min |
-| 2 | **Provisionar `COLUMN_ENCRYPTION_KEY`** no Vercel env vars (necessário para encrypt CPF) | Luiz (gerar key + `vercel env add`) | 5 min |
+| # | Bloqueador | Owner | Status |
+|---|-----------|-------|--------|
+| 1 | ~~Ativar Auth Hook `public.custom_access_token_hook`~~ | Luiz | ✅ ativo |
+| 2 | ~~Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel~~ | Luiz | ✅ provisionado |
 | 3 | Validar paleta terracota com idealizadora | Luiz | conversa |
 | 4 | Decidir split de pagamento (Pix + cartão na mesma comanda?) | Luiz com idealizadora | conversa |
 | 5 | Confirmar formato de comparativo textual ("R$ X a mais que Y" vs "↑ R$ X vs Y") | Luiz com idealizadora | conversa |
 | 6 | Resolver gaps PRD #1, #6, #7 (pricing absoluto, comissionamento, devoluções) | Luiz com idealizadora | conversa |
+| 7 | Rodar `pnpm install && pnpm build` localmente para confirmar dependency tree (Story 1.1 não pôde validar via Bash sandbox) | Luiz | 5 min |
 
 ---
 

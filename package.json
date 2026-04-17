@@ -1,0 +1,27 @@
+{
+  "name": "keyra",
+  "private": true,
+  "version": "0.1.0",
+  "description": "KEYRA — SaaS financeiro operacional para estética. Workspace root.",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "pnpm -F @keyra/web dev",
+    "build": "pnpm -F @keyra/web build",
+    "start": "pnpm -F @keyra/web start",
+    "lint": "pnpm -F @keyra/web lint",
+    "typecheck": "pnpm -F @keyra/web typecheck",
+    "format": "pnpm -F @keyra/web format",
+    "format:check": "pnpm -F @keyra/web format:check",
+    "typegen": "supabase gen types typescript --project-id oapdfhivzojyahvphebs --schema public > apps/web/src/types/database.types.ts"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "devDependencies": {
+    "supabase": "^2.0.0"
+  }
+}

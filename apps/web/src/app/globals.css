@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * KEYRA design tokens (HSL, Tailwind CSS-vars friendly).
+ * Source of truth: docs/ux/wireframes/00-design-principles.md §2.
+ */
+
+@layer base {
+  :root {
+    /* Base surfaces — cinzas quentes, sem branco puro. */
+    --background: 36 33% 97%; /* #FAF8F5 neutral-50 */
+    --foreground: 36 10% 16%; /* #2E2A25 neutral-700 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 36 10% 16%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 36 10% 16%;
+
+    /* Primary — terracota queimada (pele/argila, anti-azul-corporativo). */
+    --primary: 21 56% 50%; /* #C66A38 primary-500 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary — verde sálvia (saúde/calma). */
+    --secondary: 132 27% 37%; /* #457A50 secondary-500 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 34 20% 93%; /* #F3EFE9 neutral-100 */
+    --muted-foreground: 30 6% 40%; /* #6B6560 neutral-500 */
+
+    --accent: 34 20% 93%;
+    --accent-foreground: 36 10% 16%;
+
+    /* Destructive — vermelho terra, não "semaforo vermelho". */
+    --destructive: 0 51% 46%; /* #B23A3A */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 36 22% 84%; /* #D0C6B8 neutral-300 */
+    --input: 36 22% 84%;
+    --ring: 21 56% 50%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode placeholder — design-principles não especifica ainda,
+       mantemos mapeamento neutro para não crashear se `class="dark"` aparecer. */
+    --background: 36 6% 10%;
+    --foreground: 36 10% 92%;
+    --card: 36 6% 12%;
+    --card-foreground: 36 10% 92%;
+    --popover: 36 6% 12%;
+    --popover-foreground: 36 10% 92%;
+    --primary: 21 56% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 132 27% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 36 6% 18%;
+    --muted-foreground: 36 10% 65%;
+    --accent: 36 6% 18%;
+    --accent-foreground: 36 10% 92%;
+    --destructive: 0 51% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 6% 22%;
+    --input: 36 6% 22%;
+    --ring: 21 56% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  /* Tabular numbers for money — avoid column jitter in KPI grids. */
+  .font-tabular,
+  [data-kpi-value] {
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+  }
+}

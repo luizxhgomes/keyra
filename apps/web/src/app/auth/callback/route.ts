@@ -42,9 +42,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?error=exchange_failed', origin));
   }
 
-  // Session cookies are now set. Decide where to route: onboarding if no
-  // membership yet, dashboard otherwise. Custom JWT claim `org_id` is set
-  // by public.custom_access_token_hook (ADR-012).
+  // Session cookies are now set. Force one more refresh so the Auth Hook
+  // gets to run on the fresh session — this guarantees the JWT has the
+  // `org_id` claim for returning users (users who already have membership)
+  // and keeps the new-user path deterministic.
+  await supabase.auth.refreshSession();
+
+  // Decide where to route: onboarding if no membership yet, dashboard otherwise.
+  // `getActiveOrgId()` reads the JWT claim (ADR-012) with a user_preferences
+  // fallback (migration 021) so new users with a just-created org are routed
+  // correctly even before the access token finishes propagating.
   const orgId = await getActiveOrgId();
   const target = orgId ? '/dashboard' : '/onboarding/nova-organizacao';
 

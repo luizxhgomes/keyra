@@ -823,7 +823,7 @@ Otimizado para **escala** e **redução de CAC** no plano Essencial.
 | **Mocks reais nas seções** | Cada feature com screenshot do app | ✅ Sim |
 | **Cards flutuantes no hero** | Reforça "interface viva" | ✅ Sim — inverter: focar em "tela única" |
 | **Iconografia outline monocromática** | Visual coeso, neutro, escalável | ✅ Sim |
-| **Cor primária roxa/lilás** | Diferencia de azul-saúde concorrente | ⚠️ KEYRA já tem regra "zero azul" — escolher paleta única |
+| **Cor primária roxa/lilás** | Diferencia de azul-saúde concorrente | ℹ️ KEYRA usa paleta primária terracota/sálvia (decisão estética); azul é livre como acento |
 | **Verde para "novo/breve"** | Sinalização positiva | ✅ Sim |
 | **Botão preto sólido + branco border** | Contraste alto, decisão binária | ✅ Sim |
 | **Floating widget WhatsApp + suporte** | Reduz fricção contato | ✅ Sim |
@@ -942,7 +942,7 @@ CTA-LOOP #2  │
 ECOSSISTEMA  │ Grid 3×2 com 6 módulos (NÃO 19)
              │ + 1 banner: "Em breve: Keyra Insights (IA)"
              │
-POR QUÊ      │ 4 pilares: onboarding 1:1 · suporte humano · sem fidelidade · sem azul
+POR QUÊ      │ 3 pilares: onboarding 1:1 · suporte humano · sem fidelidade
              │
 CTA-LOOP #3  │
              │

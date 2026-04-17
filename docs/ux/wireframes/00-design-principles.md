@@ -92,9 +92,10 @@ por dev ou designer** sem aprovação explícita dela.
 
 ## 2. Paleta de cores
 
-> **Princípio:** zero azul como cor primária. Tons quentes / orgânicos alinhados
-> com estética e bem-estar. NÃO mimetizar corporativismo frio (Conta Azul é
-> anti-padrão — ver `research/2026-04-12-conta-azul-reverse-engineering.md`).
+> **Decisão estética:** paleta primária em tons quentes/orgânicos (terracota +
+> sálvia) alinhada com estética e bem-estar. Não há proibição de uso de outras
+> cores — azul, por exemplo, pode ser usado como acento, link, ou em ilustrações
+> sempre que servir à clareza ou à narrativa do produto.
 
 ### 2.1 Cor primária — Terracota quente
 ```
@@ -389,7 +390,7 @@ QA irá rejeitar stories que não cobrirem os 4.
 
 | ID | Decisão | Razão |
 |----|---------|-------|
-| AD-01 | Terracota-500 como primária | Tons quentes/orgânicos; evita azul corporativo; inclui nicho além de só esteticistas |
+| AD-01 | Terracota-500 como primária | Tons quentes/orgânicos remetem a estética/bem-estar; inclui nicho além de só esteticistas. Outras cores (azul incluso) podem ser usadas como acento sempre que servirem à clareza. |
 | AD-02 | Inter para display/numérico | Tabular nums + legibilidade + tree-shakeable |
 | AD-03 | Cards com `rounded-lg` (8px) | Arredondamento consistente = organicidade sem infantilizar |
 | AD-04 | Background base = `neutral-50` (#FAF8F5), não branco puro | Reduz fadiga visual; combina com paleta quente |

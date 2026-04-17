@@ -52,7 +52,7 @@ Construa o KEYRA: um SaaS web responsivo onde profissionais de estética adminis
 2. **Comparativos textuais.** Sempre escreva: "R$ 2.300 a mais que março" — nunca uma barra colorida comparativa.
 3. **Dashboard de tela única.** Sem scroll vertical no desktop (1366×768). Mobile aceita scroll desde que os 4 KPIs principais + "hoje na agenda" fiquem acima da dobra.
 4. **Simplicidade.** A usuária não é financista. Vocabulário coloquial: "Dinheiro que entrou", "Sobrou", "A receber" — não "Receita bruta", "EBITDA", "Contas a receber".
-5. **ZERO AZUL como cor primária.** Estética/bem-estar pede tons quentes/orgânicos.
+5. **Paleta primária quente** (terracota + sálvia) alinhada com estética/bem-estar. Outras cores (azul incluso) são livres como acento se servirem à clareza.
 
 ---
 
@@ -319,7 +319,7 @@ npx supabase gen types typescript --project-id oapdfhivzojyahvphebs > src/lib/da
 
 - ❌ Criar mais de 1 gráfico (apenas o do dashboard)
 - ❌ Usar `Number()` ou `parseFloat()` para valores monetários
-- ❌ Usar azul (#06B6D4, #3B82F6 etc) como cor primária ou de destaque
+- ❌ Trocar a cor PRIMÁRIA (terracota) por outra sem alinhamento prévio (azul como acento é permitido)
 - ❌ Mostrar "R$ 0,00" sem contexto — sempre empty state com call-to-action
 - ❌ Termos contábeis (EBITDA, DRE pode mas explicar, "Receita Bruta") — preferir coloquial
 - ❌ Modal sem fechar com ESC e click fora

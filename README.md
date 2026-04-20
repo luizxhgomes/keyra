@@ -2,6 +2,8 @@
 
 > O primeiro **financeiro operacional** para estética.
 
+[![RLS Tests](https://github.com/luizxhgomes/keyra/actions/workflows/rls-tests.yml/badge.svg?branch=main)](https://github.com/luizxhgomes/keyra/actions/workflows/rls-tests.yml)
+
 **KEYRA** = KEY (chave) + Receita + Acelerada.
 
 ## Visão

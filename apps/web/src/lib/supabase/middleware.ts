@@ -12,8 +12,8 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
  * each request. Without this, JWTs silently expire and Server Components
  * start rendering as anonymous, which breaks RLS-protected queries.
  *
- * Mounted from `apps/web/src/middleware.ts`. Returns the NextResponse the
- * caller should pass through.
+ * Mounted from `apps/web/src/proxy.ts` (Next 16 renamed `middleware` to
+ * `proxy`). Returns the NextResponse the caller should pass through.
  */
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   let response = NextResponse.next({

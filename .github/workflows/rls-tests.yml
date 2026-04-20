@@ -1,0 +1,126 @@
+name: RLS Tests
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'README.md'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'README.md'
+
+concurrency:
+  group: rls-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rls:
+    name: Cross-tenant isolation
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    # Postgres 17 mirrors `supabase/config.toml` → `db.major_version = 17`.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: keyra_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: keyra_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Bootstrap Supabase-like roles
+        # Supabase migrations assume `authenticated`, `anon`, `service_role`,
+        # the `auth` schema and the `extensions` schema exist. We create a
+        # minimal shim so the migrations apply cleanly on a vanilla Postgres.
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+            CREATE SCHEMA IF NOT EXISTS auth;
+            CREATE SCHEMA IF NOT EXISTS extensions;
+
+            ALTER DATABASE keyra_test SET search_path = public, extensions, auth;
+
+            DO $$ BEGIN
+              IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+                CREATE ROLE authenticated;
+              END IF;
+              IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+                CREATE ROLE anon;
+              END IF;
+              IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'service_role') THEN
+                CREATE ROLE service_role;
+              END IF;
+              IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_auth_admin') THEN
+                CREATE ROLE supabase_auth_admin;
+              END IF;
+            END $$;
+
+            CREATE TABLE IF NOT EXISTS auth.users (
+              id uuid PRIMARY KEY,
+              email text,
+              instance_id uuid,
+              aud text,
+              role text,
+              email_confirmed_at timestamptz,
+              created_at timestamptz DEFAULT now(),
+              updated_at timestamptz DEFAULT now()
+            );
+
+            -- Minimal auth.uid() / auth.jwt() stubs backed by GUCs (what our
+            -- tests already use). Production uses the real Supabase versions.
+            CREATE OR REPLACE FUNCTION auth.uid()
+              RETURNS uuid LANGUAGE sql STABLE
+            AS $fn$
+              SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid;
+            $fn$;
+
+            CREATE OR REPLACE FUNCTION auth.jwt()
+              RETURNS jsonb LANGUAGE sql STABLE
+            AS $fn$
+              SELECT NULLIF(current_setting('request.jwt.claims', true), '')::jsonb;
+            $fn$;
+
+            GRANT USAGE ON SCHEMA auth TO authenticated, anon, service_role;
+            GRANT USAGE ON SCHEMA extensions TO authenticated, anon, service_role, public;
+          SQL
+
+      - name: Apply migrations in order
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "==> $f"
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Run RLS isolation suite
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/rls_isolation.test.sql
+
+      - name: Summarize
+        if: always()
+        run: |
+          echo "Workflow finished. See step logs for pass/fail details."

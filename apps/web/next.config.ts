@@ -12,8 +12,6 @@ const nextConfig: NextConfig = {
       preventFullImport: true,
     },
   },
-  // TODO(Story 1.3): Next 16 deprecated `middleware.ts` in favor of `proxy.ts`.
-  // Rename when we next touch the middleware, and verify @supabase/ssr wiring still works.
 };
 
 export default nextConfig;

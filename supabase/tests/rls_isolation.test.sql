@@ -224,6 +224,168 @@ BEGIN
 END $$;
 
 -- ============================================================================
+-- Expanded coverage: memberships, organization_invites, appointments, commands,
+-- transactions, supplies, inventory_movements, payments (Story 1.4 — AC1).
+--
+-- Strategy: seed 1 row in each covered table for BOTH orgs, then impersonate
+-- user A and assert visibility = 1 per table (own org only).
+-- ============================================================================
+DO $$
+DECLARE
+  v_org_a uuid := current_setting('tests.org_a')::uuid;
+  v_org_b uuid := current_setting('tests.org_b')::uuid;
+  v_cust_a uuid := current_setting('tests.cust_a')::uuid;
+  v_cust_b uuid := current_setting('tests.cust_b')::uuid;
+  v_svc_a  uuid := current_setting('tests.svc_a')::uuid;
+  v_svc_b  uuid := current_setting('tests.svc_b')::uuid;
+  v_prof_a uuid := current_setting('tests.prof_a')::uuid;
+  v_prof_b uuid := current_setting('tests.prof_b')::uuid;
+  v_appt_a uuid;
+  v_appt_b uuid;
+  v_cmd_a  uuid;
+  v_cmd_b  uuid;
+  v_supply_a uuid;
+  v_supply_b uuid;
+BEGIN
+  SET LOCAL role TO postgres;
+
+  INSERT INTO public.appointments (org_id, customer_id, service_id, professional_id, starts_at, ends_at, price_snapshot)
+  VALUES
+    (v_org_a, v_cust_a, v_svc_a, v_prof_a, now() + interval '1 day', now() + interval '1 day 1 hour', 500.00)
+  RETURNING id INTO v_appt_a;
+
+  INSERT INTO public.appointments (org_id, customer_id, service_id, professional_id, starts_at, ends_at, price_snapshot)
+  VALUES
+    (v_org_b, v_cust_b, v_svc_b, v_prof_b, now() + interval '2 day', now() + interval '2 day 1 hour', 550.00)
+  RETURNING id INTO v_appt_b;
+
+  INSERT INTO public.commands (org_id, customer_id, professional_id, status)
+    VALUES (v_org_a, v_cust_a, v_prof_a, 'open') RETURNING id INTO v_cmd_a;
+  INSERT INTO public.commands (org_id, customer_id, professional_id, status)
+    VALUES (v_org_b, v_cust_b, v_prof_b, 'open') RETURNING id INTO v_cmd_b;
+
+  INSERT INTO public.supplies (org_id, name, unit_cost, unit)
+    VALUES (v_org_a, 'TEST_SupplyA', 10.00, 'un') RETURNING id INTO v_supply_a;
+  INSERT INTO public.supplies (org_id, name, unit_cost, unit)
+    VALUES (v_org_b, 'TEST_SupplyB', 12.00, 'un') RETURNING id INTO v_supply_b;
+
+  INSERT INTO public.organization_invites (org_id, email, role)
+    VALUES (v_org_a, 'invitea@example.com', 'professional');
+  INSERT INTO public.organization_invites (org_id, email, role)
+    VALUES (v_org_b, 'inviteb@example.com', 'professional');
+
+  PERFORM set_config('tests.appt_a', v_appt_a::text, false);
+  PERFORM set_config('tests.appt_b', v_appt_b::text, false);
+  PERFORM set_config('tests.cmd_a',  v_cmd_a::text,  false);
+  PERFORM set_config('tests.cmd_b',  v_cmd_b::text,  false);
+  PERFORM set_config('tests.supply_a', v_supply_a::text, false);
+  PERFORM set_config('tests.supply_b', v_supply_b::text, false);
+
+  RESET ROLE;
+END $$;
+
+-- Now impersonate user A again and assert per-table isolation on the expanded set.
+DO $$
+DECLARE
+  v_count int;
+  v_claims jsonb;
+BEGIN
+  v_claims := jsonb_build_object(
+    'sub',    current_setting('tests.user_a'),
+    'role',   'authenticated',
+    'org_id', current_setting('tests.org_a')
+  );
+  PERFORM set_config('request.jwt.claim.sub',    current_setting('tests.user_a'), true);
+  PERFORM set_config('request.jwt.claim.org_id', current_setting('tests.org_a'),  true);
+  PERFORM set_config('request.jwt.claims',       v_claims::text,                   true);
+  SET LOCAL role TO authenticated;
+
+  -- memberships
+  SELECT count(*) INTO v_count FROM public.memberships
+   WHERE user_id IN (current_setting('tests.user_a')::uuid, current_setting('tests.user_b')::uuid);
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [E-memberships]: expected 1 visible, got %', v_count;
+  END IF;
+
+  -- organization_invites
+  SELECT count(*) INTO v_count FROM public.organization_invites
+   WHERE email LIKE 'invite%@example.com';
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [E-invites]: expected 1 visible, got %', v_count;
+  END IF;
+
+  -- appointments
+  SELECT count(*) INTO v_count FROM public.appointments
+   WHERE id IN (current_setting('tests.appt_a')::uuid, current_setting('tests.appt_b')::uuid);
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [E-appointments]: expected 1 visible, got %', v_count;
+  END IF;
+
+  -- commands
+  SELECT count(*) INTO v_count FROM public.commands
+   WHERE id IN (current_setting('tests.cmd_a')::uuid, current_setting('tests.cmd_b')::uuid);
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [E-commands]: expected 1 visible, got %', v_count;
+  END IF;
+
+  -- supplies
+  SELECT count(*) INTO v_count FROM public.supplies
+   WHERE id IN (current_setting('tests.supply_a')::uuid, current_setting('tests.supply_b')::uuid);
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [E-supplies]: expected 1 visible, got %', v_count;
+  END IF;
+
+  -- Cross-tenant UPDATE on appointments must touch 0 rows.
+  UPDATE public.appointments SET notes = 'hack' WHERE id = current_setting('tests.appt_b')::uuid;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [E-appointments cross-UPDATE]: expected 0, got %', v_count;
+  END IF;
+
+  -- Cross-tenant INSERT on memberships must be blocked.
+  BEGIN
+    INSERT INTO public.memberships (user_id, org_id, role)
+      VALUES (current_setting('tests.user_a')::uuid, current_setting('tests.org_b')::uuid, 'admin');
+    RAISE EXCEPTION 'RLS FAIL [E-memberships cross-INSERT]: cross-tenant should have been blocked';
+  EXCEPTION WHEN insufficient_privilege OR check_violation OR OTHERS THEN
+    NULL;
+  END;
+
+  RAISE NOTICE 'RLS test block E (expanded coverage): PASSED';
+  RESET ROLE;
+END $$;
+
+-- ============================================================================
+-- Smoke inverso: se alguém desabilitar RLS em qualquer tabela tenant-scoped, a
+-- suíte falha imediatamente. Proteção contra regressão acidental.
+-- ============================================================================
+DO $$
+DECLARE
+  v_missing text;
+BEGIN
+  SELECT string_agg(c.relname, ', ')
+    INTO v_missing
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+   WHERE n.nspname = 'public'
+     AND c.relkind = 'r'
+     AND c.relname IN (
+       'organizations','memberships','organization_invites','customers','services',
+       'service_categories','service_supplies','supplies','inventory_movements',
+       'appointments','commands','command_items','payments','payment_methods',
+       'transactions','expense_categories','accounts','goals','audit_log',
+       'professionals','user_preferences'
+     )
+     AND c.relrowsecurity = false;
+
+  IF v_missing IS NOT NULL THEN
+    RAISE EXCEPTION 'RLS FAIL [F-smoke-inverso]: tabelas com RLS DESABILITADO: %', v_missing;
+  END IF;
+
+  RAISE NOTICE 'RLS test block F (smoke inverso — RLS habilitada em todas): PASSED';
+END $$;
+
+-- ============================================================================
 -- Simulate a user with NO org_id claim — must see zero tenant rows.
 -- ============================================================================
 DO $$

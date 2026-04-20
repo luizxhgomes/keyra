@@ -8,6 +8,7 @@ import {
   Package,
   Settings,
   Sparkles,
+  UserCog,
   Users,
   Wallet,
 } from 'lucide-react';
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: '/servicos', label: 'Serviços', icon: Sparkles },
   { href: '/financeiro', label: 'Financeiro', icon: Wallet },
   { href: '/estoque', label: 'Estoque', icon: Package },
+  { href: '/team', label: 'Time', icon: UserCog },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ] as const;
 

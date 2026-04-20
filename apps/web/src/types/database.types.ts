@@ -1658,6 +1658,8 @@ export type Database = {
         Args: { p_command_id: string; p_created_by: string; p_org_id: string }
         Returns: undefined
       }
+      accept_organization_invite: { Args: { p_token: string }; Returns: string }
+      count_org_owners: { Args: { p_org_id: string }; Returns: number }
       create_organization_with_owner: {
         Args: { p_cnpj?: string; p_name: string }
         Returns: string

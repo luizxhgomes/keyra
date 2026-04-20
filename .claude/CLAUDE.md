@@ -2,6 +2,34 @@
 
 You are working with Synkra AIOX, an AI-Orchestrated System for Full Stack Development.
 
+## REGRA PRIMÁRIA — Idioma e Ortografia (NON-NEGOTIABLE)
+
+**Todo conteúdo criado, editado ou gerado neste diretório DEVE ser escrito em português brasileiro (pt-BR) com ortografia e acentuação corretas.** Esta regra tem precedência sobre qualquer outra diretriz de estilo e aplica-se a TODA ação iniciada neste diretório.
+
+**Escopo de aplicação (tudo sem exceção):**
+- Respostas ao usuário no chat
+- Comentários e docstrings em código
+- Mensagens de commit, PRs, issues e changelogs
+- Documentação (`docs/`, `README`, `*.md`), stories, specs, PRDs, epics
+- Textos de UI, copy, labels, mensagens de erro, toasts, notificações
+- Logs, mensagens de CLI, output de scripts
+- Nomes de variáveis semânticas quando fizer sentido (ex.: `mensagemErro`) — mantenha identificadores técnicos consagrados em inglês (APIs, libs, frameworks)
+
+**Requisitos ortográficos (obrigatório):**
+- Usar TODOS os diacríticos corretamente: `ã`, `õ`, `á`, `é`, `í`, `ó`, `ú`, `â`, `ê`, `ô`, `à`, `ç`
+- NUNCA substituir acentos por ASCII puro (ex.: escrever "não", nunca "nao"; "ação", nunca "acao"; "português", nunca "portugues")
+- NUNCA misturar inglês no meio do texto quando houver equivalente natural em pt-BR
+- Respeitar crase, hífen e acordo ortográfico vigente (AO1990)
+- Concordância verbal e nominal corretas
+
+**Exceções permitidas (mantêm-se em inglês):**
+- Identificadores técnicos: nomes de funções, classes, tipos, arquivos, pastas
+- Termos consagrados sem tradução natural: `commit`, `branch`, `pull request`, `deploy`, `build`, `endpoint`, `payload`, `schema`, `migration`
+- Código-fonte, comandos de terminal, nomes de pacotes
+- Citações literais de documentação/erros de ferramentas externas
+
+**Verificação antes de finalizar qualquer saída:** reler o conteúdo produzido e confirmar que todos os acentos estão presentes e a ortografia está correta. Se encontrar qualquer "nao", "esta", "voce", "acao", "portugues" sem acento, CORRIGIR antes de entregar.
+
 <!-- AIOX-MANAGED-START: core-framework -->
 ## Core Framework Understanding
 

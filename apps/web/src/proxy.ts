@@ -30,7 +30,8 @@ const PROTECTED_PREFIXES = [
 const ANONYMOUS_ONLY_PATHS = ['/login'] as const;
 
 /**
- * KEYRA Next.js middleware — session refresh + auth guards.
+ * KEYRA Next.js proxy (renamed from `middleware` in Next 16) — session refresh
+ * + auth guards.
  *
  * Inlined (rather than calling `lib/supabase/middleware.ts`) because we need
  * the refreshed `supabase` client in the same request to run `.getUser()`
@@ -38,7 +39,7 @@ const ANONYMOUS_ONLY_PATHS = ['/login'] as const;
  *
  * Traceability: ADR-010 (Supabase Auth), ADR-011 (RLS tenant isolation).
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   let response = NextResponse.next({

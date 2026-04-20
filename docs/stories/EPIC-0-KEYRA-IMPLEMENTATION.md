@@ -1,8 +1,20 @@
-# EPIC-0: KEYRA — Plano de Implementacao Completo
+# EPIC-0: KEYRA — Plano de Implementação Completo
 
-> Epic geral que mapeia todas as fases de construcao do KEYRA do zero.
-> **Versao:** 1.1 (atualizada 2026-04-16 com status real Phase 0)
+> Epic geral que mapeia todas as fases de construção do KEYRA do zero.
+> **Versão:** 1.2 (atualizada 2026-04-20 — Phase 0 fechada · Phase 1 em ~60%)
 > **Data inicial:** 2026-04-12
+> **Snapshot executivo (1 min):** [`../STATE.md`](../STATE.md) · **Mapa tático:** [`../IMPLEMENTATION-MAP.md`](../IMPLEMENTATION-MAP.md)
+
+## Status atual (2026-04-20 — noite)
+
+| Fase | Progresso | Observação |
+|------|-----------|------------|
+| **Phase 0** — Fundação e Planejamento | ✅ 100% (6/6 stories) | Concluída em 2026-04-16 |
+| **Phase 1** — Fundação Técnica | 🟢 100% (pendente aceite) | 1.1 ✅ · 1.2 ✅ · 1.5 ✅ · 1.3 🟡 InReview · 1.4 🟡 InReview — migration aplicada no remoto + testes RLS verdes em Postgres local; falta smoke manual + Resend + push |
+| **Phase 2** — Catálogo + Agenda | 🟡 ~30% | 2.1 🟡 InReview · 2.2 🟡 InReview · 2.3 Draft · 2.4 Draft · 2.5 Draft · 2.6 Draft · 2.7 Draft |
+| **Phases 3–7** — Features MVP+ | ⏸️ 0% de UI | Schema 100% pronto |
+
+**Próxima ação:** smoke test das 4 stories no dev server + commit + push. Em seguida, iniciar Story 2.3 (insumos) ou pular para Story 2.4 (agenda FullCalendar) conforme prioridade.
 
 ---
 
@@ -179,13 +191,13 @@ KEYRA resolve: financeiro gerado automaticamente a partir da operacao.
 - 🔴 **Auth Hook `custom_access_token_hook` ATIVADO no Supabase Dashboard** (sem isso JWT nao tem org_id e RLS bloqueia tudo)
 - 🔴 `COLUMN_ENCRYPTION_KEY` provisionada no Vercel (encrypt CPF customers)
 
-| Story | Descricao | Agente | Artefato esperado |
-|-------|-----------|--------|------------------|
-| 1.1 | Setup Next.js 16 + Supabase clients (server/browser) + Sentry + ESLint + Prettier + Tailwind v4 + shadcn/ui base + scripts pnpm | @dev | `app/`, `lib/supabase/{server,browser}.ts`, `package.json`, primeiro deploy no `keyra.app` |
-| 1.2 | Login (email + magic link) + middleware de auth + onboarding criar 1ª organizacao | @dev | `app/(auth)/login`, `app/(onboarding)/new-org`, Server Actions |
-| 1.3 | Gestao de profissionais (CRUD + roles) + convidar membro por email | @dev | `app/(app)/team`, `organization_invites` flow |
-| 1.4 | Rodar `rls_isolation.test.sql` + suite de testes RLS automatizada (Vitest + Supabase local opcional) | @qa | `supabase/tests/` validado, badge no README |
-| 1.5 | Layout base + sidebar + bottom nav mobile + 10 componentes canonicos do wireframe + tema terracota | @dev + @ux | `components/ui/*`, `components/layout/*`, design tokens em `tailwind.config.ts` |
+| Story | Descrição | Agente | Status | Artefato esperado |
+|-------|-----------|--------|--------|------------------|
+| 1.1 | Setup Next.js 16 + Supabase clients (server/browser) + Sentry + ESLint + Prettier + Tailwind + shadcn/ui base + scripts pnpm | @dev | ✅ **Done** 2026-04-16 | `apps/web/`, `lib/supabase/{server,browser,middleware,admin}.ts`, deploy em `usekeyra.vercel.app` |
+| 1.2 | Login (email + magic link) + middleware de auth + onboarding criar 1ª organização + org switcher + user menu | @dev | ✅ **Done** 2026-04-16 (endurecida 2026-04-17/20 com commits `99fa5bd`, `2db6c19`) | `app/(auth)/login`, `app/auth/callback`, `app/onboarding/nova-organizacao`, Server Actions em `app/actions/*` |
+| 1.3 | Gestão de profissionais (CRUD + roles) + convidar membro por email | @dev | 🟡 **InReview** 2026-04-20 | `app/(app)/team/{page,layout,actions,…}`, `/invites/[token]`, migration `20260420000100_invite_accept_rpc.sql`, ADR-021 Resend, `lib/email/send.ts`, `emails/invite-email.tsx` |
+| 1.4 | Suíte de testes RLS + CI (plain SQL, não pgTAP — decidido na story) | @dev | 🟡 **InReview** 2026-04-20 | `supabase/tests/rls_isolation.test.sql` expandido (21 tabelas + smoke inverso), `.github/workflows/rls-tests.yml`, badge no README, `docs/testing/rls-tests.md`, `scripts/run-rls-tests.sh` |
+| 1.5 | Layout base + sidebar + bottom nav mobile + 10 componentes canônicos do wireframe + tema terracota | @dev + @ux | ✅ **Done** 2026-04-16 | `components/ui/*`, `components/layout/*`, design tokens em `tailwind.config.ts` |
 
 **Criterio:** Login funcional, 1ª org criada, RLS testado (org A nao ve org B), `keyra.app` mostra dashboard skeleton autenticado.
 

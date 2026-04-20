@@ -1,6 +1,7 @@
 # KEYRA — Mapa de Implementação (source of truth)
 
-> **Última atualização:** 2026-04-16 (Story 1.2 entregue — auth + onboarding)
+> **Última atualização:** 2026-04-20 (noite — Sprint 2 iniciado: Stories 2.1 e 2.2 entregues, drafts 2.3–2.7 criados, migration 022 aplicada no remoto)
+> **Snapshot executivo (1 minuto):** [`docs/STATE.md`](STATE.md)
 > **Propósito:** matriz viva que cruza **features × telas × tabelas × ADRs × stories × status**.
 > **Quando atualizar:** sempre que uma story for entregue, um ADR mudar, ou uma feature ganhar novo escopo.
 
@@ -13,9 +14,10 @@
 | **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra`, Vercel `keyra` (Hobby) rodando em [usekeyra.vercel.app](https://usekeyra.vercel.app), Supabase `keyra-br` (sa-east-1, Free). Custom `keyra.app` pendente ajuste DNS Cloudflare |
 | **Banco de Dados** | ✅ 100% schema aplicado | 21 tabelas, 21/21 RLS, 6 views, 15 funções, 19 migrations no remoto |
 | **Documentação** | ✅ Phase 0 completa | PRD v1.3 + ARCHITECTURE v1.3 + 8 wireframes + SCHEMA + INFRA-STATUS |
-| **Código aplicação** | 🟡 ~18% | Story 1.1 (scaffold) + Story 1.2 (auth + onboarding + org switcher + user menu) entregues. Features de pilar (agenda, pacientes, etc) ainda pendentes. |
-| **Auth & Multi-tenant** | ✅ ~90% | Schema + `lib/supabase/*` + Auth Hook + login magic link + callback + middleware guards + onboarding 1ª org + switcher ≥ 2 orgs + sign-out implementados. Falta convite de membro (Story 1.3). |
-| **Features MVP (Pilares 1-4)** | ⏸️ 0% código | Schema pronto; UI/Server Actions a criar |
+| **Código aplicação** | 🟡 ~28% | Stories 1.1, 1.2, 1.3, 1.4, 1.5 entregues (Phase 1 ≈ 100% pós-aceite). Story 1.2 foi **endurecida em 2026-04-17/20** com correção do chicken-and-egg de RLS e defesa em profundidade (commits `99fa5bd`, `2db6c19`). Features de pilar (agenda, pacientes, etc) ainda pendentes. |
+| **Auth & Multi-tenant** | ✅ 100% (pós-aceite) | Schema + `lib/supabase/*` + Auth Hook + login magic link + callback + middleware/proxy guards + onboarding + org switcher + sign-out + **módulo /team (convites com Resend, roles UI, RPC `accept_organization_invite`)** implementados. |
+| **Testes RLS** | 🟢 Suíte + CI | `supabase/tests/rls_isolation.test.sql` cobre 21 tabelas (blocos A/B/C/E/F incluindo smoke inverso). Workflow `.github/workflows/rls-tests.yml` roda em push/PR. Badge no README. |
+| **Features MVP (Pilares 1-4)** | ⏸️ 0% código | Schema pronto; UI/Server Actions a criar (Sprint 2) |
 
 ---
 
@@ -64,7 +66,7 @@
 | AppShell atualizado | `components/layout/AppShell.tsx` + `(app)/layout.tsx` com `requireAuth()` | ✅ |
 | ESLint config Next 16 | `eslint.config.mjs` (flat config direto, sem FlatCompat) | ✅ (corrige bug de `next lint` removido) |
 | `next.config.ts` Next 16 compat | `typedRoutes` fora de `experimental` | ✅ |
-| Database types stub | `src/types/database.types.ts` (hand-rolled para 3 tabelas) | 🟡 **rodar `pnpm typegen` local** para popular 21 tabelas |
+| Database types completos | `src/types/database.types.ts` (21 tabelas + 6 views + funções) | ✅ (script `pnpm typegen` adicionado para regenerações futuras) |
 
 **Validado:** `pnpm typecheck` ✅, `pnpm lint` ✅, `pnpm build` ✅ (5 rotas geradas). Dev server não rodado (sandbox bloqueou) — Luiz deve rodar `pnpm dev` e validar fluxo end-to-end.
 
@@ -90,7 +92,7 @@
 
 | Feature | Tela | Tabelas | ADR | Story | Status |
 |---------|------|---------|-----|-------|--------|
-| CRUD pacientes | [04-cadastros.md](ux/wireframes/04-cadastros.md) | `customers` (CPF encrypted via ADR-017) | ADR-013 | 2.1 | ⏸️ código |
+| CRUD pacientes | [04-cadastros.md](ux/wireframes/04-cadastros.md) | `customers` (CPF encrypted via ADR-017) | ADR-013 | 2.1 | 🟡 InReview — `/pacientes` com lista + busca + CRUD. CPF fora do escopo MVP (Phase 5). |
 | Histórico de atendimentos por paciente | (sub-tela) | `appointments`, `commands`, `transactions` | — | 2.1 + 4.6 | ⏸️ |
 | Prontuário financeiro (LTV, ticket médio) | (sub-tela) | mesma + view derivada | — | 6.6 | ⏸️ Phase 6 |
 
@@ -98,9 +100,9 @@
 
 | Feature | Tela | Tabelas | ADR | Story | Status |
 |---------|------|---------|-----|-------|--------|
-| CRUD serviços (preço, custo, duração, comissão) | [04-cadastros.md](ux/wireframes/04-cadastros.md) | `services`, `service_categories` | ADR-013 | 2.2 | ⏸️ |
-| Insumos por serviço (rateio) | (sub-tela) | `service_supplies`, `supplies` | ADR-013 | 2.3 | ⏸️ |
-| Cadastro de insumos / estoque inicial | [04-cadastros.md](ux/wireframes/04-cadastros.md) | `supplies`, `inventory_movements` | ADR-013 | 2.3 | ⏸️ |
+| CRUD serviços (preço, custo, duração, comissão) | [04-cadastros.md](ux/wireframes/04-cadastros.md) | `services`, `service_categories` | ADR-013 | 2.2 | 🟡 InReview — `/servicos` + `/servicos/categorias` com agrupamento, busca e filtro por tipo |
+| Insumos por serviço (rateio) | (sub-tela) | `service_supplies`, `supplies` | ADR-013 | 2.3 | ⏸️ Draft — próxima story |
+| Cadastro de insumos / estoque inicial | [04-cadastros.md](ux/wireframes/04-cadastros.md) | `supplies`, `inventory_movements` | ADR-013 | 2.3 | ⏸️ Draft — próxima story |
 | Pacotes (5 sessões com 10% off) | — | (extensão de `services` ou nova tabela) | — | 5.2 | ⏸️ Phase 5 |
 
 ### Pilar 2 — Custos & Precificação
@@ -237,17 +239,19 @@
 
 ---
 
-## 4. Dependências críticas a desbloquear ANTES da Phase 1
+## 4. Dependências críticas a desbloquear
 
-| # | Bloqueador | Owner | Status |
-|---|-----------|-------|--------|
-| 1 | ~~Ativar Auth Hook `public.custom_access_token_hook`~~ | Luiz | ✅ ativo |
-| 2 | ~~Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel~~ | Luiz | ✅ provisionado |
-| 3 | Validar paleta terracota com idealizadora | Luiz | conversa |
-| 4 | Decidir split de pagamento (Pix + cartão na mesma comanda?) | Luiz com idealizadora | conversa |
-| 5 | Confirmar formato de comparativo textual ("R$ X a mais que Y" vs "↑ R$ X vs Y") | Luiz com idealizadora | conversa |
-| 6 | Resolver gaps PRD #1, #6, #7 (pricing absoluto, comissionamento, devoluções) | Luiz com idealizadora | conversa |
-| 7 | Rodar `pnpm install && pnpm build` localmente para confirmar dependency tree (Story 1.1 não pôde validar via Bash sandbox) | Luiz | 5 min |
+> **Itens 1, 2 e 7 foram resolvidos em 2026-04-16/17.** Itens 3–6 continuam abertos; nenhum deles bloqueia Stories 1.3 ou 1.4, mas cada um trava uma Story específica de Phases 2–4.
+
+| # | Bloqueador | Owner | Status | Trava |
+|---|-----------|-------|--------|-------|
+| 1 | ~~Ativar Auth Hook `public.custom_access_token_hook`~~ | Luiz | ✅ ativo desde 2026-04-16 | — |
+| 2 | ~~Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel~~ | Luiz | ✅ provisionado em 2026-04-16 | — |
+| 3 | Validar paleta terracota com idealizadora | Luiz | ⏳ conversa | Design Sprint 2+ |
+| 4 | Decidir split de pagamento (Pix + cartão na mesma comanda?) | Luiz + idealizadora | ⏳ conversa | Story 3.2 |
+| 5 | Confirmar formato de comparativo textual ("R$ X a mais que Y" vs "↑ R$ X vs Y") | Luiz + idealizadora | ⏳ conversa | Story 4.7 |
+| 6 | Resolver gaps PRD #1, #6, #7 (pricing absoluto, comissionamento, devoluções) | Luiz + idealizadora | ⏳ conversa | Comercial, cadastro profissionais, Story 3.x |
+| 7 | ~~Rodar `pnpm install && pnpm build` localmente~~ | Luiz | ✅ validado em 2026-04-16 (build 5 rotas OK) | — |
 
 ---
 
@@ -255,7 +259,7 @@
 
 | Sprint | Foco | Stories | Saída visível |
 |--------|------|---------|---------------|
-| **Sprint 1** (1 sem) | Fundação técnica | 1.1 setup + 1.2 orgs + 1.3 profissionais + 1.4 RLS test + 1.5 layout | `keyra.app` mostra login + dashboard vazio (skeleton) |
+| **Sprint 1** (1 sem) | Fundação técnica | 1.1 ✅ · 1.2 ✅ · 1.3 🟡 InReview · 1.4 🟡 InReview · 1.5 ✅ | `usekeyra.vercel.app` mostra login + onboarding + dashboard skeleton + módulo /team (após deploy); RLS validada em CI |
 | **Sprint 2** (2 sem) | Cadastros + Agenda | 2.1 → 2.7 | Cadastrar paciente/serviço, agendar, ver receita prevista |
 | **Sprint 3** (2 sem) | Automação financeira | 3.1 → 3.8 | Marcar realizado → comanda → pagamento → transação → estoque (TUDO auto) |
 | **Sprint 4** (1.5 sem) | DRE + Dashboard | 4.1 → 4.9 | **MVP feature-complete** — idealizadora pode usar com 1 cliente real |

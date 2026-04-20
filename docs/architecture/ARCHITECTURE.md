@@ -713,6 +713,48 @@ CREATE INDEX audit_log_resource_idx ON audit_log(resource_type, resource_id);
 
 ---
 
+## 11.1 Email Transacional (ADR-021)
+
+### ADR-021 — Resend + React Email como provedor transacional
+
+**Status:** ACCEPTED (2026-04-20)
+
+**Contexto.** A Story 1.3 (convite de membros por email) é o primeiro disparo de email fora do fluxo de autenticação do Supabase. Precisamos de um provedor com boa deliverability, API simples, templates tipados em TypeScript e custo compatível com um MVP. Mais à frente (Phase 5+) virão: notificações de agenda (lembrete de consulta, cobrança amigável), relatórios mensais de DRE por email e comunicação operacional (reset de senha customizado, aviso de baixa de estoque). Logo, a decisão atual precisa escalar para dezenas de templates e ~5–10 mil emails/mês no ano 1.
+
+**Decisão.** Adotar **[Resend](https://resend.com)** como provedor de email transacional, com templates em **[React Email](https://react.email)** (pacotes `@react-email/components` + `@react-email/render`). Emails disparados a partir do servidor (Server Actions, Route Handlers ou Inngest jobs), nunca do browser.
+
+**Alternativas avaliadas.**
+
+| Opção | Por que não agora |
+|-------|-------------------|
+| **Supabase Auth email embutido** | Tem limite de ~30 emails/hora no Free e templates são ajustados no painel (não versionados em código). Serve apenas para flows internos de auth (magic link, reset de senha) — não cobre convites de membro, nem notificações futuras. Manteremos esse para os flows de auth hoje; Resend cobre o resto. |
+| **Postmark** | Deliverability superior (melhor reputação B2B) a partir de ~$15/mês por 10k emails. Overkill para MVP; reavaliar quando chegarmos em ≥ 50k/mês ou tivermos reclamações de bounce no Resend. |
+| **Amazon SES** | Preço imbatível ($0,10 por mil), mas DX ruim, necessita configurar SNS/bounces/complaints manualmente e exige validação de domínio com saída de sandbox. Não compensa o tempo de setup para o volume de MVP. |
+| **SendGrid** | Mercado maduro, porém API verbosa, plano Free de 100/dia muito apertado e UX de templates inferior ao combo Resend + React Email. |
+
+**Consequências.**
+
+1. **Custo MVP.** Free até 3 000 emails/mês e 100/dia — cobre toda Phase 1–4 com folga. Upgrade para o plano pago ($20/mês por 50 000) só será necessário em Phase 5+.
+2. **Domínio próprio.** Precisamos verificar `keyra.app` em Resend (registros SPF + DKIM + DMARC no Cloudflare) antes de emails reais. Enquanto o DNS não aponta para Vercel, usaremos o subdomínio sandbox `onboarding@resend.dev` com emails limitados a endereços verificados — suficiente para dev e Story 1.3 em ambiente interno.
+3. **Bibliotecas adicionadas.** `resend` (SDK), `@react-email/components` (componentes), `@react-email/render` (renderização SSR). Todas server-only. Devem viver atrás de `import 'server-only'` para nunca vazarem para o bundle do cliente.
+4. **Env vars novas.** `RESEND_API_KEY` (secret) e `EMAIL_FROM` (plain, default `KEYRA <no-reply@keyra.app>`). Ambas provisionadas em `apps/web/.env.local.example`, `apps/web/src/lib/env.ts` (validação Zod) e nos três targets do Vercel.
+5. **Observabilidade.** Resend tem dashboard próprio de delivered/opened/bounced/complained. Em Phase 5 integrar webhooks de bounce/complaint com Inngest para marcar emails ruins em `customers.email_status`.
+6. **Idempotência.** Cada Server Action que dispara email deve usar um `idempotency_key` (UUID derivado do convite/lembrete) para evitar duplo envio em caso de retry. Resend aceita o header `Idempotency-Key` nativamente.
+7. **Testabilidade.** Em `process.env.NODE_ENV === 'test'` ou quando `RESEND_API_KEY` estiver ausente, o helper `sendEmail` loga o payload em vez de chamar a API — facilita pgTAP/Vitest sem rede.
+
+**Helper canônico (`apps/web/src/lib/email/send.ts`).** Interface única `sendEmail({ to, subject, react, tags })`. React Email compila para HTML via `render()`; fallback para texto plano usando a mesma árvore. Cada template vive em `apps/web/src/emails/<nome>.tsx`.
+
+**Padrões de uso.**
+
+- Server Actions disparam email **após** commit de transação (never before) para que retry seguro não gere duplicata.
+- Templates recebem apenas dados derivados do servidor (nunca form values crus) — reforça a borda de validação Zod.
+- Nenhum template contém link direto — sempre usa `magic` tokens com TTL (convites 72h, reset 1h).
+- Rate limit aplicativo: 10 emails/minuto por `org_id` (enforced no Server Action). Resend já limita a 2 req/s na API.
+
+**Traceability.** ADR-021 é referenciado por Story 1.3 (convites), Story 4.9 (alertas), Story 6.x (lembretes de agenda), Story 7.3 (cobrança WhatsApp cai para email como fallback).
+
+---
+
 ## 12. Architectural Patterns Aplicados
 
 | Pattern | Onde | Razão |

@@ -29,6 +29,15 @@ const serverSchema = z.object({
   SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 
+  // Email transacional (ADR-021) — optional. Quando ausente, o helper
+  // `sendEmail` cai em dry-run (loga payload). Em produção, Vercel deve
+  // provisionar o secret.
+  RESEND_API_KEY: z.string().min(10).optional(),
+  EMAIL_FROM: z
+    .string()
+    .min(3)
+    .default('KEYRA <no-reply@keyra.app>'),
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
@@ -41,6 +50,8 @@ const parsed = serverSchema.safeParse({
   COLUMN_ENCRYPTION_KEY: process.env.COLUMN_ENCRYPTION_KEY,
   SENTRY_DSN: process.env.SENTRY_DSN,
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  EMAIL_FROM: process.env.EMAIL_FROM,
   NODE_ENV: process.env.NODE_ENV,
 });
 

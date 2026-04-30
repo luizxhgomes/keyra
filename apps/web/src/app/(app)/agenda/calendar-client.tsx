@@ -15,13 +15,22 @@ import type {
 import {
   listAppointments,
   type AgendaEvent,
+  type AgendaPickerCustomer,
+  type AgendaPickerProfessional,
+  type AgendaPickerService,
   type AgendaProfessional,
 } from './actions';
 import { AgendaToolbar, type AgendaView } from './agenda-toolbar';
+import { AgendamentoForm } from './agendamento-form';
 import { EventDetailSheet } from './event-detail-sheet';
 
 type Props = {
   professionals: AgendaProfessional[];
+  pickers: {
+    customers: AgendaPickerCustomer[];
+    services: AgendaPickerService[];
+    professionals: AgendaPickerProfessional[];
+  };
   initialProfessionalId: string | null;
 };
 
@@ -39,7 +48,7 @@ type Props = {
  *   conhecido — quando expandirmos pra equipes em fuso diferente, adicionar
  *   `@fullcalendar/luxon3` e configurar `timeZone: 'America/Sao_Paulo'`.
  */
-export function CalendarClient({ professionals, initialProfessionalId }: Props) {
+export function CalendarClient({ professionals, pickers, initialProfessionalId }: Props) {
   const calendarRef = useRef<FullCalendar | null>(null);
   const eventsRef = useRef<Map<string, AgendaEvent>>(new Map());
 
@@ -50,6 +59,10 @@ export function CalendarClient({ professionals, initialProfessionalId }: Props) 
     initialProfessionalId,
   );
   const [truncated, setTruncated] = useState(false);
+
+  // Story 2.5 — formulário de novo agendamento.
+  const [formOpen, setFormOpen] = useState(false);
+  const [formInitialStartsAt, setFormInitialStartsAt] = useState<Date | null>(null);
 
   // Mobile default = day view (AC1.1). Não chamamos setState aqui — a
   // sincronização do state acontece via callback `datesSet` do FullCalendar
@@ -78,6 +91,21 @@ export function CalendarClient({ professionals, initialProfessionalId }: Props) 
   const handleEventClick = useCallback((arg: EventClickArg) => {
     const cached = eventsRef.current.get(arg.event.id);
     if (cached) setSelectedEvent(cached);
+  }, []);
+
+  // Story 2.5 — abre o formulário de novo agendamento.
+  const handleNewAppointment = useCallback(() => {
+    setFormInitialStartsAt(null);
+    setFormOpen(true);
+  }, []);
+
+  const handleSlotClick = useCallback((arg: { date: Date }) => {
+    setFormInitialStartsAt(arg.date);
+    setFormOpen(true);
+  }, []);
+
+  const handleAppointmentCreated = useCallback(() => {
+    calendarRef.current?.getApi().refetchEvents();
   }, []);
 
   const fetchEvents = useCallback(
@@ -129,6 +157,7 @@ export function CalendarClient({ professionals, initialProfessionalId }: Props) 
         professionals={professionals}
         selectedProfessionalId={selectedProfessionalId}
         onProfessionalChange={setSelectedProfessionalId}
+        onNewAppointment={handleNewAppointment}
       />
 
       {truncated ? (
@@ -156,6 +185,7 @@ export function CalendarClient({ professionals, initialProfessionalId }: Props) 
           nowIndicator
           events={fetchEvents}
           eventClick={handleEventClick}
+          dateClick={handleSlotClick}
           datesSet={(arg) => {
             setTitle(arg.view.title);
             setView(arg.view.type as AgendaView);
@@ -168,6 +198,15 @@ export function CalendarClient({ professionals, initialProfessionalId }: Props) 
       <EventDetailSheet
         event={selectedEvent}
         onOpenChange={(open) => !open && setSelectedEvent(null)}
+      />
+
+      <AgendamentoForm
+        open={formOpen}
+        onOpenChange={setFormOpen}
+        pickers={pickers}
+        initialStartsAt={formInitialStartsAt}
+        initialProfessionalId={selectedProfessionalId}
+        onCreated={handleAppointmentCreated}
       />
     </div>
   );

@@ -1,10 +1,12 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requireRole } from '@/lib/auth/roles';
 import { createServerClient } from '@/lib/supabase/server';
+import { createAppointmentSchema } from '@/lib/validators/appointment';
 
 export type AgendaStatus = 'scheduled' | 'done' | 'cancelled' | 'no_show';
 
@@ -145,4 +147,196 @@ export async function listAgendaProfessionals(): Promise<AgendaProfessional[]> {
     throw new Error(`Erro ao listar profissionais: ${error.message}`);
   }
   return (data ?? []) as AgendaProfessional[];
+}
+
+// ---------------------------------------------------------------------------
+// Story 2.5 — Criação de agendamento
+// ---------------------------------------------------------------------------
+
+export type AgendaPickerCustomer = { id: string; full_name: string };
+export type AgendaPickerService = {
+  id: string;
+  name: string;
+  price: string;
+  duration_minutes: number | null;
+  commission_rate: string | null;
+};
+export type AgendaPickerProfessional = {
+  id: string;
+  display_name: string;
+  default_commission_rate: string;
+};
+
+/**
+ * Carrega listas para os Selects do formulário de agendamento. Uma única
+ * round-trip ao servidor cobre paciente, serviço e profissional, com filtros
+ * de soft-delete e `active`.
+ */
+export async function listAgendaPickers(): Promise<{
+  customers: AgendaPickerCustomer[];
+  services: AgendaPickerService[];
+  professionals: AgendaPickerProfessional[];
+}> {
+  const { orgId } = await requireAuth();
+  await requireRole(orgId, 'professional');
+
+  const supabase = await createServerClient();
+
+  const [customersRes, servicesRes, professionalsRes] = await Promise.all([
+    supabase
+      .from('customers')
+      .select('id, full_name')
+      .eq('org_id', orgId)
+      .is('deleted_at', null)
+      .order('full_name', { ascending: true }),
+    supabase
+      .from('services')
+      .select('id, name, price, duration_minutes, commission_rate')
+      .eq('org_id', orgId)
+      .eq('active', true)
+      .is('deleted_at', null)
+      .order('name', { ascending: true }),
+    supabase
+      .from('professionals')
+      .select('id, display_name, default_commission_rate')
+      .eq('org_id', orgId)
+      .eq('active', true)
+      .is('deleted_at', null)
+      .order('display_name', { ascending: true }),
+  ]);
+
+  if (customersRes.error) throw new Error(`pacientes: ${customersRes.error.message}`);
+  if (servicesRes.error) throw new Error(`serviços: ${servicesRes.error.message}`);
+  if (professionalsRes.error) throw new Error(`profissionais: ${professionalsRes.error.message}`);
+
+  return {
+    customers: (customersRes.data ?? []) as AgendaPickerCustomer[],
+    services: (servicesRes.data ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      price: String(s.price),
+      duration_minutes: s.duration_minutes,
+      commission_rate: s.commission_rate === null ? null : String(s.commission_rate),
+    })),
+    professionals: (professionalsRes.data ?? []).map((p) => ({
+      id: p.id,
+      display_name: p.display_name,
+      default_commission_rate: String(p.default_commission_rate),
+    })),
+  };
+}
+
+export type CreateAppointmentResult =
+  | { ok: true; data: { id: string } }
+  | { ok: false; error: string };
+
+/**
+ * Cria um agendamento. Snapshots de preço e comissão são calculados aqui
+ * (ADR-013): vamos uma vez ao banco buscar serviço/profissional, materializamos
+ * `price_snapshot` (= `services.price` no momento) e `commission_snapshot`
+ * (= `services.commission_rate` ?? `professionals.default_commission_rate` ?? 0)
+ * e fazemos o INSERT.
+ *
+ * Erros tratados:
+ * - Serviço/profissional inexistente ou de outra org → 404 amigável.
+ * - Profissional inativo → mensagem clara.
+ * - Conflict no EXCLUDE constraint (PostgreSQL `23P01`) → "Horário
+ *   indisponível para este profissional".
+ */
+export async function createAppointment(
+  input: z.input<typeof createAppointmentSchema>,
+): Promise<CreateAppointmentResult> {
+  try {
+    const { user, orgId } = await requireAuth();
+    await requireRole(orgId, 'professional');
+
+    const parsed = createAppointmentSchema.parse(input);
+    const supabase = await createServerClient();
+
+    const [serviceRes, professionalRes] = await Promise.all([
+      supabase
+        .from('services')
+        .select('price, commission_rate, deleted_at, active')
+        .eq('id', parsed.serviceId)
+        .eq('org_id', orgId)
+        .maybeSingle(),
+      supabase
+        .from('professionals')
+        .select('default_commission_rate, active, deleted_at')
+        .eq('id', parsed.professionalId)
+        .eq('org_id', orgId)
+        .maybeSingle(),
+    ]);
+
+    if (serviceRes.error) return { ok: false, error: serviceRes.error.message };
+    if (!serviceRes.data || serviceRes.data.deleted_at || !serviceRes.data.active) {
+      return { ok: false, error: 'Serviço não encontrado ou inativo.' };
+    }
+    if (professionalRes.error) return { ok: false, error: professionalRes.error.message };
+    if (!professionalRes.data || professionalRes.data.deleted_at) {
+      return { ok: false, error: 'Profissional não encontrado.' };
+    }
+    if (!professionalRes.data.active) {
+      return { ok: false, error: 'Profissional inativo.' };
+    }
+
+    const startsAt = new Date(`${parsed.date}T${parsed.startTime}:00`);
+    if (Number.isNaN(startsAt.getTime())) {
+      return { ok: false, error: 'Data ou horário inválido.' };
+    }
+    const endsAt = new Date(startsAt.getTime() + parsed.durationMinutes * 60 * 1000);
+
+    // Tipos gerados pelo Supabase mapeiam `numeric` para `number`. Para os
+    // valores absolutos do KEYRA (price até 14 dígitos / 2 decimais; commission
+    // 0-1 com 4 decimais) o range cabe sem perda em IEEE 754. O Postgres
+    // re-armazena como `numeric` no INSERT preservando precisão; round-half-even
+    // continua sendo aplicado no momento da agregação (DRE), não aqui.
+    const priceSnapshot = Number(serviceRes.data.price);
+    const commissionSnapshot = Number(
+      serviceRes.data.commission_rate ??
+        professionalRes.data.default_commission_rate ??
+        0,
+    );
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .insert({
+        org_id: orgId,
+        customer_id: parsed.customerId ?? null,
+        service_id: parsed.serviceId,
+        professional_id: parsed.professionalId,
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        price_snapshot: priceSnapshot,
+        commission_snapshot: commissionSnapshot,
+        notes: parsed.notes ?? null,
+        created_by: user.id,
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      // EXCLUDE constraint violation (PG SQLSTATE 23P01) — double-book.
+      if (error.code === '23P01') {
+        return {
+          ok: false,
+          error:
+            'Horário indisponível para este profissional. Escolha outro horário ou outro profissional.',
+        };
+      }
+      return { ok: false, error: error.message };
+    }
+
+    revalidatePath('/agenda');
+    return { ok: true, data: { id: data.id } };
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const first = err.issues[0];
+      return { ok: false, error: first?.message ?? 'Dados inválidos.' };
+    }
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : 'Erro inesperado.',
+    };
+  }
 }

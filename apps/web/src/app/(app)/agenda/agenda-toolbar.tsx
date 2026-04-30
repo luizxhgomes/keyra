@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +25,8 @@ type Props = {
   professionals: AgendaProfessional[];
   selectedProfessionalId: string | null;
   onProfessionalChange: (id: string | null) => void;
+  /** Story 2.5 — abre o formulário de novo agendamento. */
+  onNewAppointment: () => void;
 };
 
 /**
@@ -42,6 +44,7 @@ export function AgendaToolbar({
   professionals,
   selectedProfessionalId,
   onProfessionalChange,
+  onNewAppointment,
 }: Props) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
@@ -73,6 +76,16 @@ export function AgendaToolbar({
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button
+          type="button"
+          variant="default"
+          onClick={onNewAppointment}
+          className="sm:order-last"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Novo agendamento
+        </Button>
+
         <Select
           value={selectedProfessionalId ?? 'all'}
           onValueChange={(value) =>

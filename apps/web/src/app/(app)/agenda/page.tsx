@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requireRole } from '@/lib/auth/roles';
 
-import { listAgendaProfessionals } from './actions';
+import { listAgendaPickers, listAgendaProfessionals } from './actions';
 import { CalendarClient } from './calendar-client';
 
 export const metadata: Metadata = {
@@ -28,7 +28,10 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
   const { orgId } = await requireAuth();
   await requireRole(orgId, 'viewer');
 
-  const professionals = await listAgendaProfessionals();
+  const [professionals, pickers] = await Promise.all([
+    listAgendaProfessionals(),
+    listAgendaPickers(),
+  ]);
   const sp = await searchParams;
   const selectedProfessionalId =
     sp.professional && professionals.some((p) => p.id === sp.professional)
@@ -47,6 +50,7 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
 
       <CalendarClient
         professionals={professionals}
+        pickers={pickers}
         initialProfessionalId={selectedProfessionalId}
       />
     </div>

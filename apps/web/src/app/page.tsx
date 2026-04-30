@@ -1,11 +1,8 @@
 import Link from 'next/link';
 
 /**
- * Public landing — minimal placeholder for Story 1.1.
- *
- * Story 1.2 will wire login, Story 1.5 brings real marketing surfaces.
- * For now, an honest "we're cooking" page that respects the terracota palette
- * and gets the design system in front of stakeholders.
+ * Public landing — placeholder enquanto a Phase 5 não traz a página de marketing
+ * definitiva. Respeita a paleta terracota e leva direto para o login.
  */
 export default function HomePage() {
   return (
@@ -29,7 +26,7 @@ export default function HomePage() {
             Entrar
           </Link>
           <a
-            href="https://keyra.app"
+            href="https://usekeyra.com"
             className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-6 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Saber mais
@@ -37,7 +34,8 @@ export default function HomePage() {
         </div>
 
         <p className="max-w-sm text-xs text-muted-foreground">
-          Story 1.1 — scaffold inicial. Login, dashboard e agenda chegam nas próximas sprints.
+          Login passwordless, organizações, equipe e cadastros já no ar. A agenda
+          inteligente entra na próxima Sprint.
         </p>
       </section>
     </main>

@@ -3,6 +3,7 @@
 import { headers } from 'next/headers';
 import { z } from 'zod';
 
+import { isSafeNextPath } from '@/lib/auth/safe-next';
 import { createServerClient } from '@/lib/supabase/server';
 
 /**
@@ -17,6 +18,10 @@ export type ActionResult<T = undefined> =
 
 const signInSchema = z.object({
   email: z.string().trim().toLowerCase().email('E-mail inválido'),
+  /** Caminho relativo de retorno pós-magic-link. Validado de novo aqui
+   * com `isSafeNextPath` por defesa em profundidade — entradas inválidas
+   * são silenciosamente descartadas. */
+  next: z.string().optional(),
 });
 
 /**
@@ -48,10 +53,15 @@ export async function signInWithOtpAction(
       ? `${headerList.get('x-forwarded-proto') ?? 'https'}://${headerList.get('host')}`
       : 'https://usekeyra.vercel.app');
 
+  const safeNext = isSafeNextPath(parsed.data.next) ? parsed.data.next : null;
+  const callbackUrl = safeNext
+    ? `${origin}/auth/callback?next=${encodeURIComponent(safeNext)}`
+    : `${origin}/auth/callback`;
+
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: callbackUrl,
       // shouldCreateUser defaults to true — a brand-new email auto-signs-up
       // and lands in the onboarding flow (no separate signup page per ADR-010).
       shouldCreateUser: true,

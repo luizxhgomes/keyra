@@ -1,11 +1,17 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
+import { getSafeNext } from '@/lib/auth/safe-next';
+
 import { LoginForm } from './login-form';
 
 export const metadata: Metadata = {
   title: 'Entrar',
   description: 'Acesse sua conta KEYRA com um link mágico enviado por e-mail.',
+};
+
+type LoginPageProps = {
+  searchParams: Promise<{ next?: string | string[] }>;
 };
 
 /**
@@ -14,8 +20,15 @@ export const metadata: Metadata = {
  * Server Component shell. The form itself is a Client Component so we can
  * drive the two-phase UX (email input → "confira seu e-mail") without
  * round-tripping the full page.
+ *
+ * `?next=` é encaminhado ao formulário para sobreviver ao magic link e cair
+ * de volta no destino original (ex.: `/invites/{token}`).
  */
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const sp = await searchParams;
+  const rawNext = Array.isArray(sp.next) ? sp.next[0] : sp.next;
+  const next = getSafeNext(rawNext);
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
       <div className="w-full max-w-sm">
@@ -29,7 +42,7 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8">
-          <LoginForm />
+          <LoginForm next={next} />
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">

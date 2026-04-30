@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { getActiveOrgId } from '@/lib/auth/get-current-user';
+import { isSafeNextPath } from '@/lib/auth/safe-next';
 import { createServerClient } from '@/lib/supabase/server';
 
 /**
@@ -48,10 +49,20 @@ export async function GET(request: NextRequest) {
   // and keeps the new-user path deterministic.
   await supabase.auth.refreshSession();
 
-  // Decide where to route: onboarding if no membership yet, dashboard otherwise.
-  // `getActiveOrgId()` reads the JWT claim (ADR-012) with a user_preferences
-  // fallback (migration 021) so new users with a just-created org are routed
-  // correctly even before the access token finishes propagating.
+  // Se o magic link veio com `?next=` (ex.: aceite de convite), priorizamos
+  // sempre que o caminho for seguro — o destino do convite resolve por conta
+  // própria a UX correta (a página `/invites/[token]` mostra "aceitar",
+  // "email diferente", "expirado" etc.). Sem isto, um convidado novo cairia
+  // em `/onboarding/nova-organizacao` em vez do convite que disparou o login.
+  const rawNext = searchParams.get('next');
+  if (isSafeNextPath(rawNext)) {
+    return NextResponse.redirect(new URL(rawNext, origin));
+  }
+
+  // Default: onboarding se não houver membership; dashboard caso contrário.
+  // `getActiveOrgId()` lê o claim do JWT (ADR-012) com fallback em
+  // `user_preferences` (migration 021), garantindo roteamento correto mesmo
+  // antes do access token novo terminar de propagar.
   const orgId = await getActiveOrgId();
   const target = orgId ? '/dashboard' : '/onboarding/nova-organizacao';
 

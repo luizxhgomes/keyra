@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient as createSSRClient, type CookieOptions } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { isSafeNextPath } from '@/lib/auth/safe-next';
 import { env } from '@/lib/env';
 import type { Database } from '@/types/database.types';
 
@@ -88,10 +89,13 @@ export async function proxy(request: NextRequest) {
 
   if (isAnonymousOnly && user) {
     // Logged-in user accidentally navigating to /login → send them onward.
-    // We don't know yet whether they have a membership, so route to the
-    // dashboard — `requireAuth()` at the page layer will redirect to
-    // onboarding if membership is missing.
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    // Se a URL tem `?next=` válido (ex.: alguém clicou num link de convite
+    // já estando logado), respeitamos esse destino. Caso contrário rota
+    // padrão é `/dashboard` — `requireAuth()` no layout corrige caminho
+    // para onboarding se a membership ainda não existir.
+    const rawNext = request.nextUrl.searchParams.get('next');
+    const target = isSafeNextPath(rawNext) ? rawNext : '/dashboard';
+    return NextResponse.redirect(new URL(target, request.url));
   }
 
   return response;

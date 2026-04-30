@@ -18,6 +18,13 @@ const formSchema = z.object({
 });
 type FormValues = z.infer<typeof formSchema>;
 
+type LoginFormProps = {
+  /** Caminho relativo (ex.: `/invites/abc`) para o qual o usuário deve voltar
+   * após autenticar via magic link. Já validado pelo Server Component pai
+   * com `getSafeNext()`. */
+  next: string | null;
+};
+
 /**
  * Client-side login form — magic link flow.
  *
@@ -29,7 +36,7 @@ type FormValues = z.infer<typeof formSchema>;
  * Error state is surfaced via `sonner` toast AND inline (aria-live) so it's
  * both noisy-enough and a11y-compliant.
  */
-export function LoginForm() {
+export function LoginForm({ next }: LoginFormProps) {
   const [emailSent, setEmailSent] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -45,7 +52,7 @@ export function LoginForm() {
 
   function onSubmit(values: FormValues) {
     startTransition(async () => {
-      const result = await signInWithOtpAction(values);
+      const result = await signInWithOtpAction({ ...values, next: next ?? undefined });
       if (result.success) {
         setEmailSent(values.email);
         toast.success('Link enviado!', {

@@ -16,6 +16,17 @@ read_or_empty() {
   [[ -f "${f}" ]] && tr -d '[:space:]' < "${f}" || echo ""
 }
 
+# Preserva espaços internos (ex.: "KEYRA <no-reply@usekeyra.com>"); apenas
+# apara whitespace nas pontas e quebra de linha final.
+read_line_or_empty() {
+  local f="${SECRETS}/$1"
+  if [[ -f "${f}" ]]; then
+    head -n1 "${f}" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//'
+  else
+    echo ""
+  fi
+}
+
 REF=$(read_or_empty supabase-project-ref.txt)
 ANON=$(read_or_empty supabase-anon.key)
 PUB=$(read_or_empty supabase-publishable.key)
@@ -25,6 +36,8 @@ SBP=$(read_or_empty supabase.token)
 VC=$(read_or_empty vercel.token)
 GH=$(read_or_empty github.token)
 CEK=$(read_or_empty column-encryption-key.txt)
+RESEND=$(read_or_empty resend-api.key)
+EMAIL_FROM_VAL=$(read_line_or_empty email-from.txt)
 
 URL=""
 [[ -n "${REF}" ]] && URL="https://${REF}.supabase.co"
@@ -46,6 +59,10 @@ SUPABASE_ACCESS_TOKEN=${SBP}
 
 # ---- Application secrets ----
 COLUMN_ENCRYPTION_KEY=${CEK}
+
+# ---- Email transacional (Resend, ADR-021) ----
+RESEND_API_KEY=${RESEND}
+EMAIL_FROM=${EMAIL_FROM_VAL}
 
 # ---- Vercel ----
 VERCEL_TOKEN=${VC}

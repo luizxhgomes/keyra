@@ -36,7 +36,7 @@ const serverSchema = z.object({
   EMAIL_FROM: z
     .string()
     .min(3)
-    .default('KEYRA <no-reply@keyra.app>'),
+    .default('KEYRA <no-reply@usekeyra.com>'),
 
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });

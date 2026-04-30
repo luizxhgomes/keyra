@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { Analytics } from '@vercel/analytics/next';
 
 import { cn } from '@/lib/utils';
 
@@ -57,6 +58,7 @@ export default function RootLayout({
       <body className={cn(inter.variable, 'min-h-screen bg-background font-sans text-foreground')}>
         {children}
         <Toaster richColors position="bottom-right" />
+        <Analytics />
       </body>
     </html>
   );

@@ -6,10 +6,17 @@ import { ArrowLeft } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatBRL } from '@/lib/money';
 
-import { getCommand, listActiveServicesForPicker, type CommandStatus } from '../actions';
+import {
+  getCommand,
+  listActiveServicesForPicker,
+  listPaymentPickers,
+  listPaymentsForCommand,
+  type CommandStatus,
+} from '../actions';
 import { ComandaEditForm } from '../comanda-edit-form';
+import { PaymentsCard } from '../payments-card';
+import { ConsumoCard } from './consumo-card';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -31,14 +38,20 @@ const STATUS_BADGE: Record<CommandStatus, string> = {
 
 export default async function ComandaDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const [cmdRes, pickerRes] = await Promise.all([
+  const [cmdRes, pickerRes, paymentsRes, paymentPickersRes] = await Promise.all([
     getCommand(id),
     listActiveServicesForPicker(),
+    listPaymentsForCommand(id),
+    listPaymentPickers(),
   ]);
 
   if (!cmdRes.ok) notFound();
   const cmd = cmdRes.data;
   const services = pickerRes.ok ? pickerRes.data : [];
+  const payments = paymentsRes.ok ? paymentsRes.data : [];
+  const pickers = paymentPickersRes.ok
+    ? paymentPickersRes.data
+    : { methods: [], accounts: [] };
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -98,23 +111,24 @@ export default async function ComandaDetailPage({ params }: PageProps) {
         <CardHeader>
           <CardTitle>Pagamentos</CardTitle>
           <CardDescription>
-            Story 3.2 ativa o registro de pagamento. Por enquanto, o status muda
-            automaticamente para `paga` quando a soma dos pagamentos cobre o total.
+            Cada pagamento registrado dispara automaticamente uma transação financeira
+            (FR-FI-01) e atualiza o status da comanda.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Pago: {formatBRL(cmd.paid_amount)} de {formatBRL(cmd.total)}
-            {cmd.paid_at ? (
-              <>
-                {' '}
-                · pago em{' '}
-                {format(new Date(cmd.paid_at), "d 'de' MMM, HH:mm", { locale: ptBR })}
-              </>
-            ) : null}
-          </p>
+          <PaymentsCard
+            commandId={cmd.id}
+            status={cmd.status}
+            total={cmd.total}
+            paidAmount={cmd.paid_amount}
+            payments={payments}
+            methods={pickers.methods}
+            accounts={pickers.accounts}
+          />
         </CardContent>
       </Card>
+
+      <ConsumoCard commandId={cmd.id} status={cmd.status} />
     </div>
   );
 }

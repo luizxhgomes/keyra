@@ -30,6 +30,7 @@ const formSchema = z.object({
     .optional()
     .transform((v) => (v === undefined || v === '' ? undefined : Number(v)))
     .refine((v) => v === undefined || (!Number.isNaN(v) && v >= 0 && v <= 100), 'Entre 0 e 100'),
+  costCenter: z.string().max(80).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -45,6 +46,7 @@ export function ProfissionalForm() {
       specialty: '',
       color: '',
       defaultCommissionPercent: undefined,
+      costCenter: '',
     },
   });
 
@@ -58,6 +60,7 @@ export function ProfissionalForm() {
         ...(values.defaultCommissionPercent !== undefined
           ? { defaultCommissionPercent: values.defaultCommissionPercent }
           : {}),
+        ...(values.costCenter ? { costCenter: values.costCenter } : {}),
       });
       if (!result.ok) {
         toast.error(result.error);
@@ -70,6 +73,7 @@ export function ProfissionalForm() {
         specialty: '',
         color: '',
         defaultCommissionPercent: undefined,
+        costCenter: '',
       });
     });
   }
@@ -134,6 +138,19 @@ export function ProfissionalForm() {
             </p>
           ) : null}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="prof-cc">Centro de custo</Label>
+        <Input
+          id="prof-cc"
+          placeholder="Ex.: Estética Facial, Corporal"
+          disabled={isPending}
+          {...form.register('costCenter')}
+        />
+        <p className="text-xs text-muted-foreground">
+          Usado para agrupar receitas no relatório do financeiro.
+        </p>
       </div>
 
       <Button type="submit" disabled={isPending}>

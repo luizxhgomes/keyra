@@ -10,7 +10,7 @@ import { formatBRL } from '@/lib/money';
 import { listInventoryMovements, type MovementRow } from '../actions';
 
 type PageProps = {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; command?: string }>;
 };
 
 const TYPE_LABEL: Record<MovementRow['movement_type'], string> = {
@@ -32,8 +32,12 @@ const TYPE_BADGE_CLASS: Record<MovementRow['movement_type'], string> = {
 export default async function MovimentacoesPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, Number(params.page ?? 1) || 1);
+  const commandFilter = params.command;
 
-  const result = await listInventoryMovements({ page });
+  const result = await listInventoryMovements({
+    page,
+    ...(commandFilter ? { commandId: commandFilter } : {}),
+  });
   if (!result.ok) {
     return (
       <Card>
@@ -55,6 +59,16 @@ export default async function MovimentacoesPage({ searchParams }: PageProps) {
         <h2 className="text-lg font-semibold">Movimentações</h2>
         <p className="text-sm text-muted-foreground">
           {total} {total === 1 ? 'movimento' : 'movimentos'} registrados.
+          {commandFilter ? (
+            <>
+              {' · '}
+              <span>Filtrado por comanda #{commandFilter.slice(0, 8)}</span>
+              {' · '}
+              <Link href="/estoque/movimentacoes" className="underline">
+                Limpar filtro
+              </Link>
+            </>
+          ) : null}
         </p>
       </div>
 

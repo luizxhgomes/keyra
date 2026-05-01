@@ -1,10 +1,9 @@
 # KEYRA — Onde Paramos (snapshot executivo)
 
-> **Data deste snapshot:** 2026-05-01 — Phase 1 Done + Sprint 2 = 28/28 pontos (100%) + **Sprint 3 iniciada com Story 3.1 ✅ Done** (3/32 pontos da Sprint 3).
-> **Última entrega:** Story 3.1 (Comanda automática) com QA gate PASS sem concerns. 6 arquivos novos. UI completa em `/comandas` (lista paginada com filtro de status + sub-nav Todas/Abertas/Finalizadas/Pagas) e `/comandas/[id]` (detalhe com item edition + aplicar desconto + finalize). Server Actions: `listCommands`, `getCommand`, `addCommandItem` (snapshota unit_cost/commission do serviço atual), `removeCommandItem`, `applyCommandDiscount` (≤ subtotal), `finalizeCommand` (open → finalized), `listActiveServicesForPicker`. **Decisão de arquitetura: zero cálculo na app** — `commands.subtotal` é mantido pelo trigger `trg_command_items_recompute`; `commands.total` é GENERATED ALWAYS AS (subtotal - discount_amount); `command_items.total` idem. App só faz INSERT/DELETE/UPDATE simples; banco cuida do resto. Sidebar ganhou item "Comandas" (ícone Receipt) entre Agenda e Pacientes. Smoke transacional empírico via psql confirmou todo o ciclo: trigger cria comanda ao status=done, recompõe subtotal ao adicionar item, GENERATED total atualiza ao aplicar discount, ROLLBACK desfez tudo. Commits `69d8c39` (2.3) → `98d8c15` (drafts 3.x) → `XXXXXXX` (3.1).
+> **Data deste snapshot:** 2026-05-01 — Phase 1 Done + Sprint 2 = 28/28 (100%) + **Sprint 3 = 32/32 (100%) — Phase 3 ✅ COMPLETA**. MVP a uma sprint do feature-complete (Phase 4 = DRE + Dashboard).
+> **Última entrega:** **Sprint 3 fechada** — todas as 8 stories de Automação Financeira (3.1-3.8) entregues em uma sessão com QA gate PASS. O ciclo do diferencial KEYRA está vivo end-to-end: `criar agendamento → concluir → comanda automática → pagamento (com cálculo de fee) → transação automática → rateio de estoque`. Migrations 024 (`seed_chart_on_org_create` que faz seed das orgs novas + backfill nas existentes) e 025 (`professionals.cost_center`) aplicadas. UI nova: `/comandas`, `/comandas/[id]` (com PaymentsCard + ConsumoCard), `/financeiro/transacoes`, `/financeiro/receitas`, `/financeiro/despesas` (CRUD), `/financeiro/custos-fixos` (com clone do mês passado), `/financeiro/fluxo-caixa` (saldo + tabela diária + projeção), `/financeiro/categorias`. **Decisão de arquitetura central: zero cálculo na aplicação** — todos os totais são mantidos por triggers (`trg_command_items_recompute`, `trg_payments_to_transaction`, `_consume_command_inventory`) e GENERATED columns. App só dispara INSERT/UPDATE/DELETE; banco cuida do resto. RLS dupla (filtro explícito + security_invoker da migration 023). Smoke transacional via psql + ROLLBACK validou todos os 3 ciclos críticos (comanda gerada, pagamento → transação, rateio de insumos).
 >
-> **Sprint 3 — Automação Financeira** (32 pontos): drafts 3.1-3.8 todos validados pelo @po (GO 8-9/10) e Ready. Stories 3.2 (Pagamento, M ~5 pts), 3.3 (Transação, S ~2 pts), 3.4 (Receitas/profissional, S ~3 pts), 3.5 (Despesas, M ~5 pts), 3.6 (Custos fixos/variáveis, S ~3 pts), 3.7 (Fluxo de caixa, M ~5 pts), 3.8 (Rateio de estoque, S ~2 pts) aguardando @dev.
-> **Próxima ação recomendada:** `@dev *develop-story 3.2` (Pagamento — desbloqueia o ciclo completo `done → comanda → pagar → transação → DRE`).
+> **Próxima ação recomendada:** **Sprint 4 — Lucro + Dashboard** (~1.5 semanas, fecha o MVP feature-complete). Stories 4.1 (DRE básica), 4.2 (DRE por serviço — diferencial vs Conta Azul), 4.3 (Lucro por profissional), 4.4 (Dashboard tela única), 4.5 (Agenda do dia), 4.6 (Indicadores), 4.7 (Comparativo mês vs mês), 4.8 (Comparativo vs meta), 4.9 (Alertas). Aguardando `@sm *expand` para draftar.
 >
 > Este documento é a **entrada única** para retomar o contexto do KEYRA em qualquer nova sessão. Foi projetado para ser lido em menos de 60 segundos. **Regra operacional:** este snapshot é atualizado ao fim de cada Story (status Done) — header + tabela de status macro + §3 lista da sprint atual + §6 próxima ação + §8 Histórico. Detalhes nos links canônicos ao final.
 
@@ -18,7 +17,7 @@
 | **Documentação (Phase 0)** | ✅ 100% | PRD v1.3 · ARCHITECTURE v1.3 (20 ADRs) · SCHEMA (21 tabelas · 100% RLS · 6 views · 15 funções · 19 migrations) · 8 wireframes · 6 pesquisas competitivas |
 | **Phase 1 — Fundação Técnica** | ✅ **100% Done + validado em prod** | 1.1 ✅ · 1.2 ✅ · 1.3 ✅ · 1.4 ✅ · 1.5 ✅. PR #1 mergeado em `main`. Migrations 100% sincronizadas (22/22 no remoto), `database.types.ts` regenerado, suíte RLS verde no CI, Resend Verified, fluxo de convite **end-to-end testado em produção**: convidado recebe email da marca KEYRA, clica, autentica via magic link, retorna ao convite (graças ao fix do `?next=`), aceita e cai no dashboard da clínica. |
 | **Phase 2 — Catálogo + Agenda** | ✅ **100% (em pontos)** | Stories 2.1 e 2.2 em InReview · **Story 2.3 (Insumos + BOM) ✅ Done** · **Story 2.4 (Agenda FullCalendar) ✅ Done** · **Story 2.5 (Agendamento) ✅ Done** · **Story 2.6 (Status) ✅ Done** + smoke empírico validado · **Story 2.7 (Receita prevista) ✅ Done** + migration 023 (security_invoker em todas as views). Em pontos: 28 de 28 entregues (10+7+3+2+6 de 6+10+7+3+2). **Concerns C1+C2 zerados.** Próximo: Sprint 3 (Automação Financeira). |
-| **Phase 3 — Automação Financeira** | 🟢 ~9% (3/32 pts) | **Story 3.1 (Comanda automática) ✅ Done**. Drafts 3.2-3.8 Ready (validados pelo @po, 29 pts restantes). |
+| **Phase 3 — Automação Financeira** | ✅ **100% (32/32 pts)** | **8 stories ✅ Done em uma sessão**: 3.1 Comanda · 3.2 Pagamento · 3.3 Transação visualização · 3.4 Receitas por profissional + cost_center · 3.5 Despesas (CRUD) · 3.6 Custos fixos vs variáveis · 3.7 Fluxo de caixa · 3.8 Rateio de estoque. Migrations 024 + 025 aplicadas. **Ciclo do diferencial KEYRA vivo end-to-end.** |
 | **Phases 4–7 — Features MVP+** | ⏸️ 0% UI | Schema completo no remoto; views `v_dre_*`, `v_cashflow_daily`, `v_dashboard_kpis`, `v_receitas_previstas` prontas para consumo |
 | **Testes automatizados** | 🔴 0 | Nenhum arquivo `.test.*` ou `.spec.*` no repo. Validação manual + typecheck + lint + build apenas |
 
@@ -133,35 +132,39 @@ Nenhum impede a próxima Story (2.4 — Agenda); cada um trava uma Story especí
 
 ## 6. Próxima Ação Concreta — Luiz
 
-**Sprint 2 100% + Sprint 3 a 9% (Story 3.1 Done)**. Próxima Story 3.2 (Pagamento) abre o ciclo completo da automação financeira. Drafts 3.2-3.8 todos Ready.
+**Phases 1, 2 e 3 fechadas** = 60/60 pontos do MVP entregues + 32 pts da Phase 3 = **84% do MVP feature-complete**. Próximo passo: **Sprint 4 — Lucro + Dashboard** (~1.5 semanas, ~38 pts estimados) fecha o MVP.
 
-### Caminho para fechar Sprint 3 (29 pts restantes)
+### Caminho para Sprint 4 (fecha o MVP)
 
 ```text
-@dev *develop-story 3.2   # Pagamento (Pix/cartão/dinheiro) — M, ~5 pts
-@dev *develop-story 3.3   # Transação visualização — S, ~2 pts
-@dev *develop-story 3.4   # Receitas por profissional + cost_center — S, ~3 pts
-@dev *develop-story 3.5   # Despesas (CRUD) — M, ~5 pts
-@dev *develop-story 3.6   # Custos fixos vs variáveis — S, ~3 pts
-@dev *develop-story 3.7   # Fluxo de caixa — M, ~5 pts
-@dev *develop-story 3.8   # Rateio de estoque (validação + UI) — S, ~2 pts
+# 1. Drafts pelo @sm
+@sm *create-story 4.1   # DRE básica (Receita - Custos - Despesas = Lucro)
+@sm *create-story 4.2   # DRE por serviço (diferencial vs Conta Azul)
+@sm *create-story 4.3   # Lucro por profissional
+@sm *create-story 4.4   # Dashboard tela única
+@sm *create-story 4.5   # Agenda do dia no dashboard
+@sm *create-story 4.6   # Indicadores (ticket médio, top serviço, no-show)
+@sm *create-story 4.7   # Comparativo mês vs mês (diferença absoluta)
+@sm *create-story 4.8   # Comparativo vs meta projetada
+@sm *create-story 4.9   # Alertas (queda lucro, baixa margem, faltas)
+
+# 2. @po valida → 3. @dev implementa em sequência
 ```
 
-**Recomendação tática:** seguir com **3.2** — desbloqueia o trigger `trg_payments_to_transaction` (já validado em smokes anteriores) que cria automaticamente `transactions` + atualiza comanda + dispara `_consume_command_inventory`. Após 3.2, as stories 3.3 (transações) e 3.8 (rateio) ficam triviais (já têm dados reais para listar).
+**Recomendação tática:** começar pela **4.4 (Dashboard)** que consome `v_dashboard_kpis` (view pronta) — é a tela onde a idealizadora vê o produto inteiro de relance, a vitrine do diferencial KEYRA.
 
-### Smoke test pós-deploy da Story 3.1 (executar antes da próxima sessão)
+### Smoke test pós-deploy da Sprint 3 (executar antes da Sprint 4)
 
-Em `https://usekeyra.com/agenda`:
+Em `https://usekeyra.com`:
 
-1. Criar agendamento (Story 2.5) e marcar como concluído (Story 2.6).
-2. Ir em `/comandas` → comanda recém-criada aparece com status "Aberta".
-3. Click no card → detalhe mostra item snapshotado (description = nome do serviço, quantity=1, unit_price=preço do agendamento).
-4. **Adicionar item** extra: selecionar outro serviço → subtotal recompõe automaticamente.
-5. **Aplicar desconto**: digitar valor → total recalcula imediatamente.
-6. **Remover item**: ícone lixeira → subtotal volta.
-7. **Finalizar**: botão "Finalizar comanda" → status muda para "Finalizada" + controles de edição somem.
-8. Filtros do topo (Abertas/Finalizadas/Pagas) funcionam corretamente.
-9. Layout responsivo (mobile/desktop) via BottomNav vs Sidebar.
+1. **Ciclo completo**: `/agenda` cria agendamento → conclui → `/comandas` mostra comanda aberta → finalizar → registrar pagamento (Pix R$ X) → comanda vira paga.
+2. **`/comandas/[id]`**: card "Pagamentos" lista o pagamento; card "Consumo de insumos" aparece (se serviço tem BOM).
+3. **`/financeiro/transacoes`**: a transação aparece automaticamente com origin="command_payment".
+4. **`/financeiro/receitas`**: filtra por período → vê receita do profissional.
+5. **`/financeiro/despesas/nova`**: cria despesa manual → aparece em transações como debit.
+6. **`/financeiro/custos-fixos`**: marcando "fixo" no form, aparece aqui no mês corrente.
+7. **`/financeiro/fluxo-caixa`**: saldo atual, tabela diária, projeção via `v_receitas_previstas`.
+8. **`/estoque/movimentacoes?command={id}`**: filtro por comanda mostra apenas o consumo daquele atendimento.
 
 ### Smoke test pós-Story 2.6 (executar antes da próxima sessão de @dev)
 
@@ -229,5 +232,6 @@ Quando precisar de detalhes, abrir na ordem:
 | 2026-05-01 — Story 2.3 (Insumos + BOM) | **Ciclo SDC completo em sessão única — Sprint 2 fechada com 28/28 pontos**. 14 arquivos novos +1673 linhas. Validator `supply.ts` (com `serviceSupplyLinkSchema` parseando vírgula brasileira). Server Actions completas em `estoque/actions.ts`: `listSupplies` paginado, `upsertSupply` com propagação reversa de `unit_cost` para todos os serviços que usam o insumo, `archive`/`unarchive`, `listInventoryMovements` read-only, `listServiceBom`, `attachSupplyToService` com `upsert(onConflict='service_id,supply_id')` + `recalcServiceUnitCost` server-side, `detachSupplyFromService`, `listActiveSuppliesForPicker`. Layout `/estoque` com sub-nav (Insumos · Movimentações), redirect de `/estoque` para `/estoque/insumos`. Lista de insumos espelha padrão Story 2.1, com badge "Recompra" quando `current_stock <= reorder_level`. Movimentações read-only com badges semânticos por tipo (`entry`/`exit`/`adjustment`/`service_consumption`/`loss`). Card "Insumos (BOM)" inserido em `/servicos/[id]` apenas para `type='service'` — `service-bom-editor.tsx` (Client) com otimismo local, custo total em tempo real, picker filtrando insumos já vinculados (alinhado com UNIQUE constraint). Sidebar já tinha item "Estoque" — só faltava a rota. Defesa em profundidade: RLS dupla via filtro `eq('org_id')` + `security_invoker=true` (migration 023). QA gate **PASS com 1 concern não bloqueante** (smoke do BOM em prod). Tech debt registrado: TD-2.3.1 (página de form acessível por viewer; submit rejeita), TD-2.3.2 (recalc reverso em loop TS), TD-2.3.3 (recalc em app-layer, não trigger). Commit `69d8c39`. **Smoke C1 resolvido depois**: psql + ROLLBACK validou todas as 9 etapas (insumo, BOM, recalc, propagação reversa, detach, soft-delete, trigger movement). |
 | 2026-05-01 — Drafts Sprint 3 (3.1-3.8) | `@sm` draftou 8 stories da Sprint 3 (Automação Financeira) baseadas em EPIC-0 §Fase 3 + PRD (FR-CO-*, FR-FI-*, FR-CP-*, FR-ES-02). `@po` validou todas com checklist de 10 pontos: GO 8-9/10 em todas, status `Draft → Ready`. Total 32 pontos: 3.1 (Comanda, S, 3 pts), 3.2 (Pagamento, M, 5 pts), 3.3 (Transação visualização, S, 2 pts), 3.4 (Receitas por profissional, S, 3 pts), 3.5 (Despesas, M, 5 pts), 3.6 (Custos fixos vs variáveis, S, 3 pts), 3.7 (Fluxo de caixa, M, 5 pts), 3.8 (Rateio de estoque, S, 2 pts). Commit `98d8c15`. |
 | 2026-05-01 — Story 3.1 (Comanda automática) | **Sprint 3 abriu com SDC completo em sessão única.** 6 arquivos novos. Validator `command.ts` + actions completas (`listCommands` paginado com filtro por status, `getCommand` com items inline, `addCommandItem` snapshotando unit_cost/commission do serviço atual, `removeCommandItem`, `applyCommandDiscount` validando ≤ subtotal, `finalizeCommand` bloqueando comanda sem itens, `listActiveServicesForPicker`). UI: `/comandas` lista com sub-nav de filtros (Todas/Abertas/Finalizadas/Pagas), `/comandas/[id]` detalhe com `comanda-edit-form.tsx` (Client + otimismo local + cálculo local somente para feedback). Sidebar ganhou item "Comandas" (ícone Receipt). **Decisão de arquitetura: ZERO cálculo na aplicação** — trigger `trg_command_items_recompute` mantém `commands.subtotal`; `commands.total` é GENERATED ALWAYS AS (subtotal - discount); `command_items.total` idem. App só faz INSERT/DELETE/UPDATE simples; banco cuida de tudo. Smoke empírico via psql + ROLLBACK validou: trigger gera comanda ao status=done, snapshot correto em command_items, subtotal recompõe ao adicionar item (200 → 280), GENERATED total atualiza ao aplicar desconto (280 → 250), volta a 170 ao remover item, finalize muda status open → finalized + finalized_at, audit_log captura 6 entries no ciclo. RLS dupla (filtro explícito + security_invoker da migration 023). QA gate **PASS sem concerns**. typecheck + lint + build verdes. |
+| 2026-05-01 — Sprint 3 completa (Stories 3.2-3.8) | **Phase 3 FECHADA — todas as 8 stories Done em uma sessão.** Migration 024 (`seed_chart_on_org_create`) atualiza RPC + backfill: orgs nascem com 6 payment_methods + 3 accounts + 29 categorias. Migration 025 (`professionals.cost_center`). **3.2 Pagamento**: validator + action `registerPayment` com Decimal.js (`fee = round(gross × rate, 2) + fixed`), sheet com preview em tempo real, payments-card.tsx; smoke confirmou trigger criou transaction (credit, gross=200, fee=6.98, net=193.02) e comanda virou paid automaticamente. **3.3 Transação visualização**: `/financeiro` com sub-nav (Transações·Receitas·Despesas·Custos fixos·Fluxo·Categorias), `/financeiro/transacoes` com filtros + tabela paginada + 3 cards de totais; validador Zod movido para lib (regra Next 16: `'use server'` só exporta funções async). **3.4 Receitas por profissional**: ADD COLUMN cost_center; form `/team/profissionais` ganha campo; `/financeiro/receitas` agrupa por profissional E por centro. **3.5 Despesas**: validator + actions CRUD + páginas `/financeiro/despesas` + form com select nativo (evita warning React Compiler). **3.6 Custos fixos vs variáveis**: sem migration nova (schema já tinha `kind='fixed_cost'` e `is_fixed`); `/financeiro/custos-fixos` com média móvel 3 meses + clone idempotente do mês passado; `/financeiro/categorias` lista plano de contas agrupado. **3.7 Fluxo de caixa**: `/financeiro/fluxo-caixa` com saldo + tabela diária + saldo acumulado + projeção via `v_receitas_previstas`; cap 365 dias; sem gráfico. **3.8 Rateio de estoque**: smoke confirmou `_consume_command_inventory` cria movement `service_consumption` ao pagar comanda (qty=-50, unit_cost=5); `listInventoryMovements` aceita `commandId?`; `/estoque/movimentacoes?command=` filtra; ConsumoCard em `/comandas/[id]` mostra insumos consumidos quando comanda paga. **Sprint 3 totalizando 32/32 pontos. Phase 3 ✅.** |
 
 > **Quando atualizar:** ao encerrar cada Story, cada Sprint ou ao bater um bloqueador novo. Fonte de verdade operacional, complementar ao `IMPLEMENTATION-MAP.md` (tático) e ao `EPIC-0` (estratégico). Regra de obrigatoriedade pós-Story Done formalizada em 2026-05-01 (CLAUDE.md §"Workflow story-driven" passo 6).

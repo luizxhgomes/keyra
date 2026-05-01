@@ -12,6 +12,8 @@ import {
   commandIdSchema,
   removeCommandItemSchema,
 } from '@/lib/validators/command';
+import { registerPaymentSchema } from '@/lib/validators/payment';
+import { toDecimal } from '@/lib/money';
 
 export type ActionResult<T = void> =
   | { ok: true; data: T }
@@ -417,6 +419,248 @@ export type ServicePicker = {
   price: number;
   type: 'service' | 'product';
 };
+
+// ---------------------------------------------------------------------------
+// Story 3.2 — Pagamentos
+// ---------------------------------------------------------------------------
+
+export type PaymentMethodPicker = {
+  id: string;
+  name: string;
+  kind: 'pix' | 'credit_card' | 'debit_card' | 'cash' | 'bank_transfer' | 'voucher' | 'other';
+  fee_rate: number;
+  fee_fixed: number;
+  settlement_days: number;
+  default_account_id: string | null;
+};
+
+export type AccountPicker = {
+  id: string;
+  name: string;
+  kind: string;
+};
+
+export type PaymentRow = {
+  id: string;
+  payment_method_name: string;
+  account_name: string;
+  gross_amount: number;
+  fee_amount: number;
+  net_amount: number;
+  installments: number;
+  paid_at: string;
+  settled_at: string | null;
+  external_reference: string | null;
+};
+
+export async function listPaymentPickers(): Promise<
+  ActionResult<{ methods: PaymentMethodPicker[]; accounts: AccountPicker[] }>
+> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'professional');
+    const supabase = await createServerClient();
+
+    const [methodsRes, accountsRes] = await Promise.all([
+      supabase
+        .from('payment_methods')
+        .select('id, name, kind, fee_rate, fee_fixed, settlement_days, default_account_id')
+        .eq('org_id', orgId)
+        .eq('active', true)
+        .is('deleted_at', null)
+        .order('name', { ascending: true }),
+      supabase
+        .from('accounts')
+        .select('id, name, kind')
+        .eq('org_id', orgId)
+        .eq('active', true)
+        .is('deleted_at', null)
+        .order('name', { ascending: true }),
+    ]);
+
+    if (methodsRes.error) return { ok: false, error: methodsRes.error.message };
+    if (accountsRes.error) return { ok: false, error: accountsRes.error.message };
+
+    return {
+      ok: true,
+      data: {
+        methods: (methodsRes.data ?? []).map((m) => ({
+          id: m.id,
+          name: m.name,
+          kind: m.kind as PaymentMethodPicker['kind'],
+          fee_rate: Number(m.fee_rate),
+          fee_fixed: Number(m.fee_fixed),
+          settlement_days: m.settlement_days,
+          default_account_id: m.default_account_id,
+        })),
+        accounts: (accountsRes.data ?? []).map((a) => ({
+          id: a.id,
+          name: a.name,
+          kind: a.kind,
+        })),
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+export async function listPaymentsForCommand(commandId: string): Promise<ActionResult<PaymentRow[]>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'professional');
+    const parsed = commandIdSchema.parse({ id: commandId });
+    const supabase = await createServerClient();
+
+    const { data, error } = await supabase
+      .from('payments')
+      .select(
+        `id, gross_amount, fee_amount, net_amount, installments, paid_at, settled_at, external_reference,
+         method:payment_methods(name),
+         account:accounts(name)`,
+      )
+      .eq('command_id', parsed.id)
+      .eq('org_id', orgId)
+      .is('deleted_at', null)
+      .order('paid_at', { ascending: false });
+
+    if (error) return { ok: false, error: error.message };
+
+    const rows: PaymentRow[] = (data ?? []).map((p) => {
+      const m = p.method as { name: string } | { name: string }[] | null;
+      const a = p.account as { name: string } | { name: string }[] | null;
+      const method = Array.isArray(m) ? m[0] : m;
+      const account = Array.isArray(a) ? a[0] : a;
+      return {
+        id: p.id,
+        payment_method_name: method?.name ?? '—',
+        account_name: account?.name ?? '—',
+        gross_amount: Number(p.gross_amount),
+        fee_amount: Number(p.fee_amount),
+        net_amount: Number(p.net_amount),
+        installments: p.installments,
+        paid_at: p.paid_at,
+        settled_at: p.settled_at,
+        external_reference: p.external_reference,
+      };
+    });
+
+    return { ok: true, data: rows };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+/**
+ * Registra um pagamento. O trigger `trg_payments_to_transaction` cuida de:
+ * (a) criar a `transactions` (1:1), (b) atualizar `commands.paid_amount` e
+ * `commands.status`, (c) disparar `_consume_command_inventory` quando a
+ * comanda fica totalmente paga (rateio de insumos).
+ *
+ * Aqui só calculamos `fee_amount`, `net_amount` e `settled_at` server-side
+ * com Decimal.js (NFR-FI-01) e fazemos o INSERT.
+ */
+export async function registerPayment(
+  input: z.input<typeof registerPaymentSchema>,
+): Promise<ActionResult<{ id: string }>> {
+  try {
+    const { user, orgId } = await requireAuth();
+    await requireRole(orgId, 'professional');
+    const parsed = registerPaymentSchema.parse(input);
+    const supabase = await createServerClient();
+
+    // Confirma comanda finalizada e busca quanto falta pagar.
+    const { data: cmd, error: cmdErr } = await supabase
+      .from('commands')
+      .select('status, total, paid_amount')
+      .eq('id', parsed.commandId)
+      .eq('org_id', orgId)
+      .is('deleted_at', null)
+      .maybeSingle();
+    if (cmdErr) return { ok: false, error: cmdErr.message };
+    if (!cmd) return { ok: false, error: 'Comanda não encontrada.' };
+    if (cmd.status !== 'finalized' && cmd.status !== 'paid') {
+      return {
+        ok: false,
+        error: 'Apenas comandas finalizadas aceitam pagamento. Finalize a comanda primeiro.',
+      };
+    }
+
+    const total = toDecimal(cmd.total ?? 0);
+    const alreadyPaid = toDecimal(cmd.paid_amount);
+    const remaining = total.minus(alreadyPaid);
+    if (remaining.lte(0)) {
+      return { ok: false, error: 'Comanda já está paga integralmente.' };
+    }
+    const grossDecimal = toDecimal(parsed.grossAmount);
+    if (grossDecimal.gt(remaining)) {
+      return {
+        ok: false,
+        error: `Valor maior que o restante (${remaining.toFixed(2)}).`,
+      };
+    }
+
+    // Pega snapshot do payment_method.
+    const { data: pm, error: pmErr } = await supabase
+      .from('payment_methods')
+      .select('fee_rate, fee_fixed, settlement_days')
+      .eq('id', parsed.paymentMethodId)
+      .eq('org_id', orgId)
+      .eq('active', true)
+      .is('deleted_at', null)
+      .maybeSingle();
+    if (pmErr) return { ok: false, error: pmErr.message };
+    if (!pm) return { ok: false, error: 'Forma de pagamento não disponível.' };
+
+    const feeRate = toDecimal(pm.fee_rate);
+    const feeFixed = toDecimal(pm.fee_fixed);
+    // fee_amount = round(gross × rate, 2) + fee_fixed (Decimal.js
+    // ROUND_HALF_EVEN, NFR-FI-01)
+    const feeAmount = grossDecimal.times(feeRate).toDecimalPlaces(2).plus(feeFixed);
+    const netAmount = grossDecimal.minus(feeAmount);
+    if (netAmount.lt(0)) {
+      return { ok: false, error: 'Taxa maior que o valor pago — valor inválido.' };
+    }
+
+    const paidAt = new Date();
+    const settledAt = new Date(
+      paidAt.getTime() + pm.settlement_days * 24 * 60 * 60 * 1000,
+    );
+
+    const { data, error } = await supabase
+      .from('payments')
+      .insert({
+        org_id: orgId,
+        command_id: parsed.commandId,
+        payment_method_id: parsed.paymentMethodId,
+        account_id: parsed.accountId,
+        gross_amount: Number(grossDecimal.toFixed(2)),
+        fee_rate_snapshot: Number(feeRate.toFixed(4)),
+        fee_fixed_snapshot: Number(feeFixed.toFixed(2)),
+        fee_amount: Number(feeAmount.toFixed(2)),
+        net_amount: Number(netAmount.toFixed(2)),
+        installments: parsed.installments ?? 1,
+        ...(parsed.externalReference ? { external_reference: parsed.externalReference } : {}),
+        ...(parsed.notes ? { notes: parsed.notes } : {}),
+        paid_at: paidAt.toISOString(),
+        settled_at: settledAt.toISOString(),
+        created_by: user.id,
+      })
+      .select('id')
+      .single();
+
+    if (error || !data) {
+      return { ok: false, error: error?.message ?? 'Falha ao registrar pagamento.' };
+    }
+
+    revalidatePath(`/comandas/${parsed.commandId}`);
+    revalidatePath('/comandas');
+    revalidatePath('/financeiro');
+    return { ok: true, data: { id: data.id } };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
 
 export async function listActiveServicesForPicker(): Promise<ActionResult<ServicePicker[]>> {
   try {

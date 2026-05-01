@@ -1009,6 +1009,7 @@ export type Database = {
         Row: {
           active: boolean
           color: string | null
+          cost_center: string | null
           created_at: string
           default_commission_rate: number
           deleted_at: string | null
@@ -1024,6 +1025,7 @@ export type Database = {
         Insert: {
           active?: boolean
           color?: string | null
+          cost_center?: string | null
           created_at?: string
           default_commission_rate?: number
           deleted_at?: string | null
@@ -1039,6 +1041,7 @@ export type Database = {
         Update: {
           active?: boolean
           color?: string | null
+          cost_center?: string | null
           created_at?: string
           default_commission_rate?: number
           deleted_at?: string | null

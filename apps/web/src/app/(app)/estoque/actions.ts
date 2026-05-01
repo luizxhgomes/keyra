@@ -256,6 +256,7 @@ export type MovementRow = {
 
 export async function listInventoryMovements(input: {
   page?: number;
+  commandId?: string;
 }): Promise<ActionResult<{ rows: MovementRow[]; total: number; page: number; pageSize: number }>> {
   try {
     const { orgId } = await requireAuth();
@@ -265,15 +266,20 @@ export async function listInventoryMovements(input: {
     const page = Math.max(1, input.page ?? 1);
     const offset = (page - 1) * PAGE_SIZE;
 
-    const { data, error, count } = await supabase
+    let q = supabase
       .from('inventory_movements')
       .select(
         'id, movement_type, quantity, unit_cost_at_move, source_type, notes, created_at, supply:supplies(name)',
         { count: 'exact' },
       )
       .eq('org_id', orgId)
-      .order('created_at', { ascending: false })
-      .range(offset, offset + PAGE_SIZE - 1);
+      .order('created_at', { ascending: false });
+
+    if (input.commandId) {
+      q = q.eq('source_type', 'command').eq('source_id', input.commandId);
+    }
+
+    const { data, error, count } = await q.range(offset, offset + PAGE_SIZE - 1);
 
     if (error) return { ok: false, error: error.message };
 

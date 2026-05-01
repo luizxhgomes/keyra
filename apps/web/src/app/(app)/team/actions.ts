@@ -49,6 +49,11 @@ const professionalSchema = z.object({
     .min(0, 'Mínimo 0%')
     .max(100, 'Máximo 100%')
     .optional(),
+  costCenter: z
+    .string()
+    .max(80, 'Centro de custo até 80 caracteres')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
   active: z.boolean().optional(),
 });
 
@@ -445,6 +450,7 @@ export async function upsertProfessional(
       ...(parsed.specialty ? { specialty: parsed.specialty } : {}),
       ...(parsed.color ? { color: parsed.color } : {}),
       ...(commissionRate !== undefined ? { default_commission_rate: commissionRate } : {}),
+      ...(parsed.costCenter ? { cost_center: parsed.costCenter } : {}),
       active: parsed.active ?? true,
     };
 

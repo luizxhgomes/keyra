@@ -6,6 +6,7 @@ import {
   Calendar,
   LayoutDashboard,
   Package,
+  Receipt,
   Settings,
   Sparkles,
   UserCog,
@@ -24,6 +25,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agenda', label: 'Agenda', icon: Calendar },
+  { href: '/comandas', label: 'Comandas', icon: Receipt },
   { href: '/pacientes', label: 'Pacientes', icon: Users },
   { href: '/servicos', label: 'Serviços', icon: Sparkles },
   { href: '/financeiro', label: 'Financeiro', icon: Wallet },

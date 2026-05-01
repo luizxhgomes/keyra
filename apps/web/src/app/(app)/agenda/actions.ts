@@ -6,7 +6,11 @@ import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { requireRole } from '@/lib/auth/roles';
 import { createServerClient } from '@/lib/supabase/server';
-import { createAppointmentSchema } from '@/lib/validators/appointment';
+import {
+  changeAppointmentStatusSchema,
+  createAppointmentSchema,
+  type AppointmentStatusTo,
+} from '@/lib/validators/appointment';
 
 export type AgendaStatus = 'scheduled' | 'done' | 'cancelled' | 'no_show';
 
@@ -340,3 +344,116 @@ export async function createAppointment(
     };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Story 2.6 — Transição de status do agendamento
+// ---------------------------------------------------------------------------
+
+export type ChangeAppointmentStatusResult =
+  | { ok: true; data: { id: string; status: AppointmentStatusTo } }
+  | { ok: false; error: string };
+
+/**
+ * Transiciona o status de um agendamento (Story 2.6).
+ *
+ * Transições permitidas (defendidas no Zod e novamente aqui):
+ *   - scheduled → done | cancelled | no_show
+ *   - done      → cancelled (caso de correção — estornar comanda é Phase 3+)
+ *   - cancelled → ❌ read-only
+ *   - no_show   → ❌ read-only
+ *
+ * Efeitos colaterais (todos no banco, defesa em profundidade):
+ *   - `to=done`:      trigger `trg_appointments_done_to_command` cria
+ *                      `commands` + `command_items` na mesma transação;
+ *                      `done_at = now()` é setado pelo trigger.
+ *   - `to=cancelled`: setamos `cancel_reason` + `cancelled_at` aqui;
+ *                      `audit_log` registra via trigger genérico.
+ *   - `to=no_show`:   transição direta; `audit_log` registra.
+ */
+export async function changeAppointmentStatus(
+  input: z.input<typeof changeAppointmentStatusSchema>,
+): Promise<ChangeAppointmentStatusResult> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'professional');
+
+    const parsed = changeAppointmentStatusSchema.parse(input);
+    const supabase = await createServerClient();
+
+    // Lê estado atual para validar a transição. RLS garante isolamento por org.
+    const { data: current, error: readErr } = await supabase
+      .from('appointments')
+      .select('id, status')
+      .eq('id', parsed.appointmentId)
+      .eq('org_id', orgId)
+      .is('deleted_at', null)
+      .maybeSingle();
+
+    if (readErr) {
+      return { ok: false, error: `Erro ao localizar agendamento: ${readErr.message}` };
+    }
+    if (!current) {
+      return { ok: false, error: 'Agendamento não encontrado.' };
+    }
+
+    // Defesa em profundidade — Zod já restringe `to`, mas a transição
+    // depende do estado atual.
+    const from = current.status as 'scheduled' | 'done' | 'cancelled' | 'no_show';
+    const to = parsed.to;
+
+    const allowed =
+      (from === 'scheduled' && (to === 'done' || to === 'cancelled' || to === 'no_show')) ||
+      (from === 'done' && to === 'cancelled');
+
+    if (!allowed) {
+      const labelFrom = STATUS_LABEL[from];
+      const labelTo = STATUS_LABEL[to];
+      return {
+        ok: false,
+        error: `Transição inválida: ${labelFrom} → ${labelTo}. Esta operação não é permitida.`,
+      };
+    }
+
+    // Monta o patch. Trigger de banco cuida do `done_at` quando muda para done;
+    // mantemos a definição local somente para `cancelled_at` + `cancel_reason`.
+    const patch: {
+      status: AppointmentStatusTo;
+      cancelled_at?: string;
+      cancel_reason?: string;
+    } = { status: to };
+
+    if (to === 'cancelled') {
+      patch.cancelled_at = new Date().toISOString();
+      patch.cancel_reason = parsed.cancelReason!.trim();
+    }
+
+    const { error: updateErr } = await supabase
+      .from('appointments')
+      .update(patch)
+      .eq('id', parsed.appointmentId)
+      .eq('org_id', orgId);
+
+    if (updateErr) {
+      return { ok: false, error: `Erro ao atualizar status: ${updateErr.message}` };
+    }
+
+    revalidatePath('/agenda');
+    return { ok: true, data: { id: parsed.appointmentId, status: to } };
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const first = err.issues[0];
+      return { ok: false, error: first?.message ?? 'Dados inválidos.' };
+    }
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : 'Erro inesperado.',
+    };
+  }
+}
+
+const STATUS_LABEL: Record<AgendaStatus, string> = {
+  scheduled: 'Agendado',
+  done: 'Realizado',
+  cancelled: 'Cancelado',
+  no_show: 'Falta',
+};

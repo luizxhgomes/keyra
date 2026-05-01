@@ -1,8 +1,21 @@
 'use client';
 
+import { useState, useTransition } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -15,11 +28,14 @@ import {
 } from '@/components/ui/sheet';
 import { formatBRL } from '@/lib/money';
 
-import type { AgendaEvent, AgendaStatus } from './actions';
+import { changeAppointmentStatus, type AgendaEvent, type AgendaStatus } from './actions';
+import { CancelAppointmentDialog } from './cancel-dialog';
 
 type Props = {
   event: AgendaEvent | null;
   onOpenChange: (open: boolean) => void;
+  /** Callback chamado após qualquer transição de status bem-sucedida. */
+  onChanged: () => void;
 };
 
 const STATUS_LABEL: Record<AgendaStatus, string> = {
@@ -29,82 +45,235 @@ const STATUS_LABEL: Record<AgendaStatus, string> = {
   no_show: 'Falta',
 };
 
+const STATUS_BADGE_CLASS: Record<AgendaStatus, string> = {
+  scheduled: 'bg-blue-100 text-blue-900 hover:bg-blue-100',
+  done: 'bg-emerald-100 text-emerald-900 hover:bg-emerald-100',
+  cancelled: 'bg-stone-200 text-stone-700 hover:bg-stone-200',
+  no_show: 'bg-amber-100 text-amber-900 hover:bg-amber-100',
+};
+
 /**
  * Sheet (drawer lateral) com detalhes de um agendamento.
  *
- * Os botões de ação (editar, concluir, cancelar) são placeholders nesta
- * Story 2.4 — Stories 2.5 (editar) e 2.6 (concluir/cancelar) ativam o
- * comportamento real. O click só dispara um console.log + toast estilo
- * "em breve" para deixar o feedback óbvio durante o smoke test.
+ * Story 2.6 — botões contextuais:
+ *   - status `scheduled`: Concluir | Cancelar | Falta (no_show)
+ *   - status `done`:      Cancelar (correção; estornar comanda é Phase 3+)
+ *   - status `cancelled`/`no_show`: read-only (nenhum botão de transição)
+ *
+ * Editar (Story 2.5) segue como placeholder — a edição não foi implementada
+ * naquela story (que entregou só criação). Mantemos o botão disabled com
+ * rótulo explícito até a story de edição.
  */
-export function EventDetailSheet({ event, onOpenChange }: Props) {
+export function EventDetailSheet({ event, onOpenChange, onChanged }: Props) {
   const isOpen = event !== null;
 
+  const [confirmDoneOpen, setConfirmDoneOpen] = useState(false);
+  const [confirmNoShowOpen, setConfirmNoShowOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const status = event?.extendedProps.status ?? null;
+  const showDone = status === 'scheduled';
+  const showNoShow = status === 'scheduled';
+  const showCancel = status === 'scheduled' || status === 'done';
+  const isReadOnly = status === 'cancelled' || status === 'no_show';
+
+  const handleConfirmDone = () => {
+    if (!event) return;
+    startTransition(async () => {
+      const result = await changeAppointmentStatus({
+        appointmentId: event.id,
+        to: 'done',
+      });
+      if (result.ok) {
+        toast.success('Atendimento concluído. Comanda gerada automaticamente.');
+        setConfirmDoneOpen(false);
+        onChanged();
+        onOpenChange(false);
+      } else {
+        toast.error(result.error);
+      }
+    });
+  };
+
+  const handleConfirmNoShow = () => {
+    if (!event) return;
+    startTransition(async () => {
+      const result = await changeAppointmentStatus({
+        appointmentId: event.id,
+        to: 'no_show',
+      });
+      if (result.ok) {
+        toast.success('Falta registrada.');
+        setConfirmNoShowOpen(false);
+        onChanged();
+        onOpenChange(false);
+      } else {
+        toast.error(result.error);
+      }
+    });
+  };
+
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-md">
-        {event ? (
-          <>
-            <SheetHeader>
-              <SheetTitle className="text-left">
-                {event.extendedProps.serviceName}
-              </SheetTitle>
-              <SheetDescription className="text-left">
-                {STATUS_LABEL[event.extendedProps.status]} ·{' '}
-                {formatRange(event.start, event.end)}
-              </SheetDescription>
-            </SheetHeader>
+    <>
+      <Sheet open={isOpen} onOpenChange={onOpenChange}>
+        <SheetContent className="w-full sm:max-w-md">
+          {event ? (
+            <>
+              <SheetHeader>
+                <SheetTitle className="text-left">
+                  {event.extendedProps.serviceName}
+                </SheetTitle>
+                <SheetDescription className="flex flex-wrap items-center gap-2 text-left">
+                  <Badge
+                    className={STATUS_BADGE_CLASS[event.extendedProps.status]}
+                    variant="secondary"
+                  >
+                    {STATUS_LABEL[event.extendedProps.status]}
+                  </Badge>
+                  <span>{formatRange(event.start, event.end)}</span>
+                </SheetDescription>
+              </SheetHeader>
 
-            <div className="flex flex-col gap-3 px-4 py-2 text-sm">
-              <DetailRow label="Paciente" value={event.extendedProps.customerName ?? '—'} />
-              <DetailRow label="Profissional" value={event.extendedProps.professionalName} />
-              <DetailRow
-                label="Receita prevista"
-                value={formatBRL(event.extendedProps.priceSnapshot)}
-              />
-              {event.extendedProps.notes ? (
-                <DetailRow label="Observações" value={event.extendedProps.notes} />
-              ) : null}
-            </div>
+              <div className="flex flex-col gap-3 px-4 py-2 text-sm">
+                <DetailRow label="Paciente" value={event.extendedProps.customerName ?? '—'} />
+                <DetailRow label="Profissional" value={event.extendedProps.professionalName} />
+                <DetailRow
+                  label="Receita prevista"
+                  value={formatBRL(event.extendedProps.priceSnapshot)}
+                />
+                {event.extendedProps.notes ? (
+                  <DetailRow label="Observações" value={event.extendedProps.notes} />
+                ) : null}
+              </div>
 
-            <SheetFooter className="flex-col gap-2 sm:flex-col">
-              <Button
-                type="button"
-                variant="default"
-                className="w-full"
-                disabled
-                aria-label="Concluir atendimento (em breve)"
-              >
-                Concluir atendimento (Story 2.6)
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                disabled
-                aria-label="Editar agendamento (em breve)"
-              >
-                Editar (Story 2.5)
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                disabled
-                aria-label="Cancelar agendamento (em breve)"
-              >
-                Cancelar (Story 2.6)
-              </Button>
-              <SheetClose asChild>
-                <Button type="button" variant="ghost" className="w-full">
-                  Fechar
+              <SheetFooter className="flex-col gap-2 sm:flex-col">
+                {isReadOnly ? (
+                  <p className="rounded-md bg-muted px-3 py-2 text-center text-xs text-muted-foreground">
+                    Agendamento {STATUS_LABEL[event.extendedProps.status].toLowerCase()} —
+                    somente leitura.
+                  </p>
+                ) : null}
+
+                {showDone ? (
+                  <Button
+                    type="button"
+                    variant="default"
+                    className="w-full"
+                    disabled={isPending}
+                    onClick={() => setConfirmDoneOpen(true)}
+                  >
+                    Concluir atendimento
+                  </Button>
+                ) : null}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  disabled
+                  aria-label="Editar agendamento (em breve)"
+                >
+                  Editar (em breve)
                 </Button>
-              </SheetClose>
-            </SheetFooter>
-          </>
-        ) : null}
-      </SheetContent>
-    </Sheet>
+
+                {showCancel ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={isPending}
+                    onClick={() => setCancelOpen(true)}
+                  >
+                    Cancelar
+                  </Button>
+                ) : null}
+
+                {showNoShow ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={isPending}
+                    onClick={() => setConfirmNoShowOpen(true)}
+                  >
+                    Falta (no-show)
+                  </Button>
+                ) : null}
+
+                <SheetClose asChild>
+                  <Button type="button" variant="ghost" className="w-full">
+                    Fechar
+                  </Button>
+                </SheetClose>
+              </SheetFooter>
+            </>
+          ) : null}
+        </SheetContent>
+      </Sheet>
+
+      {/* Concluir — confirmação simples (AC4.3). */}
+      <AlertDialog open={confirmDoneOpen} onOpenChange={setConfirmDoneOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Concluir atendimento?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A comanda será gerada automaticamente para registrar o pagamento.
+              Esta ação não pode ser desfeita por aqui — para correção,
+              cancele o agendamento depois.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Voltar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                handleConfirmDone();
+              }}
+            >
+              {isPending ? 'Concluindo…' : 'Concluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Falta — confirmação simples (AC4.2). */}
+      <AlertDialog open={confirmNoShowOpen} onOpenChange={setConfirmNoShowOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Marcar como falta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O paciente não compareceu. Esta ação fica registrada no histórico
+              e não dispara cobrança automática.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Voltar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                handleConfirmNoShow();
+              }}
+            >
+              {isPending ? 'Registrando…' : 'Confirmar falta'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Cancelar — combobox + textarea (AC4.1). */}
+      <CancelAppointmentDialog
+        appointmentId={event?.id ?? null}
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        onCancelled={() => {
+          onChanged();
+          onOpenChange(false);
+        }}
+      />
+    </>
   );
 }
 

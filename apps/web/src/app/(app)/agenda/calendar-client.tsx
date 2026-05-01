@@ -198,6 +198,7 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
       <EventDetailSheet
         event={selectedEvent}
         onOpenChange={(open) => !open && setSelectedEvent(null)}
+        onChanged={() => calendarRef.current?.getApi().refetchEvents()}
       />
 
       <AgendamentoForm

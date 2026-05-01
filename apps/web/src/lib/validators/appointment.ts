@@ -40,3 +40,56 @@ export const createAppointmentSchema = z.object({
 
 export type CreateAppointmentInput = z.input<typeof createAppointmentSchema>;
 export type CreateAppointmentParsed = z.output<typeof createAppointmentSchema>;
+
+/**
+ * Validador de transição de status — Story 2.6.
+ *
+ * Transições permitidas (espelham AC1 da Story 2.6 — defesa em profundidade
+ * antes do banco):
+ *   - scheduled → done | cancelled | no_show
+ *   - done      → cancelled (correção; estornar comanda é Phase 3+)
+ *   - cancelled → ❌ (read-only)
+ *   - no_show   → ❌ (read-only)
+ *
+ * `cancelReason` só faz sentido para `to = cancelled`. Para outras transições
+ * é ignorado pelo backend (e preferencialmente nem enviado).
+ *
+ * O combobox de motivos de cancelamento (AC4) usa rótulos canônicos definidos
+ * em `CANCEL_REASON_OPTIONS`. Quando o usuário escolhe "Outro", `cancelReason`
+ * vem como o texto livre digitado; quando escolhe um motivo da lista, vem
+ * como `${motivo}: ${detalhe}` se houver detalhe, ou só o motivo.
+ */
+export const CANCEL_REASON_OPTIONS = [
+  'Paciente desmarcou',
+  'Conflito de agenda',
+  'Profissional indisponível',
+  'Outro',
+] as const;
+
+export type CancelReasonOption = (typeof CANCEL_REASON_OPTIONS)[number];
+
+export type AppointmentStatusTo = 'done' | 'cancelled' | 'no_show';
+
+export const changeAppointmentStatusSchema = z
+  .object({
+    appointmentId: z.string().uuid('ID de agendamento inválido'),
+    to: z.enum(['done', 'cancelled', 'no_show']),
+    cancelReason: z
+      .string()
+      .max(500, 'Motivo limitado a 500 caracteres')
+      .optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.to === 'cancelled') {
+      const reason = val.cancelReason?.trim() ?? '';
+      if (!reason) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['cancelReason'],
+          message: 'Motivo do cancelamento é obrigatório',
+        });
+      }
+    }
+  });
+
+export type ChangeAppointmentStatusInput = z.input<typeof changeAppointmentStatusSchema>;

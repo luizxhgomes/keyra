@@ -5,7 +5,9 @@
 >
 > **Próxima ação recomendada:** **Sprint 4 — Lucro + Dashboard** (~38 pts, fecha o MVP). 9 drafts criados pelo @sm, todas validadas pelo @po (GO 9-10/10) e Ready: 4.1 DRE básica · 4.2 DRE por serviço (diferencial vs Conta Azul) · 4.3 Lucro por profissional · **4.4 Dashboard tela única ⭐ (story-anchor)** · 4.5 Agenda do dia · 4.6 Indicadores · 4.7 Comparativo mês vs anterior · 4.8 Comparativo vs meta · 4.9 Alertas. Recomendação tática: começar pela **4.4** (vitrine + slots para 4.5-4.9) e construir as outras encaixando no dashboard.
 >
-> Este documento é a **entrada única** para retomar o contexto do KEYRA em qualquer nova sessão. Foi projetado para ser lido em menos de 60 segundos. **Regra operacional:** este snapshot é atualizado ao fim de cada Story (status Done) — header + tabela de status macro + §3 lista da sprint atual + §6 próxima ação + §8 Histórico. Detalhes nos links canônicos ao final.
+> Este documento é a **entrada única** para retomar o contexto do KEYRA em qualquer nova sessão. Foi projetado para ser lido em menos de 60 segundos. **Regras operacionais:**
+> 1. Este snapshot é atualizado ao fim de cada Story (status Done) — header + tabela de status macro + §3 lista da sprint atual + §6 próxima ação + §8 Histórico.
+> 2. **Validação de jornada de usuário** é critério de Done a partir da Sprint 6 — toda story precisa garantir que a persona Camila (`docs/ux/user-journeys.md`) consegue executar a jornada que a story toca, em viewport 375px, sem documentação. Não basta typecheck/lint/build verde.
 
 ---
 

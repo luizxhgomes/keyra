@@ -1,0 +1,1341 @@
+url: https://www.gestek.com.br/
+extracted_at: 2026-05-01T20:55:51.403Z
+sources:
+  external_css_files: 5
+  preload_css_files: 0
+  imports_resolved: 0
+  inline_style_blocks: 0
+  inline_style_attrs: 38
+  failed_fetches: 0
+detection:
+  css_vars_total: 5
+  css_vars_primitive: 5
+  css_vars_alias: 0
+  font_faces: 5
+  unique_tokens_in_graph: 6
+tokens:
+  colors:
+    primary:
+      value: "#00b1c5"
+      source: css_var
+      confidence: high
+      origin: --azul
+    secondary:
+      value: "#d35186"
+      source: css_var
+      confidence: high
+      origin: --rosa-escuro
+    tertiary:
+      value: "#ebf9fa"
+      source: css_var
+      confidence: high
+      origin: --azul-claro
+    neutral:
+      value: "#999999"
+      source: css_declaration
+      confidence: medium
+      origin: .text / .label declarations (mid-gray, label/caption text)
+    surface:
+      value: "#ffffff"
+      source: css_declaration
+      confidence: medium
+      origin: body background and card surfaces (light theme default)
+    text:
+      value: "#333333"
+      source: css_declaration
+      confidence: medium
+      origin: body color declarations
+    text-muted:
+      value: "#666666"
+      source: css_declaration
+      confidence: medium
+      origin: secondary text declarations
+    border:
+      value: "#cccccc"
+      source: css_declaration
+      confidence: medium
+      origin: divider/input border declarations
+    error:
+      value: "#ab3565"
+      source: inferred
+      confidence: low
+      origin: inferred from darker rose appearing in CSS (#ab3565 — error/danger
+        emphasis derived from --rosa-escuro hover state)
+    success:
+      value: "#5fd500"
+      source: css_var
+      confidence: high
+      origin: --verde
+    azul:
+      value: "#00b1c5"
+      source: css_var
+      confidence: high
+      origin: --azul
+    azul-claro:
+      value: "#ebf9fa"
+      source: css_var
+      confidence: high
+      origin: --azul-claro
+    azul-escuro:
+      value: "#007b89"
+      source: inferred
+      confidence: low
+      origin: inferred from hover-darker variant of --azul (#007b89 in CSS tokens)
+    rosa-escuro:
+      value: "#d35186"
+      source: css_var
+      confidence: high
+      origin: --rosa-escuro
+    rosa-claro:
+      value: "#ffabcd"
+      source: css_var
+      confidence: high
+      origin: --rosa-claro
+    verde:
+      value: "#5fd500"
+      source: css_var
+      confidence: high
+      origin: --verde
+  typography:
+    display-hero:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 55px
+          source: css_declaration
+          confidence: medium
+          origin: largest display heading
+        fontWeight:
+          value: "200"
+          source: css_declaration
+          confidence: medium
+          origin: .alert / display heading declarations
+        lineHeight:
+          value: 120%
+          source: css_declaration
+          confidence: medium
+          origin: heading declarations
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default (no explicit tracking found)
+        features:
+          value: "[]"
+          source: other
+          confidence: medium
+          origin: no OpenType features detected
+    display-large:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 40px
+          source: css_declaration
+          confidence: medium
+          origin: .alert font-size most_common
+        fontWeight:
+          value: "200"
+          source: css_declaration
+          confidence: medium
+          origin: .alert font-weight most_common
+        lineHeight:
+          value: 120%
+          source: inferred
+          confidence: low
+          origin: inferred from heading rhythm
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    section-heading:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 32px
+          source: css_declaration
+          confidence: medium
+          origin: secondary alert font-size
+        fontWeight:
+          value: "300"
+          source: inferred
+          confidence: low
+          origin: inferred from regular-bold archetype + h2 patterns
+        lineHeight:
+          value: 120%
+          source: inferred
+          confidence: low
+          origin: inferred from heading rhythm
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    subheading-large:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 28px
+          source: css_declaration
+          confidence: medium
+          origin: tertiary alert font-size
+        fontWeight:
+          value: "300"
+          source: inferred
+          confidence: low
+          origin: inferred from heading hierarchy
+        lineHeight:
+          value: 120%
+          source: inferred
+          confidence: low
+          origin: inferred default
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    subheading:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 24px
+          source: css_declaration
+          confidence: medium
+          origin: h3 declarations
+        fontWeight:
+          value: "400"
+          source: inferred
+          confidence: low
+          origin: inferred from heading hierarchy
+        lineHeight:
+          value: 120%
+          source: inferred
+          confidence: low
+          origin: inferred default
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    body-large:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 18px
+          source: css_declaration
+          confidence: medium
+          origin: .body-large declarations
+        fontWeight:
+          value: "400"
+          source: css_declaration
+          confidence: medium
+          origin: default Titillium Web weight
+        lineHeight:
+          value: 150%
+          source: css_declaration
+          confidence: medium
+          origin: body line-height declarations
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    body:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 16px
+          source: css_declaration
+          confidence: medium
+          origin: body default
+        fontWeight:
+          value: "400"
+          source: css_declaration
+          confidence: medium
+          origin: default Titillium Web weight
+        lineHeight:
+          value: 150%
+          source: css_declaration
+          confidence: medium
+          origin: body line-height declarations
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    body-small:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 14px
+          source: css_declaration
+          confidence: medium
+          origin: secondary body declarations
+        fontWeight:
+          value: "400"
+          source: css_declaration
+          confidence: medium
+          origin: default Titillium Web weight
+        lineHeight:
+          value: 150%
+          source: inferred
+          confidence: low
+          origin: inferred from body rhythm
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    button:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 16px
+          source: css_declaration
+          confidence: medium
+          origin: .link CTA font-size most_common
+        fontWeight:
+          value: "700"
+          source: css_declaration
+          confidence: medium
+          origin: .link font-weight most_common
+        lineHeight:
+          value: "1"
+          source: css_declaration
+          confidence: medium
+          origin: button single-line layout
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    button-small:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 15px
+          source: css_declaration
+          confidence: medium
+          origin: secondary .link size
+        fontWeight:
+          value: "700"
+          source: css_declaration
+          confidence: medium
+          origin: .link weight
+        lineHeight:
+          value: "1"
+          source: inferred
+          confidence: low
+          origin: inferred from button compact layout
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    link:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 16px
+          source: css_declaration
+          confidence: medium
+          origin: .link
+        fontWeight:
+          value: "700"
+          source: css_declaration
+          confidence: medium
+          origin: .link font-weight (links are emphasized)
+        lineHeight:
+          value: 150%
+          source: css_declaration
+          confidence: medium
+          origin: inline link rhythm
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    caption:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 13px
+          source: css_declaration
+          confidence: medium
+          origin: caption declarations
+        fontWeight:
+          value: "400"
+          source: inferred
+          confidence: low
+          origin: inferred regular weight
+        lineHeight:
+          value: 150%
+          source: inferred
+          confidence: low
+          origin: inferred default
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    caption-small:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 12px
+          source: css_declaration
+          confidence: medium
+          origin: smallest size in tokens-detected
+        fontWeight:
+          value: "400"
+          source: inferred
+          confidence: low
+          origin: inferred regular weight
+        lineHeight:
+          value: 150%
+          source: inferred
+          confidence: low
+          origin: inferred default
+        letterSpacing:
+          value: 0em
+          source: inferred
+          confidence: low
+          origin: inferred default
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    label:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: font_face
+          confidence: high
+          origin: "@font-face"
+        fontSize:
+          value: 12px
+          source: inferred
+          confidence: low
+          origin: inferred from label patterns
+        fontWeight:
+          value: "700"
+          source: inferred
+          confidence: low
+          origin: inferred bold for label emphasis
+        lineHeight:
+          value: "1"
+          source: inferred
+          confidence: low
+          origin: inferred compact label layout
+        letterSpacing:
+          value: 0.05em
+          source: inferred
+          confidence: low
+          origin: inferred slight tracking for caps labels
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    h1:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for display-hero (legacy 9-role compat)
+        fontSize:
+          value: 55px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "200"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 120%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    h2:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for display-large (legacy 9-role compat)
+        fontSize:
+          value: 40px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "200"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 120%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    h3:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for section-heading (legacy 9-role compat)
+        fontSize:
+          value: 32px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "300"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 120%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    h4:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for subheading (legacy 9-role compat)
+        fontSize:
+          value: 24px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "400"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 120%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    body-lg:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for body-large (legacy 9-role compat)
+        fontSize:
+          value: 18px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "400"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 150%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    body-md:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for body (legacy 9-role compat)
+        fontSize:
+          value: 16px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "400"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 150%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    body-sm:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: other
+          confidence: medium
+          origin: alias for body-small (legacy 9-role compat)
+        fontSize:
+          value: 14px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "400"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 150%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+    mono:
+      properties:
+        fontFamily:
+          value: Titillium Web, sans-serif
+          source: inferred
+          confidence: low
+          origin: inferred — no monospace font detected; falls back to primary family
+        fontSize:
+          value: 14px
+          source: unknown
+          confidence: low
+          origin: null
+        fontWeight:
+          value: "400"
+          source: unknown
+          confidence: low
+          origin: null
+        lineHeight:
+          value: 150%
+          source: unknown
+          confidence: low
+          origin: null
+        letterSpacing:
+          value: 0em
+          source: unknown
+          confidence: low
+          origin: null
+        features:
+          value: "[]"
+          source: unknown
+          confidence: low
+          origin: null
+  rounded:
+    none:
+      value: 0px
+      source: css_declaration
+      confidence: medium
+      origin: baseline reset
+    sm:
+      value: 10px
+      source: css_declaration
+      confidence: medium
+      origin: .card / surface radius declarations
+    md:
+      value: 20px
+      source: css_declaration
+      confidence: medium
+      origin: large card / hero block declarations
+    lg:
+      value: 90px
+      source: css_declaration
+      confidence: medium
+      origin: .link border-radius most_common (pill CTAs)
+    xl:
+      value: 150px
+      source: css_declaration
+      confidence: medium
+      origin: large decorative diagonal cuts
+    full:
+      value: 9999px
+      source: inferred
+      confidence: low
+      origin: inferred — full-pill convention (source uses 90px functionally for pill
+        height)
+  spacing:
+    xs:
+      value: 5px
+      source: css_declaration
+      confidence: medium
+      origin: button padding declarations
+    sm:
+      value: 10px
+      source: inferred
+      confidence: low
+      origin: inferred from rhythm between 5px and 20px
+    md:
+      value: 20px
+      source: css_declaration
+      confidence: medium
+      origin: .link padding (5px 20px) most_common
+    lg:
+      value: 40px
+      source: css_declaration
+      confidence: medium
+      origin: card padding declarations
+    xl:
+      value: 80px
+      source: css_declaration
+      confidence: medium
+      origin: section padding declarations
+    xxl:
+      value: 150px
+      source: css_declaration
+      confidence: medium
+      origin: page-level vertical rhythm declarations
+confidence_summary:
+  high: 23
+  medium: 49
+  low: 88
+lint:
+  ran: true
+  exit_code: 1
+  errors_count: 19
+  warnings_count: 56
+  errors:
+    - &a1
+      severity: error
+      path: typography.display-hero.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a2
+      severity: error
+      path: typography.display-large.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a3
+      severity: error
+      path: typography.section-heading.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a4
+      severity: error
+      path: typography.subheading-large.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a5
+      severity: error
+      path: typography.subheading.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a6
+      severity: error
+      path: typography.body-large.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a7
+      severity: error
+      path: typography.body.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a8
+      severity: error
+      path: typography.body-small.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a9
+      severity: error
+      path: typography.link.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a10
+      severity: error
+      path: typography.caption.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a11
+      severity: error
+      path: typography.caption-small.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a12
+      severity: error
+      path: typography.h1.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a13
+      severity: error
+      path: typography.h2.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a14
+      severity: error
+      path: typography.h3.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a15
+      severity: error
+      path: typography.h4.lineHeight
+      message: "'120%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a16
+      severity: error
+      path: typography.body-lg.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a17
+      severity: error
+      path: typography.body-md.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a18
+      severity: error
+      path: typography.body-sm.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+    - &a19
+      severity: error
+      path: typography.mono.lineHeight
+      message: "'150%' has an invalid unit '%'. Only px, rem, and em are allowed."
+  warnings:
+    - &a20
+      severity: warning
+      path: components.button-primary.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a21
+      severity: warning
+      path: components.button-primary.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a22
+      severity: warning
+      path: components.button-primary.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a23
+      severity: warning
+      path: components.button-primary.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a24
+      severity: warning
+      path: components.button-primary.font
+      message: "'font' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a25
+      severity: warning
+      path: components.button-primary.hover_bg
+      message: "'hover_bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a26
+      severity: warning
+      path: components.button-secondary.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a27
+      severity: warning
+      path: components.button-secondary.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a28
+      severity: warning
+      path: components.button-secondary.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a29
+      severity: warning
+      path: components.button-secondary.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a30
+      severity: warning
+      path: components.button-secondary.font
+      message: "'font' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a31
+      severity: warning
+      path: components.button-secondary.hover_bg
+      message: "'hover_bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a32
+      severity: warning
+      path: components.button-ghost.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a33
+      severity: warning
+      path: components.button-ghost.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a34
+      severity: warning
+      path: components.button-ghost.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a35
+      severity: warning
+      path: components.button-ghost.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a36
+      severity: warning
+      path: components.button-ghost.font
+      message: "'font' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a37
+      severity: warning
+      path: components.button-pink.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a38
+      severity: warning
+      path: components.button-pink.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a39
+      severity: warning
+      path: components.button-pink.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a40
+      severity: warning
+      path: components.button-pink.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a41
+      severity: warning
+      path: components.button-pink.font
+      message: "'font' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a42
+      severity: warning
+      path: components.button-pink.hover_bg
+      message: "'hover_bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a43
+      severity: warning
+      path: components.card.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a44
+      severity: warning
+      path: components.card.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a45
+      severity: warning
+      path: components.card.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a46
+      severity: warning
+      path: components.card.shadow
+      message: "'shadow' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a47
+      severity: warning
+      path: components.input-text.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a48
+      severity: warning
+      path: components.input-text.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a49
+      severity: warning
+      path: components.input-text.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a50
+      severity: warning
+      path: components.input-text.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a51
+      severity: warning
+      path: components.input-text.focus_border
+      message: "'focus_border' is not a recognized component sub-token. Valid
+        sub-tokens: backgroundColor, textColor, typography, rounded, padding,
+        size, height, width."
+    - &a52
+      severity: warning
+      path: components.badge-default.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a53
+      severity: warning
+      path: components.badge-default.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a54
+      severity: warning
+      path: components.badge-default.border
+      message: "'border' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a55
+      severity: warning
+      path: components.badge-default.radius
+      message: "'radius' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a56
+      severity: warning
+      path: components.badge-default.font
+      message: "'font' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a57
+      severity: warning
+      path: components.nav-header.bg
+      message: "'bg' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a58
+      severity: warning
+      path: components.nav-header.text
+      message: "'text' is not a recognized component sub-token. Valid sub-tokens:
+        backgroundColor, textColor, typography, rounded, padding, size, height,
+        width."
+    - &a59
+      severity: warning
+      path: components.nav-header.border_bottom
+      message: "'border_bottom' is not a recognized component sub-token. Valid
+        sub-tokens: backgroundColor, textColor, typography, rounded, padding,
+        size, height, width."
+    - &a60
+      severity: warning
+      path: colors.primary
+      message: "'primary' is defined but never referenced by any component."
+    - &a61
+      severity: warning
+      path: colors.secondary
+      message: "'secondary' is defined but never referenced by any component."
+    - &a62
+      severity: warning
+      path: colors.tertiary
+      message: "'tertiary' is defined but never referenced by any component."
+    - &a63
+      severity: warning
+      path: colors.neutral
+      message: "'neutral' is defined but never referenced by any component."
+    - &a64
+      severity: warning
+      path: colors.surface
+      message: "'surface' is defined but never referenced by any component."
+    - &a65
+      severity: warning
+      path: colors.text
+      message: "'text' is defined but never referenced by any component."
+    - &a66
+      severity: warning
+      path: colors.text-muted
+      message: "'text-muted' is defined but never referenced by any component."
+    - &a67
+      severity: warning
+      path: colors.border
+      message: "'border' is defined but never referenced by any component."
+    - &a68
+      severity: warning
+      path: colors.error
+      message: "'error' is defined but never referenced by any component."
+    - &a69
+      severity: warning
+      path: colors.success
+      message: "'success' is defined but never referenced by any component."
+    - &a70
+      severity: warning
+      path: colors.azul
+      message: "'azul' is defined but never referenced by any component."
+    - &a71
+      severity: warning
+      path: colors.azul-claro
+      message: "'azul-claro' is defined but never referenced by any component."
+    - &a72
+      severity: warning
+      path: colors.azul-escuro
+      message: "'azul-escuro' is defined but never referenced by any component."
+    - &a73
+      severity: warning
+      path: colors.rosa-escuro
+      message: "'rosa-escuro' is defined but never referenced by any component."
+    - &a74
+      severity: warning
+      path: colors.rosa-claro
+      message: "'rosa-claro' is defined but never referenced by any component."
+    - &a75
+      severity: warning
+      path: colors.verde
+      message: "'verde' is defined but never referenced by any component."
+  raw:
+    findings:
+      - *a1
+      - *a2
+      - *a3
+      - *a4
+      - *a5
+      - *a6
+      - *a7
+      - *a8
+      - *a9
+      - *a10
+      - *a11
+      - *a12
+      - *a13
+      - *a14
+      - *a15
+      - *a16
+      - *a17
+      - *a18
+      - *a19
+      - *a20
+      - *a21
+      - *a22
+      - *a23
+      - *a24
+      - *a25
+      - *a26
+      - *a27
+      - *a28
+      - *a29
+      - *a30
+      - *a31
+      - *a32
+      - *a33
+      - *a34
+      - *a35
+      - *a36
+      - *a37
+      - *a38
+      - *a39
+      - *a40
+      - *a41
+      - *a42
+      - *a43
+      - *a44
+      - *a45
+      - *a46
+      - *a47
+      - *a48
+      - *a49
+      - *a50
+      - *a51
+      - *a52
+      - *a53
+      - *a54
+      - *a55
+      - *a56
+      - *a57
+      - *a58
+      - *a59
+      - *a60
+      - *a61
+      - *a62
+      - *a63
+      - *a64
+      - *a65
+      - *a66
+      - *a67
+      - *a68
+      - *a69
+      - *a70
+      - *a71
+      - *a72
+      - *a73
+      - *a74
+      - *a75
+      - severity: info
+        message: Design system defines 16 colors, 22 typography scales, 6 rounding
+          levels, 6 spacing tokens, 8 components.
+    summary:
+      errors: 19
+      warnings: 56
+      infos: 1

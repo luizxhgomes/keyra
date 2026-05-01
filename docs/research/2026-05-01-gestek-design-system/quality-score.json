@@ -1,0 +1,48 @@
+{
+  "overall": 73,
+  "grade": "C",
+  "categories": {
+    "color_discipline": {
+      "score": 100,
+      "grade": "A",
+      "value": "16 colors",
+      "ideal": "25-40"
+    },
+    "typography": {
+      "score": 85,
+      "grade": "B",
+      "value": "1 families, 22 scales",
+      "ideal": "2-4 families"
+    },
+    "spacing_system": {
+      "score": 100,
+      "grade": "A",
+      "value": "6 tokens",
+      "ideal": "4-8"
+    },
+    "border_radii": {
+      "score": 100,
+      "grade": "A",
+      "value": "6 levels",
+      "ideal": "3-6"
+    },
+    "tokenization": {
+      "score": 40,
+      "grade": "F",
+      "value": "14% high confidence",
+      "ideal": "≥80%"
+    },
+    "lint_compliance": {
+      "score": 60,
+      "grade": "D",
+      "value": "19E 56W",
+      "ideal": "0E 0W"
+    },
+    "accessibility": {
+      "score": 25,
+      "grade": "F",
+      "value": "2/8 pairs ≥AA",
+      "ideal": "100% AA"
+    }
+  }
+}

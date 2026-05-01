@@ -1,8 +1,8 @@
 # KEYRA — Onde Paramos (snapshot executivo)
 
-> **Data deste snapshot:** 2026-04-30 — Phase 1 Done + Story 2.4 Done; Sprint 2 a ~50%.
-> **Última entrega:** Story 2.4 (Agenda FullCalendar) implementada, QA gate PASS e validada em produção em `https://usekeyra.com/agenda` (empty state + toolbar + responsividade + i18n + auth gating todos OK). 5 stories Ready para o `@dev` (2.3, 2.5, 2.6, 2.7) — 2.4 fechou o ciclo SDC completo (sm→po→dev→qa→devops). Magic link e convite saem como `KEYRA <no-reply@usekeyra.com>`; `usekeyra.com` é canônico em todo lugar; bug do `?next=` no magic link corrigido. **9 commits hoje em `main`** (`14696eb` → `c97d2f3`).
-> **Próxima ação recomendada:** `@dev *develop-story 2.5` (Agendamento — cria os primeiros agendamentos reais e desbloqueia smoke completo da agenda); depois 2.6 e 2.7 em sequência; 2.3 (Insumos) é independente, pode entrar a qualquer momento.
+> **Data deste snapshot:** 2026-05-01 — Phase 1 Done + Stories 2.4 e 2.5 Done; Sprint 2 a ~60% (em pontos).
+> **Última entrega:** Story 2.5 (criar agendamento) implementada e fechada com QA gate PASS sem concerns. O fluxo `/agenda` agora cobre o ciclo completo de criação: botão "+ Novo agendamento" no toolbar e `dateClick` em slot vazio do FullCalendar abrem o Sheet; pickers (paciente/serviço/profissional) carregados no SSR; preview em tempo real de término/receita prevista/comissão; `price_snapshot` e `commission_snapshot` calculados server-side (ADR-013); EXCLUDE constraint do banco (`appointments_no_double_book`) capturado via SQLSTATE `23P01` e devolvido como toast amigável sem fechar o form. **12 commits da sessão 2026-04-30 em `main`** (`14696eb` → `bf9f6d9`).
+> **Próxima ação recomendada:** `@dev *develop-story 2.6` (Status — concluir/cancelar/falta; ~3 pts) ou `@dev *develop-story 2.7` (Receita prevista; ~2 pts). 2.3 (Insumos) é independente e pode entrar a qualquer momento. Recomendação tática: 2.6 primeiro (fecha o ciclo "criar → atender → concluir"), depois 2.7 (card sticky de receita prevista bate com a agenda já populada).
 >
 > Este documento é a **entrada única** para retomar o contexto do KEYRA em qualquer nova sessão. Foi projetado para ser lido em menos de 60 segundos. Para detalhes, seguir os links canônicos ao final.
 
@@ -15,7 +15,7 @@
 | **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra` · **Vercel domínio canônico `https://usekeyra.com`** (Hobby; alias `usekeyra.vercel.app` continua respondendo) · Supabase `keyra-br` sa-east-1 (Free) · Auth Hook ativo · `COLUMN_ENCRYPTION_KEY` provisionada · `RESEND_API_KEY` + `EMAIL_FROM` + `NEXT_PUBLIC_SITE_URL=https://usekeyra.com` em Production/Preview do Vercel · Resend `usekeyra.com` **Verified** (DMARC, DKIM, SPF, MX) · SMTP customizado do Supabase Auth apontando para Resend |
 | **Documentação (Phase 0)** | ✅ 100% | PRD v1.3 · ARCHITECTURE v1.3 (20 ADRs) · SCHEMA (21 tabelas · 100% RLS · 6 views · 15 funções · 19 migrations) · 8 wireframes · 6 pesquisas competitivas |
 | **Phase 1 — Fundação Técnica** | ✅ **100% Done + validado em prod** | 1.1 ✅ · 1.2 ✅ · 1.3 ✅ · 1.4 ✅ · 1.5 ✅. PR #1 mergeado em `main`. Migrations 100% sincronizadas (22/22 no remoto), `database.types.ts` regenerado, suíte RLS verde no CI, Resend Verified, fluxo de convite **end-to-end testado em produção**: convidado recebe email da marca KEYRA, clica, autentica via magic link, retorna ao convite (graças ao fix do `?next=`), aceita e cai no dashboard da clínica. |
-| **Phase 2 — Catálogo + Agenda** | 🟢 ~50% | Stories 2.1 e 2.2 em InReview · **Story 2.4 (Agenda FullCalendar) ✅ Done — implementada, QA gate PASS, validada em prod** · Stories 2.3 (Insumos), 2.5 (Agendamento), 2.6 (Status) e 2.7 (Receita prevista) Ready. Próximo @dev: 2.5 (cria os primeiros agendamentos reais e desbloqueia smoke completo da agenda). |
+| **Phase 2 — Catálogo + Agenda** | 🟢 ~60% (em pontos) | Stories 2.1 e 2.2 em InReview · **Story 2.4 (Agenda FullCalendar) ✅ Done** · **Story 2.5 (Agendamento) ✅ Done** (QA gate PASS sem concerns) · Stories 2.3 (Insumos), 2.6 (Status) e 2.7 (Receita prevista) Ready. Em pontos: 17 de 28 entregues (10+7 de 6+10+7+3+2). Próximos @dev candidatos: 2.6 (S, ~3 pts — fecha ciclo criar→concluir) ou 2.7 (S, ~2 pts — card sticky). |
 | **Phases 3–7 — Features MVP+** | ⏸️ 0% UI | Schema completo no remoto; views `v_dre_*`, `v_cashflow_daily`, `v_dashboard_kpis`, `v_receitas_previstas` prontas para consumo |
 | **Testes automatizados** | 🔴 0 | Nenhum arquivo `.test.*` ou `.spec.*` no repo. Validação manual + typecheck + lint + build apenas |
 
@@ -130,27 +130,38 @@ Nenhum impede a próxima Story (2.4 — Agenda); cada um trava uma Story especí
 
 ## 6. Próxima Ação Concreta — Luiz
 
-Phase 1 está **Done e validada em prod**. Aceite e infra zero pendentes — a Sprint 2 é o foco exclusivo.
+Phase 1 e Stories 2.4 + 2.5 estão **Done e validadas em prod**. Sprint 2 a ~60% (em pontos). 3 Stories Ready aguardando @dev.
 
 ### Caminho para fechar a Sprint 2
 
 ```text
-1) @po *validate-story-draft 2.4   # Agenda FullCalendar — bloqueia 2.5/2.6/2.7
-2) @po *validate-story-draft 2.3   # Insumos + rateio (pode ir em paralelo)
-3) @po *validate-story-draft 2.5   # Agendamento
-4) @po *validate-story-draft 2.6   # Status do agendamento
-5) @po *validate-story-draft 2.7   # Receita prevista automática (trigger já no banco)
+@dev *develop-story 2.6   # Status (concluir/cancelar/falta) — S, ~3 pts
+@qa *qa-gate 2.6
+@devops *push
 
-6) @dev *develop-story 2.4         # Implementar Agenda primeiro
-7) @qa *qa-gate 2.4                # PASS / CONCERNS / FAIL / WAIVED
-8) @devops *push                   # apenas @devops faz git push
+@dev *develop-story 2.7   # Receita prevista (card sticky no /agenda) — S, ~2 pts
+@qa *qa-gate 2.7
+@devops *push
 
-# Repetir 6-8 para 2.3, 2.5, 2.6, 2.7 (2.5+ podem ir em paralelo após 2.4)
+@dev *develop-story 2.3   # Insumos + rateio (independente) — M, ~6 pts
+@qa *qa-gate 2.3
+@devops *push
 ```
+
+**Recomendação tática:** começar por **2.6** (fecha o ciclo "criar → atender → concluir" e ativa o trigger `trg_appointments_done_to_command` que gera comandas). Em seguida **2.7** (agora que `/agenda` tem dados, o card de receita prevista materializa visualmente o diferencial KEYRA). **2.3** pode entrar em paralelo a qualquer momento — não depende de 2.4/2.5/2.6/2.7.
+
+### Smoke test atualizado para a próxima sessão
+
+`https://usekeyra.com/agenda` agora suporta:
+- "+ Novo agendamento" → Sheet com pickers SSR, autofill de duração ao escolher serviço, preview de término/receita/comissão
+- `dateClick` em slot vazio → Sheet pré-preenchido com data/hora
+- Submit → toast "Agendamento criado", evento aparece sem reload
+- Tentativa de double-book (mesmo profissional + horário sobreposto) → toast "Horário indisponível para este profissional…" + form continua aberto
+- Click no evento criado → sheet de detalhes com botões "Concluir/Editar/Cancelar" disabled (Story 2.6 ativa)
 
 ### Pendência operacional única ainda em aberto
 
-- **`apps/web/.vercel/`** foi linkado nesta sessão e está gitignored (`.vercel/`) — a próxima sessão pode reutilizar. Caso outra máquina precise, rodar `vercel link --project keyra --scope luiz-henrique-sealdigital --token=$VERCEL_TOKEN --yes`.
+- **`apps/web/.vercel/`** foi linkado em sessão anterior e está gitignored (`.vercel/`) — a próxima sessão pode reutilizar. Caso outra máquina precise, rodar `vercel link --project keyra --scope luiz-henrique-sealdigital --token=$VERCEL_TOKEN --yes`.
 
 ---
 
@@ -181,5 +192,6 @@ Quando precisar de detalhes, abrir na ordem:
 | 2026-04-30 — sessão de canonização do domínio | **`usekeyra.com` consolidado como canônico em todo lugar.** Helper `getAbsoluteUrl()` (apps/web/src/lib/url.ts) reordenado: 1ª preferência `NEXT_PUBLIC_SITE_URL`, 2ª headers (preview/dev), 3ª fallback `https://usekeyra.com`. Vercel: `NEXT_PUBLIC_SITE_URL=https://usekeyra.com` provisionado em Production+Preview (Development fica vazio para `pnpm dev` continuar usando localhost). Supabase Auth: `site_url` migrado de `https://usekeyra.vercel.app` para `https://usekeyra.com`; `uri_allow_list` atualizado removendo `keyra.app` (domínio antigo descontinuado) e adicionando `usekeyra.com/auth/callback`. Convite vigente reenviado pelo Resend com link `usekeyra.com`. Commits `0a99da8` (docs) e `7660754` (helper). |
 | 2026-04-30 — fix do `?next=` no magic link | **Bug crítico corrigido — fluxo de convite ponta-a-ponta.** Diagnóstico: ao clicar "Aceitar convite" no email, o convidado caía em `/onboarding/nova-organizacao` em vez de aceitar — o `?next=` setado por `/invites/[token]` não sobrevivia ao magic link. Causa: 5 elos quebrados (page do login, form, action, callback, proxy). Correção: helper `apps/web/src/lib/auth/safe-next.ts` (`isSafeNextPath` valida contra open redirect — recusa `//`, `://`, paths não relativos) + propagação de `next` em toda a cadeia. `signInWithOtpAction` agora monta `emailRedirectTo=${origin}/auth/callback?next=<encoded>`; `/auth/callback` lê e valida `?next=` antes de cair no roteamento por membership; `proxy.ts` respeita `next` quando user logado bate em `/login?next=`. `uri_allow_list` do Supabase expandido com wildcard `**` em todos os origins do callback para aceitar query strings. Commit `719783e` (6 arquivos, +88 -13). Smoke test em prod confirmou aceite do convite e entrada no dashboard da clínica. |
 | 2026-04-30 — Sprint 2 destrancada (@po + Story 2.4) | **5 stories validadas pelo `@po`** (drafts 2.3-2.7 → todas Ready). Aplicados fixes mínimos em 2.5/2.6/2.7 (DoD ausente, Dependencies, UX gaps); enriquecida 2.4 com Dev Notes (timezone, locale, role, cap eventos). **Story 2.4 (Agenda) implementada e validada em produção**: 5 arquivos novos em `app/(app)/agenda/`, 2 componentes shadcn (`sheet`, `select`), 5 deps FullCalendar v6. AC1/AC3/AC4/AC5 cumpridos; AC2.1 (resource-timegrid premium) substituído por filtro via `Select` — tech debt registrado em Dev Decisions §1. QA gate **PASS** com 1 concern documentado (resource-timegrid). Smoke em prod (`https://usekeyra.com/agenda`): empty state + toolbar + responsividade + i18n + auth gating todos OK. Commits `b633a44` (po validation), `318c5c1` (dev impl), `c97d2f3` (qa gate Done). |
+| 2026-04-30 — Story 2.5 (Agendamento) | **Ciclo SDC completo**: `@dev` implementa, `@qa` aprova, `@devops` push — em uma sessão. 7 arquivos (2 novos, 5 modificados) +771 linhas. Validator novo (`lib/validators/appointment.ts`), 2 Server Actions (`createAppointment`, `listAgendaPickers`), Sheet com `react-hook-form + zod` integrando paciente/serviço/profissional/data/início/duração + preview em tempo real (término, receita prevista, comissão). Pickers carregados no SSR (`page.tsx` em `Promise.all`) — evita `useEffect+setState` no client e elimina loading state. Snapshots `price_snapshot` e `commission_snapshot` calculados server-side (`services.price` + `services.commission_rate ?? professionals.default_commission_rate ?? 0`, ADR-013). EXCLUDE constraint do banco (`appointments_no_double_book` — gist + tstzrange) capturado via SQLSTATE `23P01` e devolvido como toast amigável sem fechar form. `dateClick` em slot vazio do FullCalendar abre form com data pré-preenchida; botão "+ Novo agendamento" no toolbar abre vazio. QA gate **PASS sem concerns** — todas as 3 ACs cumpridas conforme espec. Commits `90aeae6` (dev impl), `bf9f6d9` (qa gate Done). |
 
 > **Quando atualizar:** ao encerrar cada Story, cada Sprint ou ao bater um bloqueador novo. Fonte de verdade operacional, complementar ao `IMPLEMENTATION-MAP.md` (tático) e ao `EPIC-0` (estratégico).

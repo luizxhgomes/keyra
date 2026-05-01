@@ -1,5 +1,14 @@
 'use server';
 
+import {
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+} from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -457,3 +466,85 @@ const STATUS_LABEL: Record<AgendaStatus, string> = {
   cancelled: 'Cancelado',
   no_show: 'Falta',
 };
+
+// ---------------------------------------------------------------------------
+// Story 2.7 — Receita prevista
+// ---------------------------------------------------------------------------
+
+export type ReceitaPrevista = {
+  /** Decimais como string para preservar precisão até o `formatBRL`. */
+  today: string;
+  week: string;
+  month: string;
+};
+
+/**
+ * Retorna a receita prevista para hoje, esta semana (segunda→domingo) e este
+ * mês, somando `expected_revenue` da view `v_receitas_previstas` (ADR-013 #5,
+ * FR-AG-04). A view já restringe a `status='scheduled' AND deleted_at IS NULL`,
+ * portanto agendamentos `done`/`cancelled`/`no_show` somem da projeção
+ * automaticamente — sem código extra na aplicação.
+ *
+ * Estratégia: 1 round-trip pegando todas as rows do mês corrente e
+ * agregando em TS por buckets `today` / `week` / `month` com `date-fns` em
+ * pt-BR (segunda como início de semana). Tech debt conhecido (item 3 do
+ * `STATE.md §5`): a view usa `date_trunc('day', starts_at)` em UTC, então
+ * agendamentos noturnos (>21h BRT) podem cair no bucket do dia seguinte.
+ * Aceitável para o MVP — quando expandirmos para cross-TZ, adicionar
+ * `AT TIME ZONE 'America/Sao_Paulo'` na view.
+ */
+export async function getReceitaPrevista(): Promise<ReceitaPrevista> {
+  const { orgId } = await requireAuth();
+  await requireRole(orgId, 'viewer');
+
+  const supabase = await createServerClient();
+
+  // Bounds calculados em TS — em produção (Vercel sa-east-1) o server roda em
+  // UTC, mas as datas-limite ficam corretas porque comparamos timestamps.
+  const now = new Date();
+  const dayStart = startOfDay(now);
+  const dayEnd = endOfDay(now);
+  const weekStart = startOfWeek(now, { locale: ptBR });
+  const weekEnd = endOfWeek(now, { locale: ptBR });
+  const monthStart = startOfMonth(now);
+  const monthEnd = endOfMonth(now);
+
+  const { data, error } = await supabase
+    .from('v_receitas_previstas')
+    .select('day, expected_revenue')
+    .eq('org_id', orgId)
+    .gte('day', monthStart.toISOString())
+    .lte('day', monthEnd.toISOString());
+
+  if (error) {
+    throw new Error(`Erro ao calcular receita prevista: ${error.message}`);
+  }
+
+  // Soma manualmente para preservar precisão. `expected_revenue` chega como
+  // `number | null` (Supabase mapeia `numeric` → number). Para os ranges
+  // KEYRA (até 14 dígitos) é seguro em IEEE 754; convertemos para string
+  // ao retornar para que `formatBRL` aplique `ROUND_HALF_EVEN` se houver
+  // decimais residuais.
+  let todayCents = 0;
+  let weekCents = 0;
+  let monthCents = 0;
+  const dayStartMs = dayStart.getTime();
+  const dayEndMs = dayEnd.getTime();
+  const weekStartMs = weekStart.getTime();
+  const weekEndMs = weekEnd.getTime();
+
+  for (const row of data ?? []) {
+    if (!row.day || row.expected_revenue === null) continue;
+    const dayMs = new Date(row.day).getTime();
+    const cents = Math.round(Number(row.expected_revenue) * 100);
+    monthCents += cents;
+    if (dayMs >= weekStartMs && dayMs <= weekEndMs) weekCents += cents;
+    if (dayMs >= dayStartMs && dayMs <= dayEndMs) todayCents += cents;
+  }
+
+  return {
+    today: (todayCents / 100).toFixed(2),
+    week: (weekCents / 100).toFixed(2),
+    month: (monthCents / 100).toFixed(2),
+  };
+}

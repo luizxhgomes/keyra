@@ -5,6 +5,7 @@ import { requireRole } from '@/lib/auth/roles';
 
 import { listAgendaPickers, listAgendaProfessionals } from './actions';
 import { CalendarClient } from './calendar-client';
+import { ReceitaCard } from './receita-card';
 
 export const metadata: Metadata = {
   title: 'Agenda',
@@ -40,6 +41,8 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
 
   return (
     <div className="flex h-full flex-col gap-4 p-4 sm:p-6">
+      <ReceitaCard />
+
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Agenda</h1>
         <p className="text-sm text-muted-foreground">

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import {
   endOfMonth,
   endOfWeek,
+  format,
   startOfMonth,
   startOfWeek,
   subMonths,
@@ -793,7 +794,546 @@ export async function cloneFixedCostsFromLastMonth(): Promise<
   }
 }
 
+// ---------------------------------------------------------------------------
+// Story 4.1 — DRE básica mensal
+// ---------------------------------------------------------------------------
+
+export type DreLine = {
+  label: string;
+  amount: number;
+  amountLastMonth: number;
+  /** % sobre receita do mês (calculado em TS para evitar 0/0 SQL). */
+  percentOfRevenue: number;
+};
+
+export type DreMonthly = {
+  period: string;
+  periodLabel: string;
+  lines: {
+    revenueGross: DreLine;
+    acquirerFees: DreLine;
+    revenueNet: DreLine;
+    variableCosts: DreLine;
+    commissions: DreLine;
+    fixedCosts: DreLine;
+    operatingExpenses: DreLine;
+    taxes: DreLine;
+    netProfit: DreLine;
+  };
+};
+
+export async function getDreMonthly(input: {
+  /** Mês de referência no formato YYYY-MM-01. Default: mês corrente. */
+  periodMonth?: string;
+}): Promise<ActionResult<DreMonthly>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const currentMonth =
+      input.periodMonth ?? format(startOfMonth(now), 'yyyy-MM-dd');
+    const lastMonth = format(startOfMonth(subMonths(new Date(currentMonth), 1)), 'yyyy-MM-dd');
+
+    const [currentRes, lastRes] = await Promise.all([
+      supabase
+        .from('v_dre_monthly')
+        .select(
+          'period_month, revenue_gross, acquirer_fees, revenue_net, variable_costs_manual, commissions, fixed_costs, operating_expenses, taxes, net_profit',
+        )
+        .eq('org_id', orgId)
+        .eq('period_month', currentMonth)
+        .maybeSingle(),
+      supabase
+        .from('v_dre_monthly')
+        .select(
+          'period_month, revenue_gross, acquirer_fees, revenue_net, variable_costs_manual, commissions, fixed_costs, operating_expenses, taxes, net_profit',
+        )
+        .eq('org_id', orgId)
+        .eq('period_month', lastMonth)
+        .maybeSingle(),
+    ]);
+
+    if (currentRes.error) return { ok: false, error: currentRes.error.message };
+    if (lastRes.error) return { ok: false, error: lastRes.error.message };
+
+    const cur = currentRes.data;
+    const last = lastRes.data;
+
+    const num = (v: number | string | null | undefined): number =>
+      v === null || v === undefined ? 0 : Number(v);
+
+    const revenueGrossNow = num(cur?.revenue_gross);
+    const buildLine = (
+      label: string,
+      curVal: number,
+      lastVal: number,
+    ): DreLine => ({
+      label,
+      amount: curVal,
+      amountLastMonth: lastVal,
+      percentOfRevenue:
+        revenueGrossNow > 0 ? (curVal / revenueGrossNow) * 100 : 0,
+    });
+
+    return {
+      ok: true,
+      data: {
+        period: currentMonth,
+        periodLabel: format(new Date(currentMonth), "MMMM 'de' yyyy", {
+          locale: ptBR,
+        }),
+        lines: {
+          revenueGross: buildLine(
+            'Receita Bruta',
+            revenueGrossNow,
+            num(last?.revenue_gross),
+          ),
+          acquirerFees: buildLine(
+            '(−) Taxas de cartão/Pix',
+            num(cur?.acquirer_fees),
+            num(last?.acquirer_fees),
+          ),
+          revenueNet: buildLine(
+            '= Receita Líquida',
+            num(cur?.revenue_net),
+            num(last?.revenue_net),
+          ),
+          variableCosts: buildLine(
+            '(−) Custos Variáveis',
+            num(cur?.variable_costs_manual),
+            num(last?.variable_costs_manual),
+          ),
+          commissions: buildLine(
+            '(−) Comissões',
+            num(cur?.commissions),
+            num(last?.commissions),
+          ),
+          fixedCosts: buildLine(
+            '(−) Custos Fixos',
+            num(cur?.fixed_costs),
+            num(last?.fixed_costs),
+          ),
+          operatingExpenses: buildLine(
+            '(−) Despesas Operacionais',
+            num(cur?.operating_expenses),
+            num(last?.operating_expenses),
+          ),
+          taxes: buildLine(
+            '(−) Impostos',
+            num(cur?.taxes),
+            num(last?.taxes),
+          ),
+          netProfit: buildLine(
+            '= Lucro Líquido',
+            num(cur?.net_profit),
+            num(last?.net_profit),
+          ),
+        },
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Story 4.2 — DRE por serviço (DIFERENCIAL vs Conta Azul)
+// ---------------------------------------------------------------------------
+
+export type DreByServiceRow = {
+  service_id: string;
+  service_name: string;
+  service_type: 'service' | 'product';
+  items_count: number;
+  total_quantity: number;
+  revenue_gross: number;
+  variable_cost: number;
+  commissions: number;
+  discounts: number;
+  gross_profit: number;
+  /** Margem = lucro / receita * 100. */
+  margin_percent: number;
+  /** Variação absoluta vs mesmo mês anterior. */
+  delta_profit: number;
+};
+
+export async function getDreByService(input: {
+  periodMonth?: string;
+}): Promise<ActionResult<{ rows: DreByServiceRow[]; periodLabel: string }>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const currentMonth =
+      input.periodMonth ?? format(startOfMonth(now), 'yyyy-MM-dd');
+    const lastMonth = format(
+      startOfMonth(subMonths(new Date(currentMonth), 1)),
+      'yyyy-MM-dd',
+    );
+
+    const [curRes, lastRes] = await Promise.all([
+      supabase
+        .from('v_dre_by_service')
+        .select(
+          'service_id, service_name, service_type, items_count, total_quantity, revenue_gross, variable_cost, commissions, discounts, gross_profit',
+        )
+        .eq('org_id', orgId)
+        .eq('period_month', currentMonth),
+      supabase
+        .from('v_dre_by_service')
+        .select('service_id, gross_profit')
+        .eq('org_id', orgId)
+        .eq('period_month', lastMonth),
+    ]);
+
+    if (curRes.error) return { ok: false, error: curRes.error.message };
+    if (lastRes.error) return { ok: false, error: lastRes.error.message };
+
+    const lastMap = new Map<string, number>();
+    for (const r of lastRes.data ?? []) {
+      if (r.service_id) {
+        lastMap.set(r.service_id, Number(r.gross_profit ?? 0));
+      }
+    }
+
+    const rows: DreByServiceRow[] = (curRes.data ?? [])
+      .filter((r): r is typeof r & { service_id: string } => r.service_id !== null)
+      .map((r) => {
+        const revenue = Number(r.revenue_gross ?? 0);
+        const profit = Number(r.gross_profit ?? 0);
+        const previousProfit = lastMap.get(r.service_id) ?? 0;
+        return {
+          service_id: r.service_id,
+          service_name: r.service_name ?? '(sem nome)',
+          service_type: (r.service_type ?? 'service') as 'service' | 'product',
+          items_count: Number(r.items_count ?? 0),
+          total_quantity: Number(r.total_quantity ?? 0),
+          revenue_gross: revenue,
+          variable_cost: Number(r.variable_cost ?? 0),
+          commissions: Number(r.commissions ?? 0),
+          discounts: Number(r.discounts ?? 0),
+          gross_profit: profit,
+          margin_percent: revenue > 0 ? (profit / revenue) * 100 : 0,
+          delta_profit: profit - previousProfit,
+        };
+      })
+      .sort((a, b) => b.gross_profit - a.gross_profit);
+
+    return {
+      ok: true,
+      data: {
+        rows,
+        periodLabel: format(new Date(currentMonth), "MMMM 'de' yyyy", {
+          locale: ptBR,
+        }),
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Story 4.3 — Lucro por profissional
+// ---------------------------------------------------------------------------
+
+export type DreByProfessionalRow = {
+  professional_id: string;
+  professional_name: string;
+  cost_center: string | null;
+  items_count: number;
+  revenue_gross: number;
+  variable_cost: number;
+  commission_to_pay: number;
+  gross_profit: number;
+  ticket_medio: number;
+  delta_profit: number;
+};
+
+export async function getDreByProfessional(input: {
+  periodMonth?: string;
+  costCenter?: string;
+}): Promise<ActionResult<{ rows: DreByProfessionalRow[]; periodLabel: string }>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const currentMonth =
+      input.periodMonth ?? format(startOfMonth(now), 'yyyy-MM-dd');
+    const lastMonth = format(
+      startOfMonth(subMonths(new Date(currentMonth), 1)),
+      'yyyy-MM-dd',
+    );
+
+    const [curRes, lastRes, profsRes] = await Promise.all([
+      supabase
+        .from('v_dre_by_professional')
+        .select(
+          'professional_id, professional_name, items_count, revenue_gross, variable_cost, commission_to_pay, gross_profit',
+        )
+        .eq('org_id', orgId)
+        .eq('period_month', currentMonth),
+      supabase
+        .from('v_dre_by_professional')
+        .select('professional_id, gross_profit')
+        .eq('org_id', orgId)
+        .eq('period_month', lastMonth),
+      supabase
+        .from('professionals')
+        .select('id, cost_center')
+        .eq('org_id', orgId)
+        .is('deleted_at', null),
+    ]);
+
+    if (curRes.error) return { ok: false, error: curRes.error.message };
+    if (lastRes.error) return { ok: false, error: lastRes.error.message };
+    if (profsRes.error) return { ok: false, error: profsRes.error.message };
+
+    const lastMap = new Map<string, number>();
+    for (const r of lastRes.data ?? []) {
+      if (r.professional_id) {
+        lastMap.set(r.professional_id, Number(r.gross_profit ?? 0));
+      }
+    }
+    const ccMap = new Map<string, string | null>();
+    for (const p of profsRes.data ?? []) {
+      ccMap.set(p.id, p.cost_center);
+    }
+
+    let rows: DreByProfessionalRow[] = (curRes.data ?? [])
+      .filter(
+        (r): r is typeof r & { professional_id: string } =>
+          r.professional_id !== null,
+      )
+      .map((r) => {
+        const revenue = Number(r.revenue_gross ?? 0);
+        const items = Number(r.items_count ?? 0);
+        const profit = Number(r.gross_profit ?? 0);
+        const previousProfit = lastMap.get(r.professional_id) ?? 0;
+        return {
+          professional_id: r.professional_id,
+          professional_name: r.professional_name ?? '(sem nome)',
+          cost_center: ccMap.get(r.professional_id) ?? null,
+          items_count: items,
+          revenue_gross: revenue,
+          variable_cost: Number(r.variable_cost ?? 0),
+          commission_to_pay: Number(r.commission_to_pay ?? 0),
+          gross_profit: profit,
+          ticket_medio: items > 0 ? revenue / items : 0,
+          delta_profit: profit - previousProfit,
+        };
+      });
+
+    if (input.costCenter) {
+      rows = rows.filter((r) => r.cost_center === input.costCenter);
+    }
+
+    rows.sort((a, b) => b.gross_profit - a.gross_profit);
+
+    return {
+      ok: true,
+      data: {
+        rows,
+        periodLabel: format(new Date(currentMonth), "MMMM 'de' yyyy", {
+          locale: ptBR,
+        }),
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Story 4.8 — Metas
+// ---------------------------------------------------------------------------
+
+import { goalSchema, type GoalInput } from '@/lib/validators/goal';
+
+export type GoalRow = {
+  id: string;
+  period_month: string;
+  target_revenue: number | null;
+  target_profit: number | null;
+  target_appointments: number | null;
+  notes: string | null;
+};
+
+export async function listGoals(input: { year?: number }): Promise<ActionResult<GoalRow[]>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+    const year = input.year ?? new Date().getFullYear();
+
+    const { data, error } = await supabase
+      .from('goals')
+      .select('id, period_month, target_revenue, target_profit, target_appointments, notes')
+      .eq('org_id', orgId)
+      .is('deleted_at', null)
+      .gte('period_month', `${year}-01-01`)
+      .lte('period_month', `${year}-12-31`)
+      .order('period_month', { ascending: false });
+    if (error) return { ok: false, error: error.message };
+
+    return {
+      ok: true,
+      data: (data ?? []).map((g) => ({
+        id: g.id,
+        period_month: g.period_month,
+        target_revenue: g.target_revenue === null ? null : Number(g.target_revenue),
+        target_profit: g.target_profit === null ? null : Number(g.target_profit),
+        target_appointments: g.target_appointments,
+        notes: g.notes,
+      })),
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+export async function upsertGoal(input: GoalInput): Promise<ActionResult<{ id: string }>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'admin');
+    const parsed = goalSchema.parse(input);
+    const supabase = await createServerClient();
+
+    const payload = {
+      org_id: orgId,
+      period_month: parsed.periodMonth,
+      ...(parsed.targetRevenue !== undefined ? { target_revenue: parsed.targetRevenue } : {}),
+      ...(parsed.targetProfit !== undefined ? { target_profit: parsed.targetProfit } : {}),
+      ...(parsed.targetAppointments !== undefined
+        ? { target_appointments: parsed.targetAppointments }
+        : {}),
+      ...(parsed.notes ? { notes: parsed.notes } : {}),
+    };
+
+    const { data, error } = await supabase
+      .from('goals')
+      .upsert(payload, { onConflict: 'org_id,period_month' })
+      .select('id')
+      .single();
+    if (error || !data) {
+      return { ok: false, error: error?.message ?? 'Falha ao salvar meta.' };
+    }
+    revalidatePath('/financeiro/metas');
+    revalidatePath('/dashboard');
+    return { ok: true, data: { id: data.id } };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+export type GoalProgress = {
+  goal: GoalRow | null;
+  revenue: { current: number; target: number | null; delta: number | null };
+  profit: { current: number; target: number | null; delta: number | null };
+  appointments: { current: number; target: number | null; delta: number | null };
+  daysRemainingInMonth: number;
+};
+
+export async function getCurrentMonthGoalProgress(): Promise<ActionResult<GoalProgress>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+    const monthEnd = endOfMonth(now);
+    const daysRemainingInMonth = Math.max(
+      0,
+      Math.ceil((monthEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+    );
+
+    const [goalRes, dreRes, doneRes] = await Promise.all([
+      supabase
+        .from('goals')
+        .select('id, period_month, target_revenue, target_profit, target_appointments, notes')
+        .eq('org_id', orgId)
+        .eq('period_month', monthStart)
+        .is('deleted_at', null)
+        .maybeSingle(),
+      supabase
+        .from('v_dre_monthly')
+        .select('revenue_net, net_profit')
+        .eq('org_id', orgId)
+        .eq('period_month', monthStart)
+        .maybeSingle(),
+      supabase
+        .from('appointments')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .eq('status', 'done')
+        .is('deleted_at', null)
+        .gte('starts_at', monthStart + 'T00:00:00'),
+    ]);
+
+    if (goalRes.error) return { ok: false, error: goalRes.error.message };
+    if (dreRes.error) return { ok: false, error: dreRes.error.message };
+    if (doneRes.error) return { ok: false, error: doneRes.error.message };
+
+    const goal = goalRes.data
+      ? {
+          id: goalRes.data.id,
+          period_month: goalRes.data.period_month,
+          target_revenue:
+            goalRes.data.target_revenue === null ? null : Number(goalRes.data.target_revenue),
+          target_profit:
+            goalRes.data.target_profit === null ? null : Number(goalRes.data.target_profit),
+          target_appointments: goalRes.data.target_appointments,
+          notes: goalRes.data.notes,
+        }
+      : null;
+
+    const revenueCur = Number(dreRes.data?.revenue_net ?? 0);
+    const profitCur = Number(dreRes.data?.net_profit ?? 0);
+    const appointmentsCur = doneRes.count ?? 0;
+
+    return {
+      ok: true,
+      data: {
+        goal,
+        revenue: {
+          current: revenueCur,
+          target: goal?.target_revenue ?? null,
+          delta:
+            goal?.target_revenue !== null && goal?.target_revenue !== undefined
+              ? revenueCur - goal.target_revenue
+              : null,
+        },
+        profit: {
+          current: profitCur,
+          target: goal?.target_profit ?? null,
+          delta:
+            goal?.target_profit !== null && goal?.target_profit !== undefined
+              ? profitCur - goal.target_profit
+              : null,
+        },
+        appointments: {
+          current: appointmentsCur,
+          target: goal?.target_appointments ?? null,
+          delta:
+            goal?.target_appointments !== null && goal?.target_appointments !== undefined
+              ? appointmentsCur - goal.target_appointments
+              : null,
+        },
+        daysRemainingInMonth,
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
 // Suprimir warnings de imports não usados em todas as branches.
 void startOfWeek;
 void endOfWeek;
-void ptBR;

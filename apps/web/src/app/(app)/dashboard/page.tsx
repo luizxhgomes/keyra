@@ -1,97 +1,126 @@
-import { AlertCard, KPICard, StatusBadge } from '@/components/keyra';
+import { Card, CardContent } from '@/components/ui/card';
+import { KPICard } from '@/components/keyra';
+import { buildComparativo } from '@/lib/financeiro/comparativo';
+
+import { getDashboardKpis } from './actions';
+import { AgendaHojeCard } from './agenda-hoje-card';
+import { AlertasCard } from './alertas-card';
+import { IndicadoresCard } from './indicadores-card';
+import { MetaCard } from './meta-card';
 
 /**
- * Dashboard placeholder — Story 1.1 scaffold.
+ * Story 4.4 — Dashboard tela única.
  *
- * Story 4.4 implementa o dashboard real (tela única, KPIs absolutos,
- * comparativo textual, 1 gráfico permitido). Aqui mostramos os componentes
- * canônicos com dados mockados para validar o design system e os layouts.
+ * Server Component. KPIs reais via `v_dashboard_kpis` + comparativo
+ * absoluto vs mês passado (Story 4.7). Slots para 4.5-4.9 ficam como
+ * placeholders enquanto stories irmãs não chegam — mantêm a estrutura
+ * viva sem bloquear esta entrega.
  */
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const result = await getDashboardKpis();
+
+  if (!result.ok) {
+    return (
+      <div className="flex flex-col gap-6">
+        <header>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Visão única do seu mês — números absolutos, sem gráfico.
+          </p>
+        </header>
+        <Card>
+          <CardContent className="py-6">
+            <p className="text-sm text-destructive">Erro: {result.error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const k = result.data;
+  const period = k.lastMonthLabel;
+
+  const revenueComp = buildComparativo(
+    k.revenueMtdCents,
+    k.revenueLastMonthCents,
+    period,
+    'revenue',
+  );
+  const expensesComp = buildComparativo(
+    k.expensesMtdCents,
+    k.expensesLastMonthCents,
+    period,
+    'expense',
+  );
+  const profitComp = buildComparativo(
+    k.profitMtdCents,
+    k.profitLastMonthCents,
+    period,
+    'revenue',
+  );
+
+  const noData =
+    k.revenueMtdCents === 0 &&
+    k.expensesMtdCents === 0 &&
+    k.expectedRevenueMtdCents === 0 &&
+    k.appointmentsToday === 0;
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Visão única do seu mês — números absolutos, sem gráfico (CON-UX-01).
+          Visão única do seu mês — números absolutos, sem gráfico.
         </p>
       </header>
 
-      {/* KPIs (mock data — Story 4.4 substitui por queries reais) */}
+      {noData ? (
+        <Card>
+          <CardContent className="py-6">
+            <p className="text-sm text-muted-foreground">
+              <strong>Conclua atendimentos e registre pagamentos</strong> para ver os
+              números aparecerem aqui. O dashboard mostra receita realizada, despesas
+              e lucro do mês corrente em tempo real, conforme a operação acontece.
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <section
-        aria-label="Indicadores financeiros"
+        aria-label="Indicadores financeiros do mês"
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         <KPICard
           variant="hero"
-          label="Dinheiro que entrou este mês"
-          value={2_475_000}
-          comparison={{
-            delta: 230_000,
-            period: 'março',
-            sentiment: 'positive',
-          }}
-          helper="em 47 atendimentos"
+          label="Receita realizada"
+          value={k.revenueMtdCents}
+          {...(revenueComp ? { comparison: revenueComp } : {})}
         />
         <KPICard
-          label="Dinheiro a receber"
-          value={812_500}
-          helper="22 horários marcados"
+          label="Receita prevista"
+          value={k.expectedRevenueMtdCents}
+          helper="Agendamentos do mês ainda não concluídos"
         />
         <KPICard
-          label="Despesas do mês"
-          value={1_120_000}
-          comparison={{
-            delta: -43_000,
-            period: 'março',
-            sentiment: 'positive',
-          }}
+          label="Despesas"
+          value={k.expensesMtdCents}
+          {...(expensesComp ? { comparison: expensesComp } : {})}
         />
         <KPICard
-          label="Resultado do mês"
-          value={1_355_000}
-          comparison={{
-            delta: 273_000,
-            period: 'março',
-            sentiment: 'positive',
-          }}
+          label="Lucro do mês"
+          value={k.profitMtdCents}
+          {...(profitComp ? { comparison: profitComp } : {})}
         />
       </section>
 
-      {/* Alerts */}
-      <section aria-label="Alertas" className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        <AlertCard
-          severity="warning"
-          title="3 clientes faltaram esta semana"
-          subtitle="R$ 540 perdidos"
-          action={{ label: 'Ver agenda', href: '/agenda' }}
-        />
-        <AlertCard
-          severity="info"
-          title="2 insumos com estoque baixo"
-          subtitle="Ácido hialurônico, agulhas 30G"
-          action={{ label: 'Ver estoque', href: '/estoque' }}
-        />
+      <AlertasCard />
+
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <AgendaHojeCard />
+        <IndicadoresCard />
       </section>
 
-      {/* Status badges showcase */}
-      <section aria-label="Próximos agendamentos" className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Próximos atendimentos (placeholder Story 1.1)
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          <StatusBadge status="agendado" />
-          <StatusBadge status="realizado" />
-          <StatusBadge status="cancelado" />
-          <StatusBadge status="falta" />
-          <StatusBadge status="aberta" />
-          <StatusBadge status="finalizada" />
-          <StatusBadge status="paga" />
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Lista real virá na Story 4.5 (Agenda do dia no dashboard).
-        </p>
-      </section>
+      <MetaCard />
     </div>
   );
 }

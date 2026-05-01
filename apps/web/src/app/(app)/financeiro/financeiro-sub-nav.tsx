@@ -6,11 +6,15 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const ITEMS = [
+  { href: '/financeiro/dre', label: 'DRE' },
+  { href: '/financeiro/dre-por-servico', label: 'DRE / serviço' },
+  { href: '/financeiro/dre-por-profissional', label: 'DRE / profissional' },
   { href: '/financeiro/transacoes', label: 'Transações' },
   { href: '/financeiro/receitas', label: 'Receitas' },
   { href: '/financeiro/despesas', label: 'Despesas' },
   { href: '/financeiro/custos-fixos', label: 'Custos fixos' },
   { href: '/financeiro/fluxo-caixa', label: 'Fluxo de caixa' },
+  { href: '/financeiro/metas', label: 'Metas' },
   { href: '/financeiro/categorias', label: 'Categorias' },
 ] as const;
 

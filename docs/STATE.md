@@ -1,8 +1,8 @@
 # KEYRA — Onde Paramos (snapshot executivo)
 
-> **Data deste snapshot:** 2026-05-01 — Phase 1 Done + Stories 2.4 / 2.5 / 2.6 / 2.7 Done + migration 023 aplicada + smoke empírico validado; Sprint 2 a ~79% (em pontos).
-> **Última entrega:** Story 2.7 (receita prevista — card sticky no `/agenda`) com QA gate PASS + 2 concerns **agora resolvidos na mesma sessão**. (C2) **Migration 023** (`20260501000100_views_security_invoker.sql`) aplicada no remoto: `ALTER VIEW ... SET (security_invoker = true)` para `v_receitas_previstas`, `v_dre_monthly`, `v_dre_by_service`, `v_dre_by_professional`, `v_cashflow_daily`, `v_dashboard_kpis`. Postgres 17 confirmou via `pg_class.reloptions` em todas as 6 views — RLS de `appointments`/`commands`/etc. agora aplica automaticamente em qualquer SELECT, defesa em profundidade. (C1) **Smoke empírico** rodado via psql + transação `BEGIN ... ROLLBACK` em prod: trigger `trg_appointments_done_to_command` confirmado gerar comanda + command_items snapshotados; `done_at` preenchido; view `v_receitas_previstas` aparece em `scheduled` e some em `done`; audit_log capturou todas as transições; cancelamento com `cancel_reason` + `cancelled_at` corretos; `no_show` direto. ROLLBACK desfez tudo (zero impacto). `database.types.ts` regenerado, typecheck/lint/build verdes.
-> **Próxima ação recomendada:** `@dev *develop-story 2.3` (Insumos + rateio, M, ~6 pts — fecha a Sprint 2). Independente das demais stories.
+> **Data deste snapshot:** 2026-05-01 — Phase 1 Done + **toda a Sprint 2 entregue** (Stories 2.3 / 2.4 / 2.5 / 2.6 / 2.7 Done); 2.1 e 2.2 InReview. Sprint 2 = **28/28 pontos (100% em pontos)**.
+> **Última entrega:** Story 2.3 (insumos + rateio + BOM por serviço) com QA gate PASS + 1 concern não bloqueante (smoke do BOM em prod pendente). 14 arquivos, +1673 linhas. Validator `supply.ts`; Server Actions completas (`listSupplies`, `upsertSupply` com propagação reversa de unit_cost, `archiveSupply`/`unarchiveSupply`, `listInventoryMovements`, `listServiceBom`, `attachSupplyToService` com upsert(onConflict), `detachSupplyFromService`, recálculo `services.unit_cost` server-side, `listActiveSuppliesForPicker`); `/estoque` com layout + sub-nav (Insumos · Movimentações); `/estoque/insumos` paginado com badge "Recompra"; `/estoque/movimentacoes` read-only com badges semânticos por tipo; Card "Insumos (BOM)" inserido em `/servicos/[id]` apenas para `type='service'` com `service-bom-editor.tsx` (otimismo local + custo total em tempo real + picker exclui insumos já vinculados). Sidebar já tinha "Estoque" mapeado — só faltava a rota. Defesa em profundidade: RLS dupla via filtro explícito `eq('org_id')` + security_invoker (migration 023). Commit `69d8c39`.
+> **Próxima ação recomendada:** **Sprint 3 — Automação Financeira** (~2 semanas, coração do diferencial KEYRA). Comanda automática (trigger `trg_appointments_done_to_command` já validado), Pagamento Pix/cartão/dinheiro, Transação automática (trigger `trg_payments_to_transaction`), Receitas por profissional, Despesas, Custos fixos vs variáveis, Fluxo de caixa, Rateio de estoque. Stories 3.1–3.8 a serem expandidas pelo `@sm`.
 >
 > Este documento é a **entrada única** para retomar o contexto do KEYRA em qualquer nova sessão. Foi projetado para ser lido em menos de 60 segundos. **Regra operacional:** este snapshot é atualizado ao fim de cada Story (status Done) — header + tabela de status macro + §3 lista da sprint atual + §6 próxima ação + §8 Histórico. Detalhes nos links canônicos ao final.
 
@@ -15,7 +15,7 @@
 | **Infraestrutura** | ✅ 100% | GitHub `luizxhgomes/keyra` · **Vercel domínio canônico `https://usekeyra.com`** (Hobby; alias `usekeyra.vercel.app` continua respondendo) · Supabase `keyra-br` sa-east-1 (Free) · Auth Hook ativo · `COLUMN_ENCRYPTION_KEY` provisionada · `RESEND_API_KEY` + `EMAIL_FROM` + `NEXT_PUBLIC_SITE_URL=https://usekeyra.com` em Production/Preview do Vercel · Resend `usekeyra.com` **Verified** (DMARC, DKIM, SPF, MX) · SMTP customizado do Supabase Auth apontando para Resend |
 | **Documentação (Phase 0)** | ✅ 100% | PRD v1.3 · ARCHITECTURE v1.3 (20 ADRs) · SCHEMA (21 tabelas · 100% RLS · 6 views · 15 funções · 19 migrations) · 8 wireframes · 6 pesquisas competitivas |
 | **Phase 1 — Fundação Técnica** | ✅ **100% Done + validado em prod** | 1.1 ✅ · 1.2 ✅ · 1.3 ✅ · 1.4 ✅ · 1.5 ✅. PR #1 mergeado em `main`. Migrations 100% sincronizadas (22/22 no remoto), `database.types.ts` regenerado, suíte RLS verde no CI, Resend Verified, fluxo de convite **end-to-end testado em produção**: convidado recebe email da marca KEYRA, clica, autentica via magic link, retorna ao convite (graças ao fix do `?next=`), aceita e cai no dashboard da clínica. |
-| **Phase 2 — Catálogo + Agenda** | 🟢 ~79% (em pontos) | Stories 2.1 e 2.2 em InReview · **Story 2.4 (Agenda FullCalendar) ✅ Done** · **Story 2.5 (Agendamento) ✅ Done** · **Story 2.6 (Status) ✅ Done** + smoke empírico validado · **Story 2.7 (Receita prevista) ✅ Done** + migration 023 (`security_invoker=true` em todas as views) aplicada · Story 2.3 (Insumos) Ready. Em pontos: 22 de 28 entregues (10+7+3+2 de 6+10+7+3+2). **Concerns C1+C2 zerados.** Próximo @dev: 2.3 (M, ~6 pts — fecha Sprint 2). |
+| **Phase 2 — Catálogo + Agenda** | ✅ **100% (em pontos)** | Stories 2.1 e 2.2 em InReview · **Story 2.3 (Insumos + BOM) ✅ Done** · **Story 2.4 (Agenda FullCalendar) ✅ Done** · **Story 2.5 (Agendamento) ✅ Done** · **Story 2.6 (Status) ✅ Done** + smoke empírico validado · **Story 2.7 (Receita prevista) ✅ Done** + migration 023 (security_invoker em todas as views). Em pontos: 28 de 28 entregues (10+7+3+2+6 de 6+10+7+3+2). **Concerns C1+C2 zerados.** Próximo: Sprint 3 (Automação Financeira). |
 | **Phases 3–7 — Features MVP+** | ⏸️ 0% UI | Schema completo no remoto; views `v_dre_*`, `v_cashflow_daily`, `v_dashboard_kpis`, `v_receitas_previstas` prontas para consumo |
 | **Testes automatizados** | 🔴 0 | Nenhum arquivo `.test.*` ou `.spec.*` no repo. Validação manual + typecheck + lint + build apenas |
 
@@ -85,7 +85,7 @@ Verificações executadas e resultado:
 
 ### Sprint 2 — Cadastros e Agenda (~2 semanas)
 
-2.1 Pacientes ✅ (InReview) · 2.2 Serviços ✅ (InReview) · 2.3 Insumos + rateio ⏸️ Ready · 2.4 Agenda (FullCalendar dia/semana/mês) ✅ Done · 2.5 Agendamento ✅ Done · 2.6 Status ✅ Done · 2.7 Receita prevista automática ✅ Done
+2.1 Pacientes ✅ (InReview) · 2.2 Serviços ✅ (InReview) · 2.3 Insumos + rateio ✅ Done · 2.4 Agenda (FullCalendar dia/semana/mês) ✅ Done · 2.5 Agendamento ✅ Done · 2.6 Status ✅ Done · 2.7 Receita prevista automática ✅ Done
 
 ### Sprint 3 — Automação Financeira (~2 semanas) — *coração do diferencial*
 
@@ -130,17 +130,39 @@ Nenhum impede a próxima Story (2.4 — Agenda); cada um trava uma Story especí
 
 ## 6. Próxima Ação Concreta — Luiz
 
-Phase 1 + Stories 2.4 / 2.5 / 2.6 / 2.7 estão **Done e mergeadas em `main`** com **smoke empírico validado** e **migration 023** aplicada. Sprint 2 a ~79% (em pontos). 1 Story Ready (2.3) para fechar a sprint.
+**Sprint 2 fechada** com 28/28 pontos. Phase 1 + 5 stories (2.3, 2.4, 2.5, 2.6, 2.7) Done, migration 023 aplicada, smoke empírico validado. Próximo passo é abrir a **Sprint 3 — Automação Financeira** (coração do diferencial KEYRA).
 
-### Caminho para fechar a Sprint 2
+### Caminho para Sprint 3
 
 ```text
-@dev *develop-story 2.3   # Insumos + rateio (independente) — M, ~6 pts
-@qa *qa-gate 2.3
-@devops *push
+# 1. Stories já estão draft em docs/stories/3.*.story.md (criadas pelo @sm).
+@sm *expand 3.1 ... 3.8        # Expandir/validar cada story (Pax dará GO/NO-GO)
+@po *validate-story-draft 3.x  # Por story
+
+# 2. Implementar (recomendação tática: 3.1 e 3.2 primeiro pois ativam triggers
+# que já estão prontos no banco):
+@dev *develop-story 3.1   # Comanda automática (trigger pronto) — pode reusar /estoque/movimentacoes
+@dev *develop-story 3.2   # Pagamento (Pix/cartão/dinheiro)
+@dev *develop-story 3.3   # Transação automática (trigger pronto)
+@dev *develop-story 3.4   # Receitas por profissional
+@dev *develop-story 3.5   # Despesas
+@dev *develop-story 3.6   # Custos fixos vs variáveis
+@dev *develop-story 3.7   # Fluxo de caixa
+@dev *develop-story 3.8   # Rateio de estoque (já implementado parcialmente — só validar)
 ```
 
-**Recomendação tática:** seguir direto para 2.3 e fechar a Sprint 2.
+**Recomendação tática:** começar pela **Story 3.1 (Comanda automática)**. Smoke transacional desta sessão já confirmou que o trigger `trg_appointment_done_creates_command` cria `commands` + `command_items` snapshotados ao concluir um agendamento. A 3.1 só precisa expor isso na UI (página `/comandas`, leitura por status) — implementação curta e bate o ciclo `criar agendamento → concluir → ver comanda`.
+
+### Smoke test pendente da Story 2.3 (executar antes da próxima sessão)
+
+Em `https://usekeyra.com/estoque`:
+
+1. Cadastrar insumo "Botox - 100u" (unit "u", unit_cost R$ 5,00, reorder_level 50, supplier "Lab Teste").
+2. Editar serviço existente, no card "Insumos (BOM)" adicionar o insumo com quantity 50.
+3. Confirmar via SQL: `SELECT unit_cost FROM services WHERE id = '...'` → deve ser R$ 250,00 (50 × 5).
+4. Editar o insumo, mudar unit_cost para R$ 8,00. Voltar ao serviço → custo agora deve ser R$ 400,00 (propagação reversa).
+5. Remover insumo do BOM → custo volta a 0.
+6. `/estoque/movimentacoes` ainda vazio (sem comandas pagas — virá quando Story 3.1+3.2 entrarem).
 
 ### Smoke test pós-Story 2.6 (executar antes da próxima sessão de @dev)
 
@@ -205,5 +227,6 @@ Quando precisar de detalhes, abrir na ordem:
 | 2026-05-01 — Padrão de sync STATE.md | **Regra estabelecida pela idealizadora:** o `STATE.md` deve ser atualizado ao final de cada Story marcada `Done`, na mesma sessão, antes de seguir para a próxima ou encerrar. Padrão versionado em `CLAUDE.md` (seção "Workflow story-driven", passo 6) e na auto-memória do agente (`feedback_state_md_sync.md`). Sem essa etapa, a próxima sessão lê estado errado. |
 | 2026-05-01 — Story 2.7 (Receita prevista) | **Ciclo SDC completo em sessão única**: `@dev` implementa → `@qa` PASS+2 concerns → `@devops` push. 4 arquivos (1 novo, 3 modificados) +178 linhas. `getReceitaPrevista()` em `actions.ts` faz 1 round-trip em `v_receitas_previstas` pelo mês corrente e agrega em TS por buckets `today`/`week`/`month` com `date-fns` pt-BR. Agregação em centavos (inteiros × 100) para preservar precisão dentro de `Number.MAX_SAFE_INTEGER`. `receita-card.tsx` (Server Component sticky no topo com `bg-card/95 backdrop-blur` + `-mx-4 -mt-4`) plugado em `agenda/page.tsx` antes do header. Atualização "automática" via `revalidatePath('/agenda')` chamado pelas mutations de 2.5/2.6 — sem polling. Princípios UX inegociáveis cumpridos. **Concerns**: (C1) smoke empírico em prod pendente; (C2) achado sistêmico — views (`v_receitas_previstas`, `v_dre_*`, `v_cashflow_daily`, `v_dashboard_kpis`) criadas sem `security_invoker=true`, defesa atual é filtro `.eq('org_id', orgId)` na action — sugestão: migration 023 para aplicar em todas. Commits `57a8d2c` (feat), `cd57160` (qa). |
 | 2026-05-01 — Concerns C1+C2 zerados | **Resolução completa em sessão única**, antes de avançar para Story 2.3. (C2) Migration `20260501000100_views_security_invoker.sql` aplicada no remoto via `supabase db push` — `ALTER VIEW … SET (security_invoker = true)` em todas as 6 views de leitura. Confirmado via `pg_class.reloptions` no Postgres 17. RLS de `appointments`/`commands`/etc. agora aplica automaticamente em qualquer SELECT — defesa em profundidade real. `database.types.ts` regenerado (sem mudança de shape). (C1) Smoke empírico via psql + `BEGIN ... ROLLBACK` em prod: criou agendamento `scheduled` (R$ 250) → mudou pra `done` → trigger `trg_appointments_done_to_command` gerou comanda `bc7cf634-…` (status=open, subtotal=250) com `command_items` snapshotados (description, quantity=1, unit_price=250, unit_cost=50, commission_rate=0.30) → `done_at` preenchido → view `v_receitas_previstas` confirmou que entrada some quando `status=done`; cancelamento gravou `cancel_reason` + `cancelled_at`; `no_show` transição direta; audit_log capturou tudo via `trg_audit_appointments`. ROLLBACK desfez todas as mutações (0 appointments/customers/services/professionals/commands remanescentes — só audit_log de 4 entries pré-existentes da org). typecheck + lint + build verdes pós-tudo. |
+| 2026-05-01 — Story 2.3 (Insumos + BOM) | **Ciclo SDC completo em sessão única — Sprint 2 fechada com 28/28 pontos**. 14 arquivos novos +1673 linhas. Validator `supply.ts` (com `serviceSupplyLinkSchema` parseando vírgula brasileira). Server Actions completas em `estoque/actions.ts`: `listSupplies` paginado, `upsertSupply` com propagação reversa de `unit_cost` para todos os serviços que usam o insumo, `archive`/`unarchive`, `listInventoryMovements` read-only, `listServiceBom`, `attachSupplyToService` com `upsert(onConflict='service_id,supply_id')` + `recalcServiceUnitCost` server-side, `detachSupplyFromService`, `listActiveSuppliesForPicker`. Layout `/estoque` com sub-nav (Insumos · Movimentações), redirect de `/estoque` para `/estoque/insumos`. Lista de insumos espelha padrão Story 2.1, com badge "Recompra" quando `current_stock <= reorder_level`. Movimentações read-only com badges semânticos por tipo (`entry`/`exit`/`adjustment`/`service_consumption`/`loss`). Card "Insumos (BOM)" inserido em `/servicos/[id]` apenas para `type='service'` — `service-bom-editor.tsx` (Client) com otimismo local, custo total em tempo real, picker filtrando insumos já vinculados (alinhado com UNIQUE constraint). Sidebar já tinha item "Estoque" — só faltava a rota. Defesa em profundidade: RLS dupla via filtro `eq('org_id')` + `security_invoker=true` (migration 023). QA gate **PASS com 1 concern não bloqueante** (smoke do BOM em prod). Tech debt registrado: TD-2.3.1 (página de form acessível por viewer; submit rejeita), TD-2.3.2 (recalc reverso em loop TS), TD-2.3.3 (recalc em app-layer, não trigger). Commit `69d8c39`. |
 
 > **Quando atualizar:** ao encerrar cada Story, cada Sprint ou ao bater um bloqueador novo. Fonte de verdade operacional, complementar ao `IMPLEMENTATION-MAP.md` (tático) e ao `EPIC-0` (estratégico). Regra de obrigatoriedade pós-Story Done formalizada em 2026-05-01 (CLAUDE.md §"Workflow story-driven" passo 6).

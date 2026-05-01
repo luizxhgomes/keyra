@@ -1,8 +1,10 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { UserCog } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/keyra';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { getCurrentRole, type MembershipRole } from '@/lib/auth/roles';
 import { createServerClient } from '@/lib/supabase/server';
@@ -40,7 +42,12 @@ export default async function TeamIndexPage() {
         </CardHeader>
         <CardContent>
           {(!memberships || memberships.length === 0) ? (
-            <p className="text-sm text-muted-foreground">Nenhum membro encontrado.</p>
+            <EmptyState
+              icon={UserCog}
+              title="Você ainda é a única pessoa no time"
+              description="Convide profissionais para acessar a agenda, criar comandas e cobrar pelos atendimentos delas."
+              action={{ label: 'Convidar pessoa', href: '/team/convites' }}
+            />
           ) : (
             <ul className="divide-y divide-border">
               {memberships.map((m) => {
@@ -86,7 +93,7 @@ export default async function TeamIndexPage() {
         <CardContent>
           {(!pendingInvites || pendingInvites.length === 0) ? (
             <p className="text-sm text-muted-foreground">
-              Nenhum convite pendente. Vá em <strong>Convites</strong> para enviar um novo.
+              Nenhum convite aguardando resposta. Vá em <strong>Convites</strong> para enviar um novo.
             </p>
           ) : (
             <ul className="divide-y divide-border">

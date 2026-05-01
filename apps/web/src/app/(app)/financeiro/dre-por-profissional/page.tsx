@@ -1,4 +1,7 @@
+import { Users } from 'lucide-react';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 
 import { getDreByProfessional } from '../actions';
@@ -18,7 +21,7 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );
@@ -53,7 +56,11 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem dados no período.</p>
+            <EmptyState
+              icon={Users}
+              title="Sem atendimentos pagos no período"
+              description="Quando você concluir e cobrar atendimentos, o lucro de cada profissional aparece aqui automaticamente."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

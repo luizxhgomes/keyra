@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { createServerClient } from '@/lib/supabase/server';
@@ -85,8 +86,13 @@ export default async function ServicosPage({ searchParams }: PageProps) {
 
       {grouped.size === 0 ? (
         <Card>
-          <CardContent className="py-8 text-center text-sm text-muted-foreground">
-            Nenhum serviço cadastrado. Use o botão acima.
+          <CardContent className="py-2">
+            <EmptyState
+              icon={Sparkles}
+              title="Você ainda não tem serviços"
+              description="Cadastre os procedimentos que você oferece com preço, duração e custo de insumos. A partir daí o KEYRA calcula sua margem por serviço."
+              action={{ label: 'Criar serviço', href: '/servicos/novo' }}
+            />
           </CardContent>
         </Card>
       ) : (

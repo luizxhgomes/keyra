@@ -2,31 +2,15 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ErrorMessage, StatusBadge, movementTypeToBadge } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 
-import { listInventoryMovements, type MovementRow } from '../actions';
+import { listInventoryMovements } from '../actions';
 
 type PageProps = {
   searchParams: Promise<{ page?: string; command?: string }>;
-};
-
-const TYPE_LABEL: Record<MovementRow['movement_type'], string> = {
-  entry: 'Entrada',
-  exit: 'Saída',
-  adjustment: 'Ajuste',
-  service_consumption: 'Consumo (atendimento)',
-  loss: 'Perda',
-};
-
-const TYPE_BADGE_CLASS: Record<MovementRow['movement_type'], string> = {
-  entry: 'border-emerald-500 text-emerald-700',
-  exit: 'border-stone-500 text-stone-700',
-  adjustment: 'border-blue-500 text-blue-700',
-  service_consumption: 'border-amber-500 text-amber-700',
-  loss: 'border-destructive text-destructive',
 };
 
 export default async function MovimentacoesPage({ searchParams }: PageProps) {
@@ -42,7 +26,7 @@ export default async function MovimentacoesPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );
@@ -105,12 +89,10 @@ export default async function MovimentacoesPage({ searchParams }: PageProps) {
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <Badge
-                        variant="outline"
-                        className={TYPE_BADGE_CLASS[m.movement_type]}
-                      >
-                        {TYPE_LABEL[m.movement_type]}
-                      </Badge>
+                      <StatusBadge
+                        status={movementTypeToBadge(m.movement_type)}
+                        size="sm"
+                      />
                       <span
                         className={`text-sm font-semibold tabular-nums ${
                           isNegative ? 'text-destructive' : 'text-emerald-700'

@@ -15,8 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { StatusBadge, appointmentStatusToBadge } from '@/components/keyra';
 import {
   Sheet,
   SheetClose,
@@ -43,13 +43,6 @@ const STATUS_LABEL: Record<AgendaStatus, string> = {
   done: 'Realizado',
   cancelled: 'Cancelado',
   no_show: 'Falta',
-};
-
-const STATUS_BADGE_CLASS: Record<AgendaStatus, string> = {
-  scheduled: 'bg-blue-100 text-blue-900 hover:bg-blue-100',
-  done: 'bg-emerald-100 text-emerald-900 hover:bg-emerald-100',
-  cancelled: 'bg-stone-200 text-stone-700 hover:bg-stone-200',
-  no_show: 'bg-amber-100 text-amber-900 hover:bg-amber-100',
 };
 
 /**
@@ -125,12 +118,9 @@ export function EventDetailSheet({ event, onOpenChange, onChanged }: Props) {
                   {event.extendedProps.serviceName}
                 </SheetTitle>
                 <SheetDescription className="flex flex-wrap items-center gap-2 text-left">
-                  <Badge
-                    className={STATUS_BADGE_CLASS[event.extendedProps.status]}
-                    variant="secondary"
-                  >
-                    {STATUS_LABEL[event.extendedProps.status]}
-                  </Badge>
+                  <StatusBadge
+                    status={appointmentStatusToBadge(event.extendedProps.status)}
+                  />
                   <span>{formatRange(event.start, event.end)}</span>
                 </SheetDescription>
               </SheetHeader>

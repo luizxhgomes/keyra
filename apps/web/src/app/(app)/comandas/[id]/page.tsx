@@ -4,15 +4,14 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ArrowLeft } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatusBadge, commandStatusToBadge } from '@/components/keyra';
 
 import {
   getCommand,
   listActiveServicesForPicker,
   listPaymentPickers,
   listPaymentsForCommand,
-  type CommandStatus,
 } from '../actions';
 import { ComandaEditForm } from '../comanda-edit-form';
 import { PaymentsCard } from '../payments-card';
@@ -20,20 +19,6 @@ import { ConsumoCard } from './consumo-card';
 
 type PageProps = {
   params: Promise<{ id: string }>;
-};
-
-const STATUS_LABEL: Record<CommandStatus, string> = {
-  open: 'Aberta',
-  finalized: 'Finalizada',
-  paid: 'Paga',
-  cancelled: 'Cancelada',
-};
-
-const STATUS_BADGE: Record<CommandStatus, string> = {
-  open: 'bg-amber-100 text-amber-900 hover:bg-amber-100',
-  finalized: 'bg-blue-100 text-blue-900 hover:bg-blue-100',
-  paid: 'bg-emerald-100 text-emerald-900 hover:bg-emerald-100',
-  cancelled: 'bg-stone-200 text-stone-700 hover:bg-stone-200',
 };
 
 export default async function ComandaDetailPage({ params }: PageProps) {
@@ -83,9 +68,7 @@ export default async function ComandaDetailPage({ params }: PageProps) {
             ) : null}
           </p>
         </div>
-        <Badge variant="secondary" className={STATUS_BADGE[cmd.status]}>
-          {STATUS_LABEL[cmd.status]}
-        </Badge>
+        <StatusBadge status={commandStatusToBadge(cmd.status)} />
       </header>
 
       <Card>

@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { KPICard } from '@/components/keyra';
+import { ErrorMessage, KPICard } from '@/components/keyra';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
 
 import { getDashboardKpis } from './actions';
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
         </header>
         <Card>
           <CardContent className="py-6">
-            <p className="text-sm text-destructive">Erro: {result.error}</p>
+            <ErrorMessage detail={result.error} />
           </CardContent>
         </Card>
       </div>

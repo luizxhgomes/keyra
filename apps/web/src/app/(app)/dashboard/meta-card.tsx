@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatBRL } from '@/lib/money';
 
 import { getCurrentMonthGoalProgress } from '../financeiro/actions';
+import { ErrorMessage } from '@/components/keyra';
 
 export async function MetaCard() {
   const result = await getCurrentMonthGoalProgress();
@@ -12,7 +13,7 @@ export async function MetaCard() {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

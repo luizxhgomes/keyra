@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ComparativoTexto } from '@/components/keyra';
+import { ComparativoTexto, ErrorMessage } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 
 import { getDreMonthly, type DreLine } from '../actions';
@@ -18,7 +18,7 @@ export default async function DrePage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

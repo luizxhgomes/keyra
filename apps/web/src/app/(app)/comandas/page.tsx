@@ -2,9 +2,11 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-import { Badge } from '@/components/ui/badge';
+import { Receipt } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage, StatusBadge, commandStatusToBadge } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -19,13 +21,6 @@ const STATUS_LABEL: Record<CommandStatus, string> = {
   finalized: 'Finalizada',
   paid: 'Paga',
   cancelled: 'Cancelada',
-};
-
-const STATUS_BADGE: Record<CommandStatus, string> = {
-  open: 'bg-amber-100 text-amber-900 hover:bg-amber-100',
-  finalized: 'bg-blue-100 text-blue-900 hover:bg-blue-100',
-  paid: 'bg-emerald-100 text-emerald-900 hover:bg-emerald-100',
-  cancelled: 'bg-stone-200 text-stone-700 hover:bg-stone-200',
 };
 
 const FILTER_OPTIONS: Array<{ value: 'all' | CommandStatus; label: string }> = [
@@ -49,7 +44,7 @@ export default async function ComandasPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );
@@ -100,11 +95,24 @@ export default async function ComandasPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {statusParam !== 'all'
-                ? `Sem comandas no filtro "${STATUS_LABEL[statusParam]}".`
-                : 'Sem comandas ainda. Conclua um atendimento na agenda para gerar a primeira.'}
-            </p>
+            <EmptyState
+              icon={Receipt}
+              title={
+                statusParam !== 'all'
+                  ? 'Nada nesse filtro'
+                  : 'Você ainda não tem comandas'
+              }
+              description={
+                statusParam !== 'all'
+                  ? `Nenhuma comanda no filtro "${STATUS_LABEL[statusParam]}". Tente outro filtro ou volte para "Todas".`
+                  : 'A comanda nasce automaticamente quando você marca um atendimento como concluído. Comece criando um agendamento e concluindo na agenda.'
+              }
+              action={
+                statusParam !== 'all'
+                  ? { label: 'Ver todas', href: '/comandas' }
+                  : { label: 'Ir para a agenda', href: '/agenda' }
+              }
+            />
           ) : (
             <ul className="divide-y divide-border">
               {rows.map((c) => (
@@ -128,9 +136,7 @@ export default async function ComandasPage({ searchParams }: PageProps) {
                     <span className="text-sm font-semibold tabular-nums">
                       {formatBRL(c.total)}
                     </span>
-                    <Badge variant="secondary" className={STATUS_BADGE[c.status]}>
-                      {STATUS_LABEL[c.status]}
-                    </Badge>
+                    <StatusBadge status={commandStatusToBadge(c.status)} size="sm" />
                   </div>
                 </li>
               ))}

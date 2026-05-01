@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Users } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { EmptyState } from '@/components/keyra';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { createServerClient } from '@/lib/supabase/server';
 
@@ -114,11 +115,23 @@ export default async function PacientesPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {!patients || patients.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {q
-                ? `Nenhum paciente encontrado para "${q}".`
-                : 'Ainda sem pacientes cadastrados. Use o botão acima.'}
-            </p>
+            q ? (
+              <EmptyState
+                icon={Search}
+                title="Nada por aqui"
+                description={`Nenhum paciente encontrado para "${q}". Tente outro termo ou limpe a busca.`}
+              />
+            ) : (
+              <EmptyState
+                icon={Users}
+                title="Você ainda não tem pacientes"
+                description="Cadastre quem atende você para ver histórico, ticket médio e LTV de cada cliente."
+                action={{
+                  label: 'Cadastrar paciente',
+                  href: '/pacientes/novo',
+                }}
+              />
+            )
           ) : (
             <ul className="divide-y divide-border">
               {patients.map((p) => {

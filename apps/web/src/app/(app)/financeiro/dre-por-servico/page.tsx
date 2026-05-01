@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatBRL } from '@/lib/money';
 
 import { getDreByService } from '../actions';
+import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ month?: string }>;
@@ -20,7 +21,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

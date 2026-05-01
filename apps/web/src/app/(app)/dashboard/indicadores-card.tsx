@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatCentsBRL } from '@/lib/money';
 
 import { getIndicators } from './actions';
+import { ErrorMessage } from '@/components/keyra';
 
 export async function IndicadoresCard() {
   const result = await getIndicators();
@@ -10,7 +11,7 @@ export async function IndicadoresCard() {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

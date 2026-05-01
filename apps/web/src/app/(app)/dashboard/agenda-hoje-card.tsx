@@ -1,25 +1,12 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { CalendarClock } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage, StatusBadge, appointmentStatusToBadge } from '@/components/keyra';
 
 import { getAppointmentsToday } from './actions';
-
-const STATUS_LABEL: Record<string, string> = {
-  scheduled: 'Agendado',
-  done: 'Realizado',
-  cancelled: 'Cancelado',
-  no_show: 'Falta',
-};
-
-const STATUS_BADGE: Record<string, string> = {
-  scheduled: 'bg-blue-100 text-blue-900',
-  done: 'bg-emerald-100 text-emerald-900',
-  cancelled: 'bg-stone-200 text-stone-700',
-  no_show: 'bg-amber-100 text-amber-900',
-};
 
 export async function AgendaHojeCard() {
   const result = await getAppointmentsToday();
@@ -31,7 +18,9 @@ export async function AgendaHojeCard() {
         {result.ok ? (
           <CardDescription>
             {result.data.total} {result.data.total === 1 ? 'agendamento' : 'agendamentos'}
-            {result.data.done > 0 ? ` · ${result.data.done} concluído${result.data.done > 1 ? 's' : ''}` : ''}
+            {result.data.done > 0
+              ? ` · ${result.data.done} concluído${result.data.done > 1 ? 's' : ''}`
+              : ''}
             {result.data.cancelled > 0
               ? ` · ${result.data.cancelled} cancelado${result.data.cancelled > 1 ? 's' : ''}`
               : ''}
@@ -40,20 +29,23 @@ export async function AgendaHojeCard() {
       </CardHeader>
       <CardContent>
         {!result.ok ? (
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         ) : result.data.rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Sem agendamentos para hoje.{' '}
-            <Link href="/agenda" className="text-primary hover:underline">
-              Use a agenda
-            </Link>{' '}
-            para criar.
-          </p>
+          <EmptyState
+            icon={CalendarClock}
+            title="Nada agendado para hoje"
+            description="Aproveita pra rever o que vem essa semana ou agenda alguém novo."
+            action={{ label: 'Abrir agenda', href: '/agenda' }}
+            className="py-8"
+          />
         ) : (
           <>
             <ul className="divide-y divide-border">
               {result.data.rows.map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-3 py-2">
+                <li
+                  key={r.id}
+                  className="flex items-center justify-between gap-3 py-2"
+                >
                   <div className="min-w-0">
                     <p className="text-sm font-medium tabular-nums">
                       {format(new Date(r.starts_at), 'HH:mm', { locale: ptBR })}
@@ -64,9 +56,7 @@ export async function AgendaHojeCard() {
                       {r.service_name} · {r.professional_name}
                     </p>
                   </div>
-                  <Badge variant="secondary" className={STATUS_BADGE[r.status]}>
-                    {STATUS_LABEL[r.status]}
-                  </Badge>
+                  <StatusBadge status={appointmentStatusToBadge(r.status)} size="sm" />
                 </li>
               ))}
             </ul>

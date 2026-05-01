@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatBRL } from '@/lib/money';
 
 import { getDefaultPeriod, getRevenueByProfessional } from '../actions';
+import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ start?: string; end?: string }>;
@@ -18,7 +19,7 @@ export default async function ReceitasPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

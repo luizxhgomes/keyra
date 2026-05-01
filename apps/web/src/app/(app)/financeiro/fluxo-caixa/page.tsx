@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatBRL } from '@/lib/money';
 
 import { getCashflow, getLast30DaysPeriod } from '../actions';
+import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ start?: string; end?: string }>;
@@ -39,7 +40,7 @@ export default async function FluxoCaixaPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

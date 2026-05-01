@@ -30,8 +30,8 @@ export interface KPICardProps {
 }
 
 const VARIANT_PADDING: Record<NonNullable<KPICardProps['variant']>, string> = {
-  hero: 'p-8',
-  secondary: 'p-6',
+  hero: 'px-card-x-hero py-card-y-hero',
+  secondary: 'px-card-x py-card-y',
   compact: 'p-4',
 };
 

@@ -1,10 +1,11 @@
 import Link from 'next/link';
-import { AlertTriangle, Plus, Search } from 'lucide-react';
+import { AlertTriangle, Package, Plus, Search } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 
 import { listSupplies } from '../actions';
@@ -30,7 +31,7 @@ export default async function InsumosPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );
@@ -108,11 +109,20 @@ export default async function InsumosPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              {q
-                ? `Nenhum insumo encontrado para "${q}".`
-                : 'Ainda sem insumos cadastrados. Use o botão acima.'}
-            </p>
+            q ? (
+              <EmptyState
+                icon={Search}
+                title="Nada por aqui"
+                description={`Nenhum insumo encontrado para "${q}".`}
+              />
+            ) : (
+              <EmptyState
+                icon={Package}
+                title="Você ainda não cadastrou insumos"
+                description="Insumos viram custo automático nos serviços. Cadastre o primeiro pra acompanhar margem e estoque."
+                action={{ label: 'Cadastrar insumo', href: '/estoque/insumos/novo' }}
+              />
+            )
           ) : (
             <ul className="divide-y divide-border">
               {rows.map((s) => {

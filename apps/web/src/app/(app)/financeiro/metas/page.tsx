@@ -6,6 +6,7 @@ import { formatBRL } from '@/lib/money';
 
 import { listGoals } from '../actions';
 import { MetaForm } from './meta-form';
+import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ year?: string }>;
@@ -20,7 +21,7 @@ export default async function MetasPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {result.error}</p>
+          <ErrorMessage detail={result.error} />
         </CardContent>
       </Card>
     );

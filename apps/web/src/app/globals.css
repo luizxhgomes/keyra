@@ -28,7 +28,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 34 20% 93%; /* #F3EFE9 neutral-100 */
-    --muted-foreground: 30 6% 40%; /* #6B6560 neutral-500 */
+    --muted-foreground: 30 8% 32%; /* #5A5249 — Story 5.4: subido de 40% para 32% para passar WCAG AA em text-xs (≥4.5:1) */
 
     --accent: 34 20% 93%;
     --accent-foreground: 36 10% 16%;

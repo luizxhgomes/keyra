@@ -9,6 +9,11 @@ import { requireAuth } from '@/lib/auth/require-auth';
 import { createServerClient } from '@/lib/supabase/server';
 import type { ServiceType } from '@/lib/validators/service';
 
+import {
+  listActiveSuppliesForPicker,
+  listServiceBom,
+} from '../../estoque/actions';
+import { ServiceBomEditor } from '../../estoque/service-bom-editor';
 import { ServicoForm } from '../servico-form';
 
 type PageProps = {
@@ -20,7 +25,7 @@ export default async function ServicoEditarPage({ params }: PageProps) {
   const { id } = await params;
 
   const supabase = await createServerClient();
-  const [serviceRes, categoriesRes] = await Promise.all([
+  const [serviceRes, categoriesRes, bomRes, pickerRes] = await Promise.all([
     supabase
       .from('services')
       .select(
@@ -36,11 +41,16 @@ export default async function ServicoEditarPage({ params }: PageProps) {
       .eq('org_id', orgId)
       .is('deleted_at', null)
       .order('sort_order', { ascending: true }),
+    listServiceBom(id),
+    listActiveSuppliesForPicker(),
   ]);
 
   const svc = serviceRes.data;
   if (!svc) notFound();
   if (svc.type !== 'service' && svc.type !== 'product') notFound();
+
+  const bomRows = bomRes.ok ? bomRes.data : [];
+  const pickerSupplies = pickerRes.ok ? pickerRes.data : [];
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -88,6 +98,25 @@ export default async function ServicoEditarPage({ params }: PageProps) {
           />
         </CardContent>
       </Card>
+
+      {svc.type === 'service' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Insumos (BOM)</CardTitle>
+            <CardDescription>
+              Vincule insumos ao serviço e informe quanto de cada um é consumido por
+              atendimento. O custo unitário do serviço é recalculado automaticamente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ServiceBomEditor
+              serviceId={svc.id}
+              initialRows={bomRows}
+              pickerSupplies={pickerSupplies}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="flex justify-end">
         <Link href="/servicos">

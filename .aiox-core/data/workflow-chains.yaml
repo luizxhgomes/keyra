@@ -154,3 +154,123 @@ workflows:
         task: brownfield-create-epic.md
         output: Epic + stories ready for development
         condition: QA gate APPROVED
+
+  # 5. KEYRA SDC com Gate Financeiro — SQUAD WORKFLOW (squad-keyra-core)
+  - id: keyra-sdc-com-gate-financeiro
+    name: KEYRA SDC com Gate Financeiro
+    description: SDC estendido com gate obrigatório de Valéria entre @dev e @qa
+    squad: squad-keyra-core
+    workflow_yaml: squads/squad-keyra-core/workflows/keyra-sdc-com-gate-financeiro.yaml
+    chain:
+      - step: 1
+        agent: "@sm"
+        command: "*draft"
+        task: create-next-story.md
+        output: Story file (Draft)
+        condition: Epic context available
+      - step: 2
+        agent: "@po"
+        command: "*validate-story-draft {story-id}"
+        task: validate-next-story.md
+        output: GO/NO-GO decision
+        condition: Story status is Draft
+      - step: 3
+        agent: "@dev"
+        command: "*develop {story-id}"
+        task: dev-develop-story.md
+        output: Implementation complete
+        condition: Story status is Approved
+      - step: 4
+        agent: "@finance-domain-expert"
+        command: "*review-financial-logic"
+        output: APPROVE/CONCERNS/REJECT verdict
+        condition: Story touches transactions/dre/services.price/services.cost/payments
+        gate_type: specialist_financial
+      - step: 5
+        agent: "@compliance-br"
+        command: "*lgpd-audit"
+        output: APPROVE/CONCERNS/REJECT verdict
+        condition: Story touches personal data, uploads, or paid integrations
+        gate_type: specialist_compliance
+        optional: true
+      - step: 6
+        agent: "@qa"
+        command: "*review {story-id}"
+        task: qa-gate.md
+        output: PASS/CONCERNS/FAIL/WAIVED
+        condition: All specialist gates passed
+      - step: 7
+        agent: "@devops"
+        command: "*push"
+        task: github-devops-pre-push-quality-gate.md
+        output: Code pushed to remote
+        condition: QA gate PASS
+
+  # 6. KEYRA Integrações — SQUAD WORKFLOW (squad-keyra-integrations)
+  - id: keyra-integracoes-spec-sdc
+    name: KEYRA Integrações Spec + SDC
+    description: Spec pipeline + SDC para integrações externas (Asaas, WhatsApp, NFS-e, OCR)
+    squad: squad-keyra-integrations
+    workflow_yaml: squads/squad-keyra-integrations/workflows/keyra-integracoes-spec-sdc.yaml
+    chain:
+      - step: 1
+        agent: "@architect"
+        command: "*spec-integration"
+        output: Integration spec (API contract, retry policy, idempotency)
+        condition: New external integration
+      - step: 2
+        agent: "@document-processor"
+        command: "*design-ocr-pipeline"
+        output: OCR pipeline design
+        condition: Integration involves document parsing
+        optional: true
+      - step: 3
+        agent: "@compliance-br"
+        command: "*lgpd-audit"
+        output: Compliance review of integration spec
+        condition: Always for external integrations
+        gate_type: specialist_compliance
+      - step: 4
+        agent: "@sm"
+        command: "*draft"
+        output: Story file (Draft)
+        condition: Spec approved
+      - step: 5
+        agent: "@dev"
+        command: "*develop {story-id}"
+        output: Implementation
+      - step: 6
+        agent: "@finance-domain-expert"
+        command: "*validate-reconciliation"
+        output: Financial reconciliation review
+        condition: Integration affects financial reconciliation
+        optional: true
+      - step: 7
+        agent: "@qa"
+        command: "*review {story-id}"
+        output: PASS/CONCERNS/FAIL/WAIVED
+
+  # 7. Deep Research — SQUAD WORKFLOW (deep-research)
+  - id: deep-research-pipeline
+    name: Deep Research Pipeline
+    description: Pesquisa estruturada multi-fonte com validação e síntese
+    squad: deep-research
+    workflow_yaml: squads/deep-research/workflows/deep-research-pipeline.yaml
+    chain:
+      - step: 1
+        agent: "research-lead"
+        command: "*scope"
+        output: Research scope and questions
+        condition: New research topic
+      - step: 2
+        agent: "source-analyst"
+        command: "*search"
+        output: Raw findings from multiple sources
+      - step: 3
+        agent: "source-analyst"
+        command: "*validate"
+        output: Validated findings with credibility tiers
+      - step: 4
+        agent: "synthesis-writer"
+        command: "*synthesize"
+        output: Structured research report in docs/research/

@@ -251,6 +251,70 @@ A tela em dark é o **error de browser nativo** (não `error.tsx` do KEYRA), o q
 
 ---
 
+## Issue #5 — `/agenda` explode ao clicar 🔴 CRITICAL
+
+**Severidade:** 🔴 **CRITICAL** — bloqueia funcionalidade core (criar agendamento)
+**Tela:** `/agenda`
+**Descoberto em:** 2026-05-02 — após Story 7.0 já deployed (próximo digest pode mudar)
+
+### Sintomas reportados pela idealizadora
+
+- Toca item "Agenda" no BottomNav ou Sidebar → tela "ALGO DEU ERRADO"
+- Mesmo erro quando tenta ir para "Novo agendamento"
+- **Não consegue selecionar produto, cadastrar cliente, paciente ou serviço**
+- Jornada inteira de criação de agendamento quebrada
+
+### Análise
+
+Erro em `/agenda` + `/dashboard` + `/pacientes` simultaneamente sugere **falha compartilhada no layer comum**: `(app)/layout.tsx` ou `(app)/template.tsx` (Story 6.2).
+
+**Hipótese principal**: `(app)/template.tsx` envolve children em `<m.div className="contents">` — combinação `display: contents` + framer-motion transform pode causar comportamento indefinido em algumas combinações browser/SSR.
+
+---
+
+## Issue #6 — `/pacientes` com erro 🔴 CRITICAL
+
+**Severidade:** 🔴 **CRITICAL** — outra tela core sem acesso
+**Tela:** `/pacientes`
+**Sintoma:** mesmo "ALGO DEU ERRADO" do dashboard
+
+Confirma hipótese de problema compartilhado no layer `(app)/`.
+
+---
+
+## Issue #7 — `/mais` jornada morta (sem rota) 🔴 HIGH (consolidado de Issue #3)
+
+Já registrado como Issue #3. Confirmado pela idealizadora — toca "Mais" no BottomNav e cai em 404 default do NextJS.
+
+---
+
+## Issue #8 — `/configuracoes` falha (sem rota) 🔴 HIGH (consolidado de Issue #4)
+
+Já registrado como Issue #4. Confirmado.
+
+---
+
+## Análise transversal — todas as rotas autenticadas com erro
+
+A idealizadora reportou problemas em:
+- `/dashboard` (Issue #2) — `digest 3213099672`
+- `/agenda` (Issue #5) — explode ao clicar
+- `/agenda` novo agendamento — não consegue criar
+- `/pacientes` (Issue #6) — erro
+- `/mais` (Issue #3) — 404
+- `/configuracoes` (Issue #4) — browser error
+
+**Padrão**: tudo dentro de `(app)/` quebra. AppShell (Sidebar/BottomNav/OrgSwitcher) carrega — confirma que `(app)/layout.tsx` funciona. Erro está em algo **abaixo do layout**.
+
+**Suspeitos:**
+1. **`(app)/template.tsx`** (Story 6.2 AC2.7) — wrapper `<m.div className="contents">` em todas as rotas
+2. **`<MotionProvider>` LazyMotion strict** — pode estar rejeitando algo silenciosamente
+3. **Server Component fetch de view com `security_invoker=true`** + JWT custom claims em chamada nova (auth refresh corrompendo)
+
+**Sentry NÃO está configurado em prod** (DSN não existe nas env vars Vercel). Story 7.0 habilitou capture mas sem DSN é NO-OP. **Bloqueador absoluto de debug em prod até DSN ser configurado.**
+
+---
+
 ## Outras issues encontradas (continuar registrando)
 
 | # | Severidade | Tela | Descrição | Status |
@@ -259,7 +323,10 @@ A tela em dark é o **error de browser nativo** (não `error.tsx` do KEYRA), o q
 | 2 | 🔴 CRITICAL | `/dashboard` pós-login | "Algo deu errado" digest 3213099672 | ✅ registrado + plano completo |
 | 3 | 🔴 HIGH | `/mais` (BottomNav) | 404 — rota não existe | ✅ registrado |
 | 4 | 🔴 HIGH | `/configuracoes` (Sidebar) | Browser error — rota não existe | ✅ registrado |
-| 5 | — | — | — | aguardando |
+| **5** | 🔴 **CRITICAL** | `/agenda` | Explode ao clicar — bloqueia criação de agendamento | ✅ **registrado** |
+| **6** | 🔴 **CRITICAL** | `/pacientes` | Mesmo erro genérico | ✅ **registrado** |
+| **7** | 🔴 **BLOCKER** | Sentry DSN ausente em prod | `instrumentation.ts` checa `if (!dsn) return` — Story 7.0 não captura nada | ✅ **descoberto** |
+| 8 | — | — | — | aguardando |
 
 ---
 

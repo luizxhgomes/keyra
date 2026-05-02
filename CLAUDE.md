@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > **Idioma:** Todo conteúdo (chat, commits, docs, código) DEVE ser pt-BR com acentuação correta. Detalhes em `.claude/CLAUDE.md` (regra primária do AIOX, ainda vale).
 > **Framework de orquestração:** Synkra AIOX rege o fluxo story-driven (`@sm` → `@po` → `@dev` → `@qa` → `@devops`). Regras em `.claude/CLAUDE.md` e `.claude/rules/`.
+> **Especialistas KEYRA:** 4 agentes de domínio adicionais (`@finance-domain-expert` Valéria, `@document-processor` Íris, `@compliance-br` Têmis, `@growth-product` Gaia) — gates obrigatórios em stories que tocam DRE/preço/dados sensíveis/paywall. Catálogo em `.claude/CLAUDE.md` §Especialistas KEYRA.
+> **Squads:** 5 composições pré-configuradas em `squads/` (bootstrap, core, integrations, intelligence, deep-research). Disparar via `@aiox-master *workflow {nome}`. Catálogo em `.claude/CLAUDE.md` §Squads.
 
 ---
 
@@ -88,6 +90,8 @@ Todo desenvolvimento parte de uma story em `docs/stories/{epic}.{n}.story.md`. E
 4. `@qa *qa-gate` — PASS/CONCERNS/FAIL/WAIVED
 5. `@devops *push` — operação exclusiva (push / PR / merge)
 6. **Sync `docs/STATE.md`** — após cada story atingir `Done`, atualizar header (data + última entrega + próxima ação), tabela §1 Status Macro (pontos da Sprint), §3 lista de stories da sprint atual, §6 Próxima Ação Concreta e adicionar entrada nova em §8 Histórico. Commit com `docs(state): Story X.Y Done — ...` e push. Sem essa etapa, a próxima sessão lê estado errado.
+
+**Gates condicionais entre @dev e @qa:** stories financeiras (DRE/preço/margem) acionam `@finance-domain-expert *review-financial-logic`; stories com dados sensíveis/integrações pagas acionam `@compliance-br *lgpd-audit`; stories de paywall/tiers/onboarding acionam `@growth-product *review-growth`. Detalhes em `.claude/rules/story-lifecycle.md` §Phase 3.5.
 
 `git push`, `gh pr create/merge` e gerência de MCP são **exclusivos** do `@devops` — qualquer outro agente delega.
 

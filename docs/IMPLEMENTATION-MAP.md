@@ -232,10 +232,16 @@
 2. Validada por @po            → status: Draft → Ready
 3. Implementada por @dev       → migrations (se DB) + Server Actions + componentes UI + testes
 4. CodeRabbit review automático → max 2 iterações de fix
+4.5 Gates especialistas (condicional, KEYRA-only):
+    - @finance-domain-expert *review-financial-logic  (se story toca DRE/preço/margem/payments)
+    - @compliance-br *lgpd-audit                       (se story toca dados sensíveis/integrações pagas)
+    - @growth-product *review-growth                   (se story toca paywall/tiers/onboarding)
 5. QA gate por @qa             → 7 checks (code, tests, AC, regression, perf, security, docs)
 6. Push por @devops            → main → Vercel auto-deploy → keyra.app
 7. Story marcada Done          → atualizar este IMPLEMENTATION-MAP
 ```
+
+> Detalhes dos gates: `.claude/rules/story-lifecycle.md` §Phase 3.5. Squad workflows (`squads/squad-keyra-core/workflows/keyra-sdc-com-gate-financeiro.yaml`) bakeam os gates direto no fluxo.
 
 ---
 

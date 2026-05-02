@@ -99,6 +99,80 @@ When an agent is active:
 - Maintain the agent's perspective throughout the interaction
 <!-- AIOX-MANAGED-END: agent-system -->
 
+<!-- AIOX-MANAGED-START: especialistas-keyra -->
+## Especialistas KEYRA
+
+Além dos 10 agentes core do AIOX, o KEYRA mantém **4 especialistas de domínio** em `.aiox-core/development/agents/`. São invocáveis exatamente como os core agents (`@nome` ou `/AIOX:agents:nome`).
+
+| Agente | Persona | Quando invocar | Comandos-chave (verificados) |
+|--------|---------|----------------|-------------------------------|
+| `@finance-domain-expert` | Valéria | DRE, precificação, margem, custos fixos/variáveis, validação de fórmulas financeiras | `*validate-dre`, `*validate-pricing`, `*pricing-analysis`, `*cost-structure`, `*profit-per-service`, `*review-financial-logic` |
+| `@document-processor` | Íris | OCR, parsing de extratos bancários, extratos de maquininhas (Cielo/Rede/Stone), pipelines de reconciliação | `*parse-bank-statement`, `*parse-card-statement`, `*design-ocr-pipeline`, `*reconciliation-flow`, `*extract-transactions` |
+| `@compliance-br` | Têmis | LGPD, dados sensíveis (CPF), regras fiscais, NFS-e, retenção, isolamento multitenant | `*lgpd-audit`, `*tax-rules`, `*nf-compliance`, `*data-mapping`, `*pii-inventory`, `*right-to-delete` |
+| `@growth-product` | Gaia | Monetização SaaS, tiers de pricing, paywall, onboarding, growth metrics, conversion funnel | `*pricing-tiers`, `*paywall-design`, `*feature-matrix`, `*onboarding-flow`, `*growth-metrics`, `*conversion-funnel`, `*upgrade-triggers` |
+
+### Gates obrigatórios (não-negociáveis)
+
+- **Gate financeiro:** stories que tocam `transactions`, `dre`, `services.price/cost`, `payments`, fórmulas de margem ou DRE por serviço → revisão de `@finance-domain-expert *review-financial-logic` antes do QA gate.
+- **Gate de compliance:** stories que tocam dados pessoais (CPF, telefone, email), uploads de extratos, integrações externas com pagamento ou WhatsApp → revisão de `@compliance-br *lgpd-audit` antes do QA gate.
+- **Gate de growth:** stories que tocam paywall, gating de feature, tiers, onboarding, billing → revisão de `@growth-product *review-growth` antes do QA gate.
+
+Esses gates são **adicionais** ao QA gate normal de Quinn (`@qa`) — não o substituem.
+<!-- AIOX-MANAGED-END: especialistas-keyra -->
+
+<!-- AIOX-MANAGED-START: squads -->
+## Squads — Composições pré-configuradas
+
+O diretório `squads/` agrega 5 squads (cada um com `squad.yaml`, agentes, workflows, tasks, templates, checklists e config próprios). Disparar via `@aiox-master *workflow {nome-do-workflow-yaml-sem-extensao}`.
+
+| Squad | Fase KEYRA | Status atual | Workflow principal | Composição |
+|-------|-----------|--------------|--------------------|------------|
+| `squad-keyra-bootstrap` | Fase 0 (planejamento) | ✅ Cumprido — referência arquivada | `keyra-fase-0` | pm + architect + data-engineer + analyst + ux-design-expert + finance + document + compliance |
+| `squad-keyra-core` | Fases 2-4 (MVP) | ✅ MVP feature-complete; reativar em refactors core | `keyra-sdc-com-gate-financeiro` | sm + po + dev + data-engineer + qa + devops + finance + compliance |
+| `squad-keyra-integrations` | Fase 7 (Asaas, WhatsApp, NFS-e, OCR de PDFs) | 🔮 Pós-MVP — ativar quando começar Asaas/PIX | `keyra-integracoes-spec-sdc` | sm + po + dev + qa + devops + architect + document + finance + compliance |
+| `squad-keyra-intelligence` | Fases 5-6 (motor de precificação, projeções, what-if) | 🔮 Pós-MVP — ativar quando começar precificação inteligente | `keyra-inteligencia-spec-sdc` | sm + po + dev + qa + devops + architect + data-engineer + finance |
+| `deep-research` | Genérico (qualquer projeto) | 🟢 Em uso ativo (Trinks, Belle, Gestek em `docs/research/`) | `deep-research-pipeline` + `strategic-research-pipeline` | research-lead + source-analyst + strategy-analyst + synthesis-writer (próprios do squad) |
+
+Cada squad tem `README.md` com missão, entregáveis e instruções de uso. **Leia antes de modificar.**
+
+### Gatilhos → Squad/Agente (mapeamento prático)
+
+| Gatilho na conversa | Recurso | Como invocar |
+|---------------------|---------|--------------|
+| "pesquisar concorrente" / "benchmark" | deep-research | `/deep-research:research-lead` então `*benchmark` |
+| "engenharia reversa de site/produto" | deep-research | `/deep-research:research-lead` então `*reverse-engineer` |
+| "validar DRE / precificação / margem" | Valéria | `@finance-domain-expert *validate-dre` |
+| "auditar LGPD / dados sensíveis / CPF" | Têmis | `@compliance-br *lgpd-audit` |
+| "regras fiscais / NFS-e / regime tributário" | Têmis | `@compliance-br *tax-rules` ou `*nf-compliance` |
+| "parsear extrato bancário/PDF" | Íris | `@document-processor *parse-bank-statement` |
+| "começar Fase 7 (integrações)" | squad-keyra-integrations | `@aiox-master *workflow keyra-integracoes-spec-sdc` |
+| "começar Fases 5-6 (inteligência)" | squad-keyra-intelligence | `@aiox-master *workflow keyra-inteligencia-spec-sdc` |
+| "story financeira touch DRE/preço" | SDC + gate financeiro | `@aiox-master *workflow keyra-sdc-com-gate-financeiro` |
+<!-- AIOX-MANAGED-END: squads -->
+
+<!-- AIOX-MANAGED-START: deep-research-squad -->
+## Squad deep-research — Pesquisa profissional
+
+4 agentes próprios em `squads/deep-research/agents/`, com comandos slash já registrados em `.claude/commands/deep-research/`. Invocáveis via `/deep-research:{agent-name}`.
+
+| Agente | Comandos-chave | Quando usar |
+|--------|----------------|-------------|
+| `🔬 research-lead` | `*research`, `*scope`, `*consolidate`, `*benchmark`, `*strategies`, `*sales-strategy`, `*positioning`, `*reverse-engineer`, `*full-strategic` | Coordenar qualquer pesquisa multi-fonte |
+| `🔍 source-analyst` | `*search`, `*validate`, `*triangulate`, `*validate-benchmark`, `*validate-strategy` | Validar credibilidade e triangular fontes |
+| `📐 strategy-analyst` | `*benchmark`, `*strategies`, `*sales-strategy`, `*positioning`, `*reverse-engineer` | Análise estratégica (Porter, Blue Ocean, Wardley, Business Model Canvas) |
+| `📝 synthesis-writer` | `*synthesize`, `*summarize`, `*recommend`, `*write-benchmark`, `*write-catalog`, `*write-playbook` | Gerar reports estruturados a partir dos templates do squad |
+
+### Modos do `strategic-research-pipeline`
+
+`benchmark` · `strategy-collection` · `sales-analysis` · `positioning-analysis` · `reverse-engineering` · `full`
+
+### Outputs
+
+`docs/research/` (organizado por tipo: `benchmarks/`, `strategies/`, `sales/`, `positioning/`, `reverse-engineering/`, `reports/`, `validated-findings/`).
+
+**Use no lugar de Web fetch ad-hoc** para qualquer decisão estratégica/competitiva — garante triangulação de fontes, validação por source-analyst e report estruturado.
+<!-- AIOX-MANAGED-END: deep-research-squad -->
+
 ## Development Methodology
 
 ### Story-Driven Development

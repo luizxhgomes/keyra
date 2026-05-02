@@ -1,7 +1,7 @@
-# EPIC-7 — Auth UX & Reliability (Sprint 7)
+# EPIC-7 — Auth UX & Reliability + Recovery (Sprint 7)
 
-**Status:** 🔴 **ATIVA — bloqueador de go-to-market**
-**Origem:** validação manual real da idealizadora em 2026-05-02 (mobile, Safari iOS, http://192.168.0.50:3000) revelou **4 issues HIGH+CRITICAL** + 8 LOWs na jornada de login + navegação primária.
+**Status:** 🔴🔴 **ATIVA EM EMERGÊNCIA — produto inutilizável em produção**
+**Origem:** validação manual real da idealizadora em 2026-05-02 (mobile real, usekeyra.com) revelou **8 issues HIGH+CRITICAL+BLOCKER** + 9 LOWs. **Todas as rotas autenticadas (`/dashboard`, `/agenda`, `/pacientes`, etc.) explodem com erro genérico**. Camila com conta criada não consegue usar nenhuma feature.
 **Documentos-fonte:**
 - `docs/ux/validacao-manual-idealizadora-2026-05-02.md` (issues #1-#4 catalogados)
 - `docs/ux/plano-melhoria-jornada-login-2026-05-02.md` (análise técnica + 6 estágios + 10 bugs B1-B10 + 5 gates G5-G9)
@@ -13,16 +13,28 @@
 
 ---
 
-## Por que existe
+## Por que existe (escopo EXPANDIDO 2026-05-02 14h)
 
-A Sprint 6 fechou camada visual editorial (DS + Motion + Navegação contextual) com gates anti-regressão Phase 2.5. **Validação real** em mobile descobriu que **Camila com conta já criada não consegue acessar o produto**:
+Investigação revelou que **NÃO é só dashboard**. A camada inteira de `(app)/` explode após login válido:
 
-1. Magic link em **inglês** (viola pt-BR inegociável CON-UX-01)
-2. Tela "Confira seu e-mail" sem auto-detect de login (5-8 toques + troca de app)
-3. Dashboard **explode** após login válido com `digest 3213099672` opaco (Sentry capture nunca foi habilitado — TODO da Story 5.2)
-4. **2 rotas linkadas mas sem implementação** (`/mais` BottomNav, `/configuracoes` Sidebar)
+| Tela | Status |
+|------|--------|
+| `/dashboard` | 🔴 "ALGO DEU ERRADO" digest 3213099672 |
+| `/agenda` | 🔴 Mesmo erro ao clicar |
+| `/agenda` novo agendamento | 🔴 Não consegue selecionar produto, cliente, serviço |
+| `/pacientes` | 🔴 Mesmo erro |
+| `/mais` | 🔴 404 (rota inexistente) |
+| `/configuracoes` | 🔴 Browser error (rota inexistente) |
 
-**Bloqueia go-to-market.** Sprint 7 entrega login funcional + reliability + navegação 100% navegável + sistema antecipativo de prevenção (Phase 2.6 com 5 gates novos).
+**AppShell carrega** (Sidebar, BottomNav, OrgSwitcher renderizam) → camada `(app)/layout.tsx` ok.
+**Erro está em layer abaixo do layout** — provavelmente:
+
+1. **`(app)/template.tsx` Story 6.2 AC2.7** — `<m.div className="contents">` (display:contents + transform = comportamento indefinido)
+2. **`<MotionProvider>` LazyMotion strict** rejeitando algo
+3. **Sentry DSN ausente em prod** — `instrumentation.ts` faz `if (!dsn) return` → Story 7.0 captura zero, debug impossível
+4. **Server Component fetch** com JWT custom claims após `security_invoker=true` corrompendo
+
+Plus: tudo o que já estava mapeado (login UX, email pt-BR, magic link estático, rotas faltantes).
 
 ---
 
@@ -242,42 +254,47 @@ Quando a Story 7.4 fechar, `.claude/rules/story-lifecycle.md` ganha **5 gates no
 
 ---
 
-## Sequenciamento sugerido (cronograma de 1 semana)
+## Sequenciamento REVISTO (escopo expandido — emergência)
 
 ```
-DIA 0 (HOJE — agora) — Story 7.0 (30min)
-  └─ Sentry capture habilitado
-  └─ Reproduzir digest 3213099672 → root cause revelado
-  └─ Hotfix se trivial; senão alimenta escopo da 7.5
+DIA 0 (AGORA) — STORIES BLOCKER em sequência ESTRITA (~3-4h):
+  ├─ 7.0.1 (15min) Configurar Sentry DSN em prod (Vercel env var) ⚡
+  │   └─ Sem isso, Story 7.0 captura zero. Pré-requisito de tudo.
+  │
+  ├─ 7.0.2 (1h) HOTFIX template.tsx + diagnóstico ⚡⚡
+  │   └─ Hipótese principal: <m.div className="contents"> quebrando rotas
+  │   └─ Plano A: simplificar template (remover m.div ou className=contents)
+  │   └─ Plano B: desabilitar template temporariamente (rename para .bak)
+  │   └─ Reproduzir após cada plano e ver se erro some
+  │
+  └─ 7.0.3 (1-2h) Boundary granular nos cards do dashboard ⚡
+      └─ Mesmo se template.tsx for o culpado, cards de dashboard devem ter
+        boundaries próprios para erro num não derrubar o resto
 
-DIA 1 — Stories 7.2 + 7.4 (paralelas, 0.5+1h)
-  ├─ 7.2 Email templates pt-BR (no Supabase Dashboard, sem deploy)
-  └─ 7.4 not-found.tsx + audit script (rápido)
+DIA 1 — Stories 7.2 + 7.4 (paralelas, 1-2h cada)
+  ├─ 7.2 Email templates pt-BR (Supabase Dashboard, sem deploy)
+  └─ 7.4 not-found.tsx + audit script
 
-DIA 2-3 — Story 7.1 (1.5 dia)
-  └─ Auth UX completo (polling, reenviar, timer, callback loading)
+DIA 1-2 — Story 7.3 (0.5 dia)
+  └─ Páginas /mais e /configuracoes
+  └─ Smoke de TODOS os links da Sidebar e BottomNav
+
+DIA 2-3 — Story 7.5 (1 dia, escopo definido pós-Sentry)
+  └─ Defensive fetch nas Server Actions
+  └─ Phase 3.5 Financial review com @finance-domain-expert
+
+DIA 3-4 — Story 7.1 (1.5 dia)
+  └─ Auth UX (polling, reenviar, timer, callback loading)
   └─ Phase 3.5 Compliance review com @compliance-br
 
-DIA 3-4 — Story 7.3 (0.5 dia)
-  └─ Páginas /mais e /configuracoes
-  └─ FAB action atualizada
-  └─ Smoke de TODOS os links
-
-DIA 4-5 — Story 7.5 (1 dia)
-  └─ Reliability backend
-  └─ Phase 3.5 Financial review com @finance-domain-expert
-  └─ Validação real ponta-a-ponta J1-J6
-
-DIA 6 — Validação manual da idealizadora (humano)
+DIA 5 — Validação manual da idealizadora (humano)
   └─ Camila refaz jornada inteira em mobile real
-  └─ Aprovação final ou abertura de Story 7.7+ se necessário
+  └─ Aprovação final ou nova rodada de issues
 
-DIA 7 — Sprint 7 fechada → considerar go-to-market
-  └─ Atualizar STATE.md
-  └─ Phase 2.6 instaurada como regra permanente
+DIA 6 — Sprint 7 fechada (Phase 2.6 instaurada) → considerar go-to-market
 ```
 
-**Total:** ~6-7 dias úteis. Story 7.6 (cosmético home) entra em paralelo com qualquer outra ou depois.
+**Total:** ~6 dias úteis. Story 7.6 (cosmético home) é opcional.
 
 ---
 
@@ -367,3 +384,45 @@ Sprint 7 fecha quando:
 **Aguardando decisão da idealizadora para iniciar.**
 
 Convocação imediata: aprovar Story 7.0 (30 min) para desbloquear debug do digest 3213099672.
+
+---
+
+## Status Final — 2026-05-02 (encerramento)
+
+🟢🟢 **EPIC-7 ENCERRADO. Sprint 7 entregue completa em jornada única.**
+
+### Stories executadas
+
+| Story | Estado | Commit | Síntese |
+|-------|--------|--------|---------|
+| 7.0 | ✅ Done | `44c315e` | `Sentry.captureException(error)` em `(app)/error.tsx` |
+| 7.0.1 | ✅ Done | `8ab06b1` | `withSentryConfig` no `next.config.ts` (source maps + tunnel `/monitoring`) |
+| 7.0.2 HOTFIX | ✅ Done | `58988d4` | Root cause identificado por inspeção estática (Sentry capture nem foi necessário): `<m.div className="contents">` em `(app)/template.tsx` (Story 6.2 AC2.7) → `display: contents` + `transform` = UB em Safari iOS / React 19 hydration. Template virou passthrough `<>{children}</>` |
+| 7.1 | ✅ Done | `0f8888f` | Login form: cooldown 60s + botão "Reenviar link" com timer pt-BR; `onResend()` reusa `signInWithOtpAction` |
+| 7.2 | ✅ Done | `0f8888f` (código) + Management API (aplicação) | `supabase/email-templates/magic-link.html` (4249 chars, identidade KEYRA) aplicado via `PATCH /v1/projects/{ref}/config/auth` (campos `mailer_subjects_magic_link` + `mailer_templates_magic_link_content`). Subject: "Seu link de acesso ao KEYRA" |
+| 7.3 | ✅ Done | `58988d4` | `/mais` (hub mobile com 9 destinos) + `/configuracoes` (org + plano + perfil + sair) |
+| 7.4 | ✅ Done | `02ec96f` | 3× `not-found.tsx` (root + `(app)/` + `global-error.tsx`) + Phase 2.6 Gate G5 via `scripts/audit-dead-links.sh` (38 rotas, 16 hrefs estáticos únicos, 0 dead links) |
+| 7.5 | ⏭️ Coberta | — | Arquitetura existente: `(app)/error.tsx` mantém AppShell (layout pai persistente). Falha de rota não derruba sidebar/bottom nav. Sem código novo necessário. |
+| 7.6 | ⏸️ Deferido | — | Home cleanup cosmético — fora da Sprint 7. |
+
+### Hardening pós-deploy (3 dependências não-código fechadas)
+
+1. **Sentry production capture** — após corrigir 3 erros simultâneos nas Vercel envs (slug invertido `SENTRY_ORG`/`SENTRY_PROJECT`, trailing newline, token formato legado de 32-hex chars retornando 401), Sentry plugin opera limpo. Token novo `sntrys_*` validado contra `POST /api/0/organizations/seal-digital/releases/` (HTTP 201) **antes** de provisionar. Source maps subindo automaticamente em build (release `1cfb1773` com 230+ uploads e debug IDs).
+2. **Supabase magic-link em pt-BR** — aplicado via Management API. Daqui pra frente magic link de login chega com identidade KEYRA. Templates HTML versionados em `supabase/email-templates/` como fonte canônica.
+3. **Repo `luizxhgomes/keyra` ↔ Sentry GitHub integration** — verificado já ativo: `GET /api/0/organizations/seal-digital/repos/` retorna `id=5314448 status=active provider=integrations:github`. Stacktrace agora linka código fonte ↔ commit no GitHub.
+
+### Phase 2.6 instaurada (parcial)
+
+- ✅ **G5 Dead Link Audit** — `scripts/audit-dead-links.sh` (encontraria `/mais` e `/configuracoes` ANTES da regressão Sprint 6).
+- 🔮 **G6-G10** ficam para instauração quando próxima oportunidade aparecer — estrutura defensiva já é fornecida pela arquitetura `(app)/error.tsx`.
+
+### Lições registradas como memory permanente
+
+- `feedback_validate_creds_before_provisioning.md` — nunca aceitar credenciais coladas no chat sem testar via API antes de provisionar. Custo de 1 curl < custo de 4 redeploys.
+- `feedback_no_time_metrics.md` (já existia) — reforçada nesta sessão: planejamento por jornadas/fases/ações, nunca por tempo.
+
+### Critério de fechamento oficial pendente
+
+Validação manual em mobile real (Safari iOS) da idealizadora confirmando que `/dashboard`, `/agenda`, `/pacientes`, `/financeiro`, `/comandas`, `/servicos`, `/estoque`, `/team`, `/mais`, `/configuracoes` carregam **sem** o digest `3213099672` e a operação de criar agendamento funciona ponta-a-ponta.
+
+Sentry serve como **rede de segurança contínua** após esse aceite — qualquer regressão futura ou bug em outro browser chega no dashboard com stacktrace de-minified.

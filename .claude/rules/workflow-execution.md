@@ -31,6 +31,13 @@ Uma task validada é lei: deve ser executada conforme configurada, com todas as 
 - **CodeRabbit:** Self-healing max 2 iterations
 - **Status:** Ready → InProgress
 
+#### Phase 3.5: Specialist Gates (Conditional — KEYRA only)
+- **Triggered by story scope, not always required.**
+- **Financial gate:** `@finance-domain-expert *review-financial-logic` — for stories touching `transactions`, `dre`, `services.price/cost`, `payments`, margin/profit formulas.
+- **Compliance gate:** `@compliance-br *lgpd-audit` — for stories touching personal data (CPF, phone, email), uploads, paid integrations.
+- **Growth gate:** `@growth-product *review-growth` — for stories touching paywall, feature gating, tiers, onboarding, billing.
+- **Output:** Specialist verdict appended to story Change Log; blocks @qa gate if FAIL.
+
 #### Phase 4: QA Gate (@qa)
 - **Task:** `qa-gate.md`
 - **7 quality checks** (see `story-lifecycle.md`)
@@ -139,6 +146,24 @@ Every statement in spec.md MUST trace to FR-*, NFR-*, CON-*, or research finding
 
 ---
 
+### 5. Squad Workflows — KEYRA-SPECIFIC PRE-CONFIGURED
+
+**5 squads em `squads/` agregam agentes + tasks + workflows + templates. Disparar via `@aiox-master *workflow {nome}`.**
+
+| Squad | Workflow YAML | Phase | Trigger |
+|-------|--------------|-------|---------|
+| `squad-keyra-bootstrap` | `keyra-fase-0` | Phase 0 (planning) | New project bootstrap (already done — reference only) |
+| `squad-keyra-core` | `keyra-sdc-com-gate-financeiro` | Phases 2-4 (MVP) | Refactors of catalog/agenda/financial-automation/dashboard |
+| `squad-keyra-integrations` | `keyra-integracoes-spec-sdc` | Phase 7 | Asaas/PIX, WhatsApp, NFS-e, OCR of statements |
+| `squad-keyra-intelligence` | `keyra-inteligencia-spec-sdc` | Phases 5-6 | Pricing engine, projections, what-if, scenarios |
+| `deep-research` | `deep-research-pipeline` + `strategic-research-pipeline` | Generic | Competitive research, benchmarking, reverse-engineering |
+
+**Squad workflows extend SDC** with mandatory specialist gates baked in (e.g., `keyra-sdc-com-gate-financeiro` requires `@finance-domain-expert` review on every story).
+
+**Catálogo:** `.claude/CLAUDE.md` §Squads + READMEs em `squads/{squad-name}/README.md`.
+
+---
+
 ## Workflow Selection Guide
 
 | Situation | Workflow |
@@ -148,3 +173,7 @@ Every statement in spec.md MUST trace to FR-*, NFR-*, CON-*, or research finding
 | Complex feature needs spec | Spec Pipeline → then SDC |
 | Joining existing project | Brownfield Discovery |
 | Simple bug fix | SDC only (YOLO mode) |
+| KEYRA financial story (DRE/preço/margem) | SDC + Phase 3.5 financial gate, ou squad workflow `keyra-sdc-com-gate-financeiro` |
+| KEYRA Phase 7 (Asaas/WhatsApp/NFS-e) | Squad workflow `keyra-integracoes-spec-sdc` |
+| KEYRA Phases 5-6 (intelligence) | Squad workflow `keyra-inteligencia-spec-sdc` |
+| Competitive/strategic research | Deep-research squad (`/deep-research:research-lead *benchmark` ou `*reverse-engineer`) |

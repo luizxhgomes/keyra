@@ -44,6 +44,9 @@ build/
 *.log
 logs/
 
+# Skill artifacts (design-system-md extractions, etc.)
+outputs/
+
 # IDE & OS (AIOX)
 .DS_Store
 Thumbs.db

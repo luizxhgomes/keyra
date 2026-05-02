@@ -75,6 +75,43 @@
 | Framework governance | Constitutional enforcement |
 | Override agent boundaries | When necessary for framework health |
 
+### @finance-domain-expert (Valéria) — Financial Domain Authority (KEYRA)
+
+| Owns | Gate Trigger |
+|------|--------------|
+| DRE structure validation | Stories touching `transactions`, `dre`, `services.price/cost`, `payments` |
+| Pricing logic & margin formulas | Any pricing engine, packages, margin computation |
+| Cost structure (fixed/variable) | Stories on cost allocation, breakeven, profit-per-service |
+| Financial code review (`*review-financial-logic`) | Mandatory before @qa gate on financial stories |
+
+### @document-processor (Íris) — Document Parsing Authority (KEYRA)
+
+| Owns | Used By |
+|------|---------|
+| OCR pipeline design | squad-keyra-integrations (Phase 7) |
+| Bank statement parsers (OFX/CSV/PDF) | Asaas reconciliation |
+| Card machine statement parsers (Cielo/Rede/Stone) | Card payment reconciliation |
+| Reconciliation flow design | Cross-system payment matching |
+
+### @compliance-br (Têmis) — Compliance Authority (KEYRA)
+
+| Owns | Gate Trigger |
+|------|--------------|
+| LGPD audit (`*lgpd-audit`) | Stories touching personal data (CPF, phone, email) |
+| Tax rules (MEI/Simples/Lucro Presumido) | Pricing/billing/invoicing stories |
+| NFS-e integration spec | Invoice emission stories |
+| PII inventory & retention policy | Data lifecycle stories |
+| Tenant isolation validation | Multi-tenant stories |
+
+### @growth-product (Gaia) — Growth & Monetization Authority (KEYRA)
+
+| Owns | Gate Trigger |
+|------|--------------|
+| Pricing tiers & feature matrix | Tier definition, paywall stories |
+| Onboarding flow design | First-run experience, activation stories |
+| Conversion funnel & growth metrics | Analytics, upgrade-trigger stories |
+| Growth code review (`*review-growth`) | Mandatory before @qa gate on monetization stories |
+
 ## Cross-Agent Delegation Patterns
 
 ### Git Push Flow
@@ -87,15 +124,30 @@ ANY agent → @devops *push
 @architect (decides technology) → @data-engineer (implements DDL)
 ```
 
-### Story Flow
+### Story Flow (default)
 ```
 @sm *draft → @po *validate → @dev *develop → @qa *qa-gate → @devops *push
+```
+
+### Story Flow (com gates especialistas KEYRA)
+```
+@sm *draft → @po *validate → @dev *develop
+  → [gate financeiro: @finance-domain-expert *review-financial-logic] (se story toca DRE/preço/margem)
+  → [gate compliance: @compliance-br *lgpd-audit] (se story toca dados sensíveis/integrações pagas)
+  → [gate growth: @growth-product *review-growth] (se story toca paywall/tiers/onboarding)
+  → @qa *qa-gate → @devops *push
 ```
 
 ### Epic Flow
 ```
 @pm *create-epic → @pm *execute-epic → @sm *draft (per story)
 ```
+
+### Squad Flow (workflows pré-configurados em `squads/`)
+```
+@aiox-master *workflow {nome-do-workflow}
+```
+Workflows disponíveis: `keyra-fase-0` (bootstrap) · `keyra-sdc-com-gate-financeiro` (core) · `keyra-integracoes-spec-sdc` (Phase 7) · `keyra-inteligencia-spec-sdc` (Phases 5-6) · `deep-research-pipeline` · `strategic-research-pipeline`. Catálogo completo em `.claude/CLAUDE.md` §Squads.
 
 ## Escalation Rules
 

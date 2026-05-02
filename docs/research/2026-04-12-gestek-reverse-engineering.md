@@ -1,4 +1,6 @@
-# Engenharia Reversa: Gestek - Sistema de Gestão para Clínicas Estéticas
+![
+    
+](image.png)# Engenharia Reversa: Gestek - Sistema de Gestão para Clínicas Estéticas
 
 **Data:** 2026-04-12
 **Pipeline:** Deep Research > Reverse Engineering + Benchmark

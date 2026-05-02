@@ -21,6 +21,8 @@ import {
   type AgendaPickerService,
   type AgendaProfessional,
 } from './actions';
+import { AlertCard } from '@/components/keyra';
+
 import { AgendaToolbar, type AgendaView } from './agenda-toolbar';
 import { AgendamentoForm } from './agendamento-form';
 import { EventDetailSheet } from './event-detail-sheet';
@@ -194,13 +196,14 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
       />
 
       {truncated ? (
-        <div
-          role="status"
-          className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
-        >
-          Mais de 200 agendamentos neste período. Refine o filtro de profissional
-          ou diminua a faixa de datas para ver todos.
-        </div>
+        // Story 6.0 (AC4) — fonte única de "warning visual" via AlertCard.
+        // Substitui banner inline cru `border-amber-300 bg-amber-50` que
+        // duplicava a linguagem do <AlertCard severity="warning">.
+        <AlertCard
+          severity="warning"
+          title="Período com muitos agendamentos"
+          subtitle="Mais de 200 eventos neste intervalo. Refine o filtro de profissional ou diminua a faixa de datas para ver todos."
+        />
       ) : null}
 
       <div className="flex-1 overflow-x-auto rounded-lg border border-border bg-card p-2">

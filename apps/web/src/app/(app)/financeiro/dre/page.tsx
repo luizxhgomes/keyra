@@ -4,6 +4,18 @@ import { formatBRL } from '@/lib/money';
 
 import { getDreMonthly, type DreLine } from '../actions';
 
+/**
+ * DRE — Demonstrativo do Resultado do Exercício.
+ *
+ * **Coluna "% sobre receita" (Story 6.0 / decisão da idealizadora):**
+ * mantida como **ratio analítico** (peso de cada conta sobre receita bruta),
+ * não como **comparativo de variação**. Princípio inegociável KEYRA "sem
+ * percentual" aplica-se a comparativos (variação vs período anterior),
+ * não a ratios (composição estrutural). Por isso a coluna `vs {period}`
+ * usa `<ComparativoTexto>` com valores absolutos enquanto `% sobre receita`
+ * permanece percentual — duas dimensões diferentes de análise.
+ */
+
 type PageProps = {
   searchParams: Promise<{ month?: string }>;
 };

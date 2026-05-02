@@ -80,11 +80,14 @@ export function AlertCard({
         <p className="text-sm font-medium text-foreground">{title}</p>
         {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
         {(action || secondaryAction) && (
-          <div className="mt-1 flex flex-wrap items-center gap-3">
+          // Story 6.0 (AC3) — touch target AA 44×44px no Link e button.
+          // `min-h-[44px]` garante altura clicável; `-mx-2 px-2` no button
+          // compensa o padding sem empurrar layout.
+          <div className="mt-1 flex flex-wrap items-center gap-2">
             {action && (
               <Link
                 href={action.href}
-                className="inline-flex w-fit text-sm font-medium text-primary hover:underline"
+                className="inline-flex min-h-[44px] w-fit items-center text-sm font-medium text-primary hover:underline"
               >
                 {action.label} →
               </Link>
@@ -93,7 +96,7 @@ export function AlertCard({
               <button
                 type="button"
                 onClick={secondaryAction.onClick}
-                className="inline-flex w-fit text-sm text-muted-foreground hover:text-foreground"
+                className="-mx-2 inline-flex min-h-[44px] w-fit items-center px-2 text-sm text-muted-foreground hover:text-foreground"
               >
                 {secondaryAction.label}
               </button>

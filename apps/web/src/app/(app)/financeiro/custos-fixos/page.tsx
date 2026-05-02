@@ -212,7 +212,7 @@ function SummaryCell({
       <p
         className={`text-xl font-semibold tabular-nums ${
           positive === true
-            ? 'text-emerald-700'
+            ? 'text-lucro'
             : positive === false
               ? 'text-destructive'
               : ''

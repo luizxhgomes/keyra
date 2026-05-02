@@ -96,7 +96,7 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
                       </td>
                       <td
                         className={`py-stack-loose text-right tabular-nums font-semibold ${
-                          r.gross_profit >= 0 ? 'text-emerald-700' : 'text-destructive'
+                          r.gross_profit >= 0 ? 'text-lucro' : 'text-destructive'
                         }`}
                       >
                         {formatBRL(r.gross_profit)}
@@ -115,7 +115,7 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
                     <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                       {formatBRL(totals.commission)}
                     </td>
-                    <td className="py-stack-loose text-right tabular-nums text-emerald-700">
+                    <td className="py-stack-loose text-right tabular-nums text-lucro">
                       {formatBRL(totals.profit)}
                     </td>
                   </tr>

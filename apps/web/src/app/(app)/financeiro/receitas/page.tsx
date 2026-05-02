@@ -178,7 +178,7 @@ function SummaryCell({
       <p className="text-label uppercase text-muted-foreground">{label}</p>
       <p
         className={`text-xl font-semibold tabular-nums ${
-          positive ? 'text-emerald-700' : ''
+          positive ? 'text-lucro' : ''
         }`}
       >
         {value}

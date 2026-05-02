@@ -26,7 +26,9 @@ export function ErrorMessage({
     <div
       role="alert"
       className={cn(
-        'flex items-start gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-card-y',
+        // Story 6.0 (AC5/#5) — `px-card-x py-card-y` alinha com Card/KPICard;
+        // antes era `p-card-y` (vertical aplicado em todos os lados — semanticamente errado).
+        'flex items-start gap-3 rounded-md border border-destructive/30 bg-destructive/5 px-card-x py-card-y',
         className,
       )}
     >

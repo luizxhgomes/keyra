@@ -97,7 +97,7 @@ export default async function MovimentacoesPage({ searchParams }: PageProps) {
                       />
                       <span
                         className={`text-sm font-semibold tabular-nums ${
-                          isNegative ? 'text-destructive' : 'text-emerald-700'
+                          isNegative ? 'text-destructive' : 'text-lucro'
                         }`}
                       >
                         {isNegative ? '' : '+'}

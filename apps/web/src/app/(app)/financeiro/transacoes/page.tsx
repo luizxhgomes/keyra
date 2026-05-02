@@ -222,7 +222,7 @@ export default async function TransacoesPage({ searchParams }: PageProps) {
                   <div className="text-right shrink-0">
                     <p
                       className={`text-sm font-semibold tabular-nums ${
-                        r.direction === 'credit' ? 'text-emerald-700' : 'text-destructive'
+                        r.direction === 'credit' ? 'text-lucro' : 'text-destructive'
                       }`}
                     >
                       {r.direction === 'credit' ? '+' : '-'}
@@ -289,7 +289,7 @@ function SummaryCell({
       <p
         className={`text-xl font-semibold tabular-nums ${
           positive === true
-            ? 'text-emerald-700'
+            ? 'text-lucro'
             : positive === false
               ? 'text-destructive'
               : ''

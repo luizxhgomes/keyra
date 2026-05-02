@@ -154,7 +154,7 @@ export default async function FluxoCaixaPage({ searchParams }: PageProps) {
                       <td className="py-2 pr-3">
                         {format(new Date(d.day), "d 'de' MMM", { locale: ptBR })}
                       </td>
-                      <td className="py-2 pr-3 text-right tabular-nums text-emerald-700">
+                      <td className="py-2 pr-3 text-right tabular-nums text-lucro">
                         {d.inflow > 0 ? `+${formatBRL(d.inflow)}` : '—'}
                       </td>
                       <td className="py-2 pr-3 text-right tabular-nums text-destructive">
@@ -162,7 +162,7 @@ export default async function FluxoCaixaPage({ searchParams }: PageProps) {
                       </td>
                       <td
                         className={`py-2 pr-3 text-right tabular-nums font-medium ${
-                          d.net >= 0 ? 'text-emerald-700' : 'text-destructive'
+                          d.net >= 0 ? 'text-lucro' : 'text-destructive'
                         }`}
                       >
                         {d.net >= 0 ? '+' : ''}
@@ -181,7 +181,7 @@ export default async function FluxoCaixaPage({ searchParams }: PageProps) {
                 <tfoot>
                   <tr className="bg-muted/50">
                     <td className="py-2 pr-3 font-semibold">Total no período</td>
-                    <td className="py-2 pr-3 text-right tabular-nums font-semibold text-emerald-700">
+                    <td className="py-2 pr-3 text-right tabular-nums font-semibold text-lucro">
                       +{formatBRL(inflowTotal)}
                     </td>
                     <td className="py-2 pr-3 text-right tabular-nums font-semibold text-destructive">
@@ -242,7 +242,7 @@ function SummaryCell({
       <p
         className={`text-xl font-semibold tabular-nums ${
           positive === true
-            ? 'text-emerald-700'
+            ? 'text-lucro'
             : positive === false
               ? 'text-destructive'
               : ''

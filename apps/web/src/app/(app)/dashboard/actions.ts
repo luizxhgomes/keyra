@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { AuthorizationError, requireRole } from '@/lib/auth/roles';
 import { createServerClient } from '@/lib/supabase/server';
+import { formatBRL } from '@/lib/money';
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -385,22 +386,27 @@ export async function getActiveAlerts(): Promise<ActionResult<Alert[]>> {
     const revenueCur = Number(dreCurRes.data?.revenue_net ?? 0);
 
     if (profitLast > 0 && profitCur < profitLast * 0.8) {
+      // Story 6.0 (AC1) — princípio inegociável: descriptions em valores
+      // absolutos, threshold em % apenas no gatilho.
       const dropPct = ((profitLast - profitCur) / profitLast) * 100;
+      const absoluteDrop = profitLast - profitCur;
       alerts.push({
         id: 'profit-drop',
         severity: dropPct > 20 ? 'critical' : 'warning',
         title: 'Queda de lucro',
-        description: `Lucro do mês está ${dropPct.toFixed(0)}% abaixo do mês passado.`,
+        description: `Lucro está ${formatBRL(absoluteDrop)} a menos que mês passado.`,
         href: '/financeiro/dre',
       });
     }
 
     if (revenueCur > 0 && profitCur / revenueCur < 0.15) {
+      // Story 6.0 (AC1) — abaixo de 15% é threshold; copy mostra valores
+      // absolutos de lucro e receita para Camila enxergar a relação real.
       alerts.push({
         id: 'low-margin',
         severity: 'warning',
         title: 'Margem baixa',
-        description: `Margem do mês está abaixo de 15% (${((profitCur / revenueCur) * 100).toFixed(1)}%).`,
+        description: `Lucro de ${formatBRL(profitCur)} sobre receita de ${formatBRL(revenueCur)} — abaixo do nível saudável de 15%.`,
         href: '/financeiro/dre-por-servico',
       });
     }
@@ -412,11 +418,13 @@ export async function getActiveAlerts(): Promise<ActionResult<Alert[]>> {
       ).length;
       const rate = negatives / apptArr.length;
       if (rate > 0.25) {
+        // Story 6.0 (AC1) — contagem absoluta `${negatives} de ${total}`
+        // substitui a percentagem que violava o princípio inegociável.
         alerts.push({
           id: 'high-noshow',
           severity: 'warning',
           title: 'Alta taxa de faltas',
-          description: `${(rate * 100).toFixed(0)}% dos agendamentos do mês foram falta ou cancelamento.`,
+          description: `${negatives} de ${apptArr.length} agendamentos do mês foram falta ou cancelamento.`,
           href: '/agenda',
         });
       }

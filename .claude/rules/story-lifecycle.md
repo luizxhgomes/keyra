@@ -47,6 +47,84 @@ Draft → Ready → InProgress → InReview → Done
 
 **Decision:** GO (≥7/10) or NO-GO (<7/10 with required fixes)
 
+## Phase 2.5: Anti-Regression Gates (KEYRA — Story 6.0+)
+
+**Origem:** Story 6.0 (2026-05-02) — auditoria `@baziotti` `docs/ux/audit-2026-05-02-pre-motion.md` identificou 4 issues HIGH (regressões e furos sistêmicos) cuja raiz comum era **falta de gates automáticos cross-cutting** durante o draft das stories. Esta phase instaura prevenção permanente.
+
+Antes de qualquer story sair de `Ready` para `InProgress`, o `@sm` (durante draft) ou `@dev` (no início da implementação) executa 4 gates automáticos baseados no escopo da story. **Gate failure NUNCA é silencioso** — se passou, é porque foi rodado e zerado.
+
+### G1 — Princípios inegociáveis (KEYRA)
+
+**Trigger:** Story toca copy, alertas, dashboard, comparativos, ou qualquer texto visível à persona.
+
+**Verificação (greps automáticos antes da implementação):**
+
+```bash
+grep -rEn '\.toFixed\([0-9]+\)%|\* 100\)\.toFixed' apps/web/src/app
+```
+
+- **Esperado:** 0 matches novos em copy de alertas/labels/comparativos.
+- **Exceção válida:** ratios analíticos (ex.: coluna `% sobre receita` no DRE — decisão registrada da idealizadora). Story explicita a exceção.
+- **Auditoria manual:** copy passa pelo princípio "números absolutos, sem percentual" (CON-UX-01)?
+
+### G2 — Inventário de tokens
+
+**Trigger:** Story toca cor, spacing, tipografia, ou qualquer token semântico do design system.
+
+**Verificação (ANTES de escrever os ACs, rodar grep no codebase inteiro):**
+
+```bash
+# Exemplo: migrar `text-emerald-700` → `text-lucro`
+grep -rn 'text-emerald-700' apps/web/src
+```
+
+- Story lista TODAS as ocorrências do padrão antigo.
+- Story explicita: sweep **completo** (todas as ocorrências) ou **parcial** (subset com justificativa explícita).
+- Sweep parcial requer documento "Out of Scope" listando o que fica de fora e por quê (ex.: badge categórico vs valor financeiro).
+
+### G3 — Touch target AA (44×44 mínimo)
+
+**Trigger:** Story cria componente clicável novo (button, link, card-clicável, secondaryAction, etc.).
+
+**Verificação:**
+
+- Componente cumpre `min-h-[44px]` AA do W3C/Apple HIG **OU** tem **waiver explícito da idealizadora** documentado no Change Log da story.
+- **"Decisão deliberada para reduzir proeminência" NÃO é razão suficiente** sem ancoragem em pesquisa (Apple HIG, Material, NN/g) ou validação direta com a persona. Hierarquia de proeminência é alcançada por cor/contraste/posição, não por reduzir área clicável.
+- Greps de validação:
+
+```bash
+grep -rn 'min-h-\[44px\]' apps/web/src/components/keyra
+grep -rn '<button\|<Link' {arquivo-novo}
+```
+
+### G4 — Fonte única real
+
+**Trigger:** Story diz "X é fonte única" (ex.: AlertCard como fonte única de warning visual; tokens de spacing como fonte única de padding em Card).
+
+**Verificação:** Grep do padrão antigo em **TODO codebase**, não só no arquivo refatorado:
+
+```bash
+# Exemplo: AlertCard fonte única → buscar alertas inline crus
+grep -rEn 'bg-(amber|red|yellow)-(50|100)' apps/web/src/app
+```
+
+- Se a story consolida em `<X>`, todas as ocorrências do padrão antigo migram **OU** ficam explicitamente fora de escopo no documento.
+- "Refatoramos só o `AlertasCard`" não é fonte única — é refatoração local. Fonte única exige sweep total.
+
+### Gate Failure — protocolo
+
+Se qualquer gate falhar durante draft (`@sm`) ou validação (`@po`):
+
+1. **Expandir escopo** da story para cobrir o gap, **OU**
+2. **Criar story irmã imediata** para fechar o gap antes da próxima entrega, **OU**
+3. **Registrar waiver explícito** no Change Log com justificativa concreta (não tácita).
+
+A 3ª opção (waiver) requer aprovação do `@po` e justificativa que não seja racionalização — exemplo válido: "issue #6 (Badge `Top` em DRE-por-servico) preservado porque é badge categórico, não valor financeiro; criar `StatusBadge` semântico próprio é story futura". Exemplo inválido: "secondaryAction deve ser menos proeminente" (sem ancoragem).
+
+### Aplicação retroativa
+
+Gates valem para stories **abertas a partir da Story 6.0**. Stories Done não são revisitadas — auditoria periódica (como a `@baziotti` pre-motion) é o mecanismo para detectar regressões em código já mergeado.
+
 ## Phase 3: Implement (@dev)
 
 **Task:** `dev-develop-story.md`
@@ -79,6 +157,32 @@ while CRITICAL issues found AND iteration < 2:
 if CRITICAL persist after 2 iterations:
   HALT — manual intervention required
 ```
+
+## Phase 3.5: Specialist Gates (Conditional — KEYRA only)
+
+**Triggered by story scope, not every story.** When triggered, gate runs between Phase 3 (@dev complete) and Phase 4 (@qa).
+
+| Gate | Agent | Command | Trigger Conditions (story scope) |
+|------|-------|---------|----------------------------------|
+| Financial | `@finance-domain-expert` (Valéria) | `*review-financial-logic` | Story touches `transactions`, `dre`, `services.price`, `services.cost`, `payments`, margin/profit formulas, DRE per service |
+| Compliance | `@compliance-br` (Têmis) | `*lgpd-audit` | Story touches personal data (CPF, phone, email), uploads of bank/card statements, paid integrations (Asaas, WhatsApp Business), NFS-e |
+| Growth | `@growth-product` (Gaia) | `*review-growth` | Story touches paywall, feature gating, pricing tiers, onboarding flow, billing, upgrade triggers |
+
+### Gate Verdicts
+
+| Verdict | Action |
+|---------|--------|
+| APPROVE | Append entry to story Change Log; proceed to Phase 4 (QA gate) |
+| CONCERNS | Document in story Change Log; proceed to Phase 4 (QA inherits concerns) |
+| REJECT | Return to @dev with structured feedback; do NOT proceed to @qa |
+
+### Multiple Gates
+
+If multiple gates trigger (e.g., a paywall story that touches `payments`), **all gates must pass before @qa**. Order is not strict — run in any sequence.
+
+### Squad Workflows (alternative)
+
+Squad-specific workflows (e.g., `keyra-sdc-com-gate-financeiro` in `squads/squad-keyra-core/workflows/`) bake specialist gates into the workflow definition itself, removing the conditional check.
 
 ## Phase 4: QA Gate (@qa)
 

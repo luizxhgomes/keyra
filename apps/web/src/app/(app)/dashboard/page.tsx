@@ -16,6 +16,19 @@ import { MetaCard } from './meta-card';
  * absoluto vs mês passado (Story 4.7). Slots para 4.5-4.9 ficam como
  * placeholders enquanto stories irmãs não chegam — mantêm a estrutura
  * viva sem bloquear esta entrega.
+ *
+ * **Ordem dos elementos (Story 6.0 / decisão da idealizadora):**
+ * 1. KPIs hero (Receita realizada, Receita prevista, Despesas, Lucro) —
+ *    indicadores agregados que comunicam saúde do mês em 1 olhada.
+ * 2. AlertasCard — sinais que merecem atenção; aparece com empty state
+ *    positivo quando não há alertas (Story 5.7).
+ * 3. Grid 2 cols: AgendaHojeCard + IndicadoresCard — segundo nível de
+ *    leitura, detalhamento operacional do dia.
+ * 4. MetaCard — progressão da meta do mês.
+ *
+ * AgendaHojeCard é **lista detalhada** (horários do dia), não **KPI agregado**
+ * (número absoluto único). Por isso fica abaixo dos KPIs hero. Decisão
+ * registrada após auditoria `@baziotti` 2026-05-02 questionar a ordem.
  */
 export default async function DashboardPage() {
   const result = await getDashboardKpis();

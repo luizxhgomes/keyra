@@ -101,7 +101,7 @@ function ProgressRow({
       {delta !== null ? (
         <p
           className={`text-xs tabular-nums ${
-            reached ? 'text-emerald-700' : 'text-muted-foreground'
+            reached ? 'text-lucro' : 'text-muted-foreground'
           }`}
         >
           {reached

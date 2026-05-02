@@ -1,4 +1,4 @@
-import { Award, AlertTriangle, PieChart, TrendingDown } from 'lucide-react';
+import { Award, AlertTriangle, Coins, TrendingDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,7 +61,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
         <CardContent>
           {rows.length === 0 ? (
             <EmptyState
-              icon={PieChart}
+              icon={Coins}
               title="Sem comandas pagas no período"
               description="O lucro de cada serviço aparece aqui depois que você marca atendimentos como concluídos e registra os pagamentos."
             />
@@ -126,7 +126,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                         </td>
                         <td
                           className={`py-stack-loose pr-3 text-right tabular-nums font-semibold ${
-                            r.gross_profit >= 0 ? 'text-emerald-700' : 'text-destructive'
+                            r.gross_profit >= 0 ? 'text-lucro' : 'text-destructive'
                           }`}
                         >
                           {formatBRL(r.gross_profit)}
@@ -155,7 +155,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                     </td>
                     <td
                       className={`py-stack-loose pr-3 text-right tabular-nums ${
-                        totals.profit >= 0 ? 'text-emerald-700' : 'text-destructive'
+                        totals.profit >= 0 ? 'text-lucro' : 'text-destructive'
                       }`}
                     >
                       {formatBRL(totals.profit)}

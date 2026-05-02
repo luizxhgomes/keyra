@@ -56,11 +56,11 @@ export default async function ComandasPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-display">Comandas</h1>
+        <h1 className="text-display">Serviços</h1>
         <p className="text-sm text-muted-foreground">
-          {total} {total === 1 ? 'comanda' : 'comandas'}
+          {total} {total === 1 ? 'atendimento' : 'atendimentos'}
           {statusParam !== 'all' ? ` · filtro: ${STATUS_LABEL[statusParam]}` : ''}.
-          Comandas nascem automaticamente ao concluir um atendimento.
+          Os serviços nascem automaticamente ao concluir um atendimento na agenda.
         </p>
       </header>
 

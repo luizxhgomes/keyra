@@ -9,7 +9,7 @@ export default async function NovoPacientePage() {
   return (
     <div className="max-w-3xl space-y-6">
       <header>
-        <h1 className="text-display">Novo paciente</h1>
+        <h1 className="text-display">Novo cliente</h1>
         <p className="text-sm text-muted-foreground">Preencha os dados para cadastrar.</p>
       </header>
 
@@ -19,7 +19,7 @@ export default async function NovoPacientePage() {
           <CardDescription>Apenas o nome é obrigatório.</CardDescription>
         </CardHeader>
         <CardContent>
-          <PacienteForm submitLabel="Cadastrar paciente" />
+          <PacienteForm submitLabel="Cadastrar cliente" />
         </CardContent>
       </Card>
     </div>

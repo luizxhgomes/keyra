@@ -94,7 +94,6 @@ export default async function DashboardPage() {
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         <KPICard
-          variant="hero"
           label="Receita realizada"
           value={k.revenueMtdCents}
           {...(revenueComp ? { comparison: revenueComp } : {})}

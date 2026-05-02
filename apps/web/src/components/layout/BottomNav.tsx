@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 const ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agenda', label: 'Agenda', icon: Calendar },
-  { href: '/pacientes', label: 'Pacientes', icon: Users },
+  { href: '/pacientes', label: 'Clientes', icon: Users },
   { href: '/mais', label: 'Mais', icon: MoreHorizontal },
 ] as const;
 
@@ -32,10 +32,10 @@ const ITEMS = [
 export function getFabAction(pathname: string | null): { href: string; label: string } {
   if (!pathname) return { href: '/agenda?novo=1', label: 'Criar novo agendamento' };
   if (pathname.startsWith('/pacientes')) {
-    return { href: '/pacientes/novo', label: 'Cadastrar novo paciente' };
+    return { href: '/pacientes/novo', label: 'Cadastrar novo cliente' };
   }
   if (pathname.startsWith('/servicos')) {
-    return { href: '/servicos/novo', label: 'Cadastrar novo serviço' };
+    return { href: '/servicos/novo', label: 'Cadastrar novo serviço no catálogo' };
   }
   if (pathname.startsWith('/financeiro/despesas')) {
     return { href: '/financeiro/despesas/nova', label: 'Cadastrar nova despesa' };

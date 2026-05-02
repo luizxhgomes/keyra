@@ -111,6 +111,36 @@ grep -rEn 'bg-(amber|red|yellow)-(50|100)' apps/web/src/app
 - Se a story consolida em `<X>`, todas as ocorrências do padrão antigo migram **OU** ficam explicitamente fora de escopo no documento.
 - "Refatoramos só o `AlertasCard`" não é fonte única — é refatoração local. Fonte única exige sweep total.
 
+### G5 — RSC Boundary Audit (instaurado 2026-05-02)
+
+**Trigger:** Story toca **qualquer um** dos itens abaixo:
+
+- `apps/web/src/app/(app)/**` (rotas autenticadas)
+- `'use client'` boundary (qualquer adição/remoção)
+- `apps/web/src/components/keyra/**` ou `components/ui/**`
+- `apps/web/src/lib/hooks/**`
+- `apps/web/src/lib/motion/**`
+- Server Action que retorna dados consumidos por componente Client
+
+**Verificação automatizada:**
+
+```bash
+./scripts/check-rsc-boundaries.sh
+```
+
+Roda em CI (workflow `rls-tests.yml` job `rsc-audit`) — PR não merge se falhar.
+
+**Verificação manual obrigatória:** ler `docs/dev/rsc-boundary-rules.md` (4 regras + checklist de PR) antes de marcar story Done.
+
+**4 regras inegociáveis:**
+
+1. Nunca passar `forwardRef` (Lucide, Card, Button) como prop Server→Client
+2. Client Component não pode importar Server Component
+3. `useSyncExternalStore` proibido — usar `useState + useEffect + queueMicrotask`
+4. Build verde NÃO é funcional — smoke real da idealizadora em mobile é critério de Done
+
+**Origem:** sessão 2026-05-02 onde Dashboard quebrou em produção por mais de 1h apesar de Sprints 5/6/7 terem fechado "Done" com deploys READY. Bugs não foram pegos por TypeScript, ESLint, build ou QA gate.
+
 ### Gate Failure — protocolo
 
 Se qualquer gate falhar durante draft (`@sm`) ou validação (`@po`):

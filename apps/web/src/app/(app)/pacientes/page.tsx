@@ -65,15 +65,15 @@ export default async function PacientesPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-display">Pacientes</h1>
+          <h1 className="text-display">Clientes</h1>
           <p className="text-sm text-muted-foreground">
-            {count ?? 0} {count === 1 ? 'paciente' : 'pacientes'}
+            {count ?? 0} {count === 1 ? 'cliente' : 'clientes'}
             {showArchived ? ' (incluindo arquivados)' : ''}
           </p>
         </div>
         <Link href="/pacientes/novo">
           <Button>
-            <Plus className="mr-2 h-4 w-4" /> Novo paciente
+            <Plus className="mr-2 h-4 w-4" /> Novo cliente
           </Button>
         </Link>
       </header>
@@ -119,15 +119,15 @@ export default async function PacientesPage({ searchParams }: PageProps) {
               <EmptyState
                 icon={Search}
                 title="Nada por aqui"
-                description={`Nenhum paciente encontrado para "${q}". Tente outro termo ou limpe a busca.`}
+                description={`Nenhum cliente encontrado para "${q}". Tente outro termo ou limpe a busca.`}
               />
             ) : (
               <EmptyState
                 icon={Users}
-                title="Você ainda não tem pacientes"
+                title="Você ainda não tem clientes"
                 description="Cadastre quem atende você para ver histórico, ticket médio e LTV de cada cliente."
                 action={{
-                  label: 'Cadastrar paciente',
+                  label: 'Cadastrar cliente',
                   href: '/pacientes/novo',
                 }}
               />

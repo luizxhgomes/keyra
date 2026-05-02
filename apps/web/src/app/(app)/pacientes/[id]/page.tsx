@@ -47,7 +47,7 @@ export default async function PacienteEditarPage({ params }: PageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Dados do paciente</CardTitle>
+          <CardTitle>Dados do cliente</CardTitle>
           <CardDescription>As mudanças são salvas imediatamente ao clicar em Salvar.</CardDescription>
         </CardHeader>
         <CardContent>

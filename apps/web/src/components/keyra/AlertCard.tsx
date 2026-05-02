@@ -17,7 +17,6 @@ import { cn } from '@/lib/utils';
  */
 export interface AlertCardProps {
   severity: 'warning' | 'info' | 'critical';
-  icon?: LucideIcon;
   title: string;
   subtitle?: string;
   action?: { label: string; href: string };
@@ -29,6 +28,11 @@ export interface AlertCardProps {
   secondaryAction?: { label: string; onClick: () => void };
   className?: string;
 }
+
+// HOTFIX 2026-05-02: prop `icon?: LucideIcon` removida (Regra 1 RSC).
+// Ícone agora vem sempre do mapa SEVERITY interno. Se algum dia for
+// necessário customizar, usar `iconNode?: ReactNode` (ReactElement
+// pré-renderizado, serializável Server↔Client).
 
 const SEVERITY: Record<
   AlertCardProps['severity'],
@@ -59,7 +63,6 @@ const SEVERITY: Record<
 
 export function AlertCard({
   severity,
-  icon,
   title,
   subtitle,
   action,
@@ -67,7 +70,7 @@ export function AlertCard({
   className,
 }: AlertCardProps) {
   const cfg = SEVERITY[severity];
-  const Icon = icon ?? cfg.icon;
+  const Icon = cfg.icon;
 
   // Story 6.2 (AC2.4 + AC2.11) — severity=critical usa `criticalEntrance`
   // (slideInDown 300ms seguido de pulseOnce 1500ms — atenção pontual sem

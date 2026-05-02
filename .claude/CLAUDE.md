@@ -249,6 +249,25 @@ O AIOX carrega regras contextuais de `.claude/rules/` automaticamente. Regras co
 | `workflow-execution.md` | 4 primary workflows (SDC, QA Loop, Spec Pipeline, Brownfield) |
 
 > **Diretório:** `.claude/rules/` — rules são carregadas automaticamente pelo Claude Code quando relevantes.
+
+## RSC Boundary Rules — LEITURA OBRIGATÓRIA antes de Done
+
+**Documento:** [`docs/dev/rsc-boundary-rules.md`](../docs/dev/rsc-boundary-rules.md)
+
+Origem: 2026-05-02. Dashboard ficou completamente quebrado em produção por mais de 1 hora apesar das Sprints 5/6/7 terem fechado "Done" com deploys READY. Bugs `digest 3213099672` (forwardRef cruzando Server↔Client) e hidratação inconsistente (`useSyncExternalStore`) NÃO foram pegos por TypeScript, ESLint, build, nem QA gate — só apareceram quando a idealizadora abriu produção autenticada.
+
+**4 regras inegociáveis:**
+
+1. **Nunca passar `forwardRef`** (Lucide icons, shadcn/ui Card/Button) **como prop através da fronteira Server↔Client**
+2. **Client Component não pode importar Server Component diretamente**
+3. **`useSyncExternalStore` proibido nesta codebase** (instabilidade SSR Next 16) — usar `useState + useEffect + queueMicrotask`
+4. **Build verde NÃO é funcional** — smoke test ponta-a-ponta com idealizadora em mobile real é critério de Done não negociável
+
+**Auditoria automatizada:** `scripts/check-rsc-boundaries.sh` roda em CI (workflow `rls-tests.yml` job `rsc-audit`). PR não merge se falhar.
+
+**Aplicabilidade:** qualquer agente AIOX que toque `apps/web/src/app/(app)/**`, `'use client'` boundary, `components/keyra/**`, `lib/hooks/**`, `lib/motion/**`, ou Server Action consumida por Client.
+
+Antes de marcar story Done: ler `docs/dev/rsc-boundary-rules.md` (4 regras + checklist de PR + histórico de violações). Sem essa validação, story volta com NO-GO retroativo.
 <!-- AIOX-MANAGED-END: rules-system -->
 
 <!-- AIOX-MANAGED-START: code-intelligence -->

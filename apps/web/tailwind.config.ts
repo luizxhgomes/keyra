@@ -117,8 +117,10 @@ const config: Config = {
         'h1': ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
         'h2': ['24px', { lineHeight: '1.25', letterSpacing: '0', fontWeight: '600' }],
         'h3': ['20px', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }],
-        'kpi-hero': ['56px', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '600' }],
-        'kpi': ['40px', { lineHeight: '1', letterSpacing: '-0.015em', fontWeight: '600' }],
+        // 2026-05-02: KPI tokens reduzidos (era 56/40, agora 36/28)
+        // após feedback de desproporcionalidade no Dashboard.
+        'kpi-hero': ['36px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'kpi': ['28px', { lineHeight: '1.1', letterSpacing: '-0.015em', fontWeight: '600' }],
         'body': ['16px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
         'body-sm': ['14px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
         'label': ['12px', { lineHeight: '1.2', letterSpacing: '0.05em', fontWeight: '600' }],

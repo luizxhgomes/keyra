@@ -2,8 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   LayoutDashboard,
   Package,
   Receipt,
@@ -17,19 +20,25 @@ import {
 import { cn } from '@/lib/utils';
 
 /**
- * Desktop sidebar (≥ lg). Mirrors `docs/ux/wireframes/05-navegacao.md` §2.
+ * Desktop sidebar (≥ lg) — Story 6.5 + HOTFIX 2026-05-02.
+ *
+ * Mudanças 2026-05-02:
+ * - **Sticky top-0 h-screen** — não some mais ao fazer scroll do conteúdo.
+ * - **Toggle minimizar** — usuária pode colapsar para barra estreita só com
+ *   ícones. Estado persistido em localStorage (`keyra:sidebar-collapsed`).
+ * - **Renames**: "Pacientes" → "Clientes", "Comandas" → "Serviços",
+ *   "Serviços" → "Catálogo" (decisão da idealizadora; URLs mantidas para
+ *   não quebrar links salvos).
  *
  * Story 6.5 (AC1) — 7 itens primários + 2 secundários (Time, Configurações)
- * separados por `border-t border-border`. Hierarquia visual clara: trabalho
- * diário acima, configuração abaixo. Active state usa primary background +
- * left border para satisfazer WCAG sem depender só de cor.
+ * separados por `border-t border-border`.
  */
 const NAV_PRIMARY = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agenda', label: 'Agenda', icon: Calendar },
-  { href: '/comandas', label: 'Comandas', icon: Receipt },
-  { href: '/pacientes', label: 'Pacientes', icon: Users },
-  { href: '/servicos', label: 'Serviços', icon: Sparkles },
+  { href: '/comandas', label: 'Serviços', icon: Receipt },
+  { href: '/pacientes', label: 'Clientes', icon: Users },
+  { href: '/servicos', label: 'Catálogo', icon: Sparkles },
   { href: '/financeiro', label: 'Financeiro', icon: Wallet },
   { href: '/estoque', label: 'Estoque', icon: Package },
 ] as const;
@@ -39,8 +48,42 @@ const NAV_SECONDARY = [
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ] as const;
 
+const STORAGE_KEY = 'keyra:sidebar-collapsed';
+
+function readCollapsed(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export function Sidebar() {
   const pathname = usePathname();
+  // Server snapshot e primeiro render: false (expandida — default).
+  // Cliente lê localStorage no useEffect (Regra 3 RSC: sem useSyncExternalStore).
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setCollapsed(readCollapsed());
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function toggleCollapsed() {
+    const next = !collapsed;
+    setCollapsed(next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, next ? '1' : '0');
+    } catch {
+      // localStorage indisponível (incognito iOS) — só atualiza state local.
+    }
+  }
 
   function renderItem(item: { href: string; label: string; icon: typeof LayoutDashboard }) {
     const isActive = pathname?.startsWith(item.href) ?? false;
@@ -49,16 +92,19 @@ export function Sidebar() {
       <Link
         key={item.href}
         href={item.href}
+        title={collapsed ? item.label : undefined}
+        aria-label={collapsed ? item.label : undefined}
         className={cn(
-          'flex items-center gap-3 rounded-md border-l-4 px-4 py-3 text-sm font-medium transition-colors',
+          'flex items-center gap-3 rounded-md border-l-4 text-sm font-medium transition-colors',
+          collapsed ? 'justify-center px-2 py-3' : 'px-4 py-3',
           isActive
             ? 'border-primary bg-primary-50 text-primary-700'
             : 'border-transparent text-foreground hover:bg-muted',
         )}
         aria-current={isActive ? 'page' : undefined}
       >
-        <Icon className="h-5 w-5" aria-hidden="true" />
-        <span>{item.label}</span>
+        <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+        {collapsed ? null : <span className="truncate">{item.label}</span>}
       </Link>
     );
   }
@@ -66,20 +112,51 @@ export function Sidebar() {
   return (
     <aside
       aria-label="Navegação principal"
-      className="hidden w-60 shrink-0 border-r border-border bg-background lg:flex lg:flex-col"
+      className={cn(
+        'sticky top-0 hidden h-screen shrink-0 border-r border-border bg-background lg:flex lg:flex-col',
+        collapsed ? 'w-16' : 'w-60',
+      )}
     >
-      <div className="flex h-16 items-center border-b border-border px-6">
-        <Link href="/dashboard" className="text-xl font-bold tracking-tight text-primary">
-          KEYRA
+      <div
+        className={cn(
+          'flex h-16 items-center border-b border-border',
+          collapsed ? 'justify-center px-2' : 'px-6',
+        )}
+      >
+        <Link
+          href="/dashboard"
+          className="text-xl font-bold tracking-tight text-primary"
+          title={collapsed ? 'KEYRA' : undefined}
+        >
+          {collapsed ? 'K' : 'KEYRA'}
         </Link>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 p-3">
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
         {NAV_PRIMARY.map(renderItem)}
       </nav>
 
       <div className="flex flex-col gap-1 border-t border-border p-3">
         {NAV_SECONDARY.map(renderItem)}
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+          aria-pressed={collapsed}
+          className={cn(
+            'mt-1 flex items-center gap-3 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+            collapsed ? 'justify-center px-2 py-3' : 'px-4 py-3',
+          )}
+        >
+          {collapsed ? (
+            <ChevronRight className="h-5 w-5 shrink-0" aria-hidden="true" />
+          ) : (
+            <>
+              <ChevronLeft className="h-5 w-5 shrink-0" aria-hidden="true" />
+              <span>Recolher</span>
+            </>
+          )}
+        </button>
       </div>
     </aside>
   );

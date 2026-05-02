@@ -1,4 +1,4 @@
-name: RLS Tests
+name: RLS Tests + RSC Audit
 
 on:
   push:
@@ -124,3 +124,19 @@ jobs:
         if: always()
         run: |
           echo "Workflow finished. See step logs for pass/fail details."
+
+  rsc-audit:
+    name: RSC Boundary Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run RSC boundary audit
+        # Verifica padrões que TypeScript e ESLint NÃO pegam mas que quebram
+        # produção em runtime (digest 3213099672 e similares).
+        # Detalhes: docs/dev/rsc-boundary-rules.md
+        run: |
+          chmod +x scripts/check-rsc-boundaries.sh
+          ./scripts/check-rsc-boundaries.sh

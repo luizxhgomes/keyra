@@ -3,6 +3,7 @@ import { ErrorMessage, KPICard } from '@/components/keyra';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
 
 import { getDashboardKpis } from './actions';
+import { AlertasCard } from './alertas-card';
 
 /**
  * Story 4.4 — Dashboard tela única (HOTFIX 2026-05-02 BISECT).
@@ -92,6 +93,8 @@ export default async function DashboardPage() {
           {...(profitComp ? { comparison: profitComp } : {})}
         />
       </section>
+
+      <AlertasCard />
     </div>
   );
 }

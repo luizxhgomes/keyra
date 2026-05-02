@@ -1,19 +1,29 @@
-'use client';
-
 import Link from 'next/link';
-import { m } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { variants } from '@/lib/motion/tokens';
 import { cn } from '@/lib/utils';
 
+import { EmptyStateAction } from './EmptyStateAction';
+
 /**
- * `<EmptyState>` — placeholder para listas/seções vazias (Story 5.3).
+ * `<EmptyState>` — placeholder para listas/seções vazias (Story 5.3 + HOTFIX 2026-05-02).
  *
  * Padrão consistente: ícone outline + título + descrição em pt-BR + CTA real
  * (não "use o botão acima"). Persona-iniciante (mês 1 de uso) cai em todas
  * as listas vazias e precisa saber o próximo passo.
+ *
+ * **HOTFIX 2026-05-02 (digest 3213099672):** componente migrado de Client
+ * para Server. Versão anterior tinha `'use client'` + `<m.div>` (framer-motion)
+ * e recebia `icon: LucideIcon` como prop. Em React 19 + Next 16 RSC, passar
+ * um componente `forwardRef` (Lucide icons são forwardRef) de Server → Client
+ * via prop é proibido — joga `Error: Functions cannot be passed directly to
+ * Client Components`. Esse erro afetava TODAS as rotas autenticadas que
+ * renderizavam EmptyState (org nova com listas vazias = todas exceto Agenda).
+ *
+ * Fix: EmptyState agora renderiza o ícone direto no server (Lucide é
+ * Server-safe quando usado, não passado como prop). `action.onClick` (Client
+ * handler) move para `<EmptyStateAction>` (Client Component dedicado).
  *
  * Spec UX: docs/ux/PLANO-SPRINT-5-6.md §Story 5.3.
  */
@@ -40,12 +50,7 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    // Story 6.2 (AC2.8) — fadeRiseSlow (400ms, expo-out) no mount inicial.
-    // Camila percebe que o card "apareceu", não que estava lá.
-    <m.div
-      variants={variants.fadeRiseSlow}
-      initial="hidden"
-      animate="visible"
+    <div
       className={cn(
         'flex flex-col items-center justify-center gap-3 py-12 text-center',
         className,
@@ -71,13 +76,11 @@ export function EmptyState({
               {action.label}
             </Button>
           </Link>
-        ) : (
-          <Button size="sm" className="mt-2" onClick={action.onClick}>
-            {action.label}
-          </Button>
-        )
+        ) : action.onClick ? (
+          <EmptyStateAction label={action.label} onClick={action.onClick} />
+        ) : null
       ) : null}
       {hint ? <div className="mt-1 text-xs text-muted-foreground">{hint}</div> : null}
-    </m.div>
+    </div>
   );
 }

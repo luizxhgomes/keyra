@@ -1,11 +1,11 @@
-import { Award, AlertTriangle, TrendingDown } from 'lucide-react';
+import { Award, AlertTriangle, PieChart, TrendingDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
 import { formatBRL } from '@/lib/money';
 
 import { getDreByService } from '../actions';
-import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ month?: string }>;
@@ -60,10 +60,11 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Sem comandas pagas no período. Conclua atendimentos e registre pagamentos
-              para ver os números aqui.
-            </p>
+            <EmptyState
+              icon={PieChart}
+              title="Sem comandas pagas no período"
+              description="O lucro de cada serviço aparece aqui depois que você marca atendimentos como concluídos e registra os pagamentos."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

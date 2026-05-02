@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Trash2 } from 'lucide-react';
+import { ListPlus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/keyra';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -167,13 +168,15 @@ export function ComandaEditForm({
 
   return (
     <div className="space-y-5">
-      <ul className="divide-y divide-border">
-        {items.length === 0 ? (
-          <li className="py-3 text-sm text-muted-foreground">
-            Sem itens. Adicione abaixo.
-          </li>
-        ) : (
-          items.map((it) => (
+      {items.length === 0 ? (
+        <EmptyState
+          icon={ListPlus}
+          title="Comanda sem itens"
+          description="Adicione um serviço abaixo para registrar este atendimento."
+        />
+      ) : (
+        <ul className="divide-y divide-border">
+          {items.map((it) => (
             <li key={it.id} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
                 <p className="text-sm font-medium">{it.description}</p>
@@ -194,9 +197,9 @@ export function ComandaEditForm({
                 </Button>
               ) : null}
             </li>
-          ))
-        )}
-      </ul>
+          ))}
+        </ul>
+      )}
 
       <div className="rounded-md bg-muted/50 p-3 text-sm space-y-1">
         <p>

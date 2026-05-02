@@ -1,10 +1,9 @@
-import Link from 'next/link';
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { Target } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import { getCurrentMonthGoalProgress } from '../financeiro/actions';
-import { ErrorMessage } from '@/components/keyra';
 
 export async function MetaCard() {
   const result = await getCurrentMonthGoalProgress();
@@ -34,12 +33,12 @@ export async function MetaCard() {
       </CardHeader>
       <CardContent>
         {!hasGoal ? (
-          <p className="text-sm text-muted-foreground">
-            Você ainda não definiu meta para o mês.{' '}
-            <Link href="/financeiro/metas" className="text-primary hover:underline">
-              Criar meta →
-            </Link>
-          </p>
+          <EmptyState
+            icon={Target}
+            title="Sem meta para o mês"
+            description="Defina quanto você quer faturar, lucrar ou atender este mês — o dashboard vai mostrar quanto falta a cada dia."
+            action={{ label: 'Criar meta', href: '/financeiro/metas' }}
+          />
         ) : (
           <div className="space-y-3">
             {p.revenue.target !== null ? (

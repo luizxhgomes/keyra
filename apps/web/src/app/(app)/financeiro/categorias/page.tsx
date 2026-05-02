@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  ErrorMessage,
   StatusBadge,
   categoryKindToBadge,
   type CategoryKind,
@@ -41,7 +42,7 @@ export default async function CategoriasPage() {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {error.message}</p>
+          <ErrorMessage detail={error.message} />
         </CardContent>
       </Card>
     );

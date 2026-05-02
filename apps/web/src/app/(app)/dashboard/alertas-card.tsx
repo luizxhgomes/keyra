@@ -1,15 +1,33 @@
 import Link from 'next/link';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ErrorMessage, StatusBadge, alertSeverityToBadge } from '@/components/keyra';
+import {
+  EmptyState,
+  ErrorMessage,
+  StatusBadge,
+  alertSeverityToBadge,
+} from '@/components/keyra';
 
 import { getActiveAlerts } from './actions';
 
+/**
+ * Cores de borda lateral e do ícone usam **tokens semânticos** alinhados
+ * com o `<StatusBadge>` (`alertSeverityToBadge`). Story 5.7 removeu o
+ * `border-blue-500` / `text-blue-700` inline, deixando o `<StatusBadge>`
+ * como única fonte de verdade do status no pill e os tokens (`border-info`,
+ * `text-info`) na borda lateral. Sem duplicação.
+ */
 const SEVERITY_BORDER: Record<'warning' | 'critical' | 'info', string> = {
   warning: 'border-amber-500',
   critical: 'border-destructive',
-  info: 'border-blue-500',
+  info: 'border-info',
+};
+
+const SEVERITY_ICON: Record<'warning' | 'critical' | 'info', string> = {
+  warning: 'text-amber-700',
+  critical: 'text-destructive',
+  info: 'text-info',
 };
 
 export async function AlertasCard() {
@@ -25,7 +43,27 @@ export async function AlertasCard() {
     );
   }
 
-  if (result.data.length === 0) return null;
+  // Empty state positivo: não some quando 0 alertas — reforça que está
+  // tudo sob controle (Status Quo a favor). Story 5.7.
+  if (result.data.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Alertas</CardTitle>
+          <CardDescription>
+            Sinais que merecem sua atenção esta semana.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EmptyState
+            icon={CheckCircle2}
+            title="Nenhum alerta esta semana"
+            description="Sua operação está sob controle. Quando margem cair, falta subir ou estoque baixar, você vê aqui."
+          />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -46,13 +84,7 @@ export async function AlertasCard() {
               }`}
             >
               <AlertTriangle
-                className={`mt-0.5 h-4 w-4 shrink-0 ${
-                  a.severity === 'critical'
-                    ? 'text-destructive'
-                    : a.severity === 'warning'
-                      ? 'text-amber-700'
-                      : 'text-blue-700'
-                }`}
+                className={`mt-0.5 h-4 w-4 shrink-0 ${SEVERITY_ICON[a.severity]}`}
                 aria-hidden="true"
               />
               <div className="flex-1 min-w-0">

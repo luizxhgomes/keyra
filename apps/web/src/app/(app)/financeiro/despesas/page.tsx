@@ -6,6 +6,8 @@ import { Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { Receipt } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import {
@@ -48,7 +50,7 @@ export default async function DespesasPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {expRes.error}</p>
+          <ErrorMessage detail={expRes.error} />
         </CardContent>
       </Card>
     );
@@ -147,7 +149,12 @@ export default async function DespesasPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem despesas no período.</p>
+            <EmptyState
+              icon={Receipt}
+              title="Sem despesas no período"
+              description="Quando você cadastrar despesas (aluguel, energia, fornecedores), elas aparecem aqui e entram automaticamente no fluxo de caixa e na DRE."
+              action={{ label: 'Cadastrar despesa', href: '/financeiro/despesas/nova' }}
+            />
           ) : (
             <ul className="divide-y divide-border">
               {rows.map((r) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
@@ -51,6 +52,9 @@ type Props = {
 export function CalendarClient({ professionals, pickers, initialProfessionalId }: Props) {
   const calendarRef = useRef<FullCalendar | null>(null);
   const eventsRef = useRef<Map<string, AgendaEvent>>(new Map());
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const novoParam = searchParams?.get('novo') === '1';
 
   const [view, setView] = useState<AgendaView>('timeGridWeek');
   const [title, setTitle] = useState('');
@@ -61,8 +65,21 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
   const [truncated, setTruncated] = useState(false);
 
   // Story 2.5 — formulário de novo agendamento.
+  // Story 5.7 — `?novo=1` (FAB do BottomNav, J2 mobile) abre o sheet automático.
   const [formOpen, setFormOpen] = useState(false);
   const [formInitialStartsAt, setFormInitialStartsAt] = useState<Date | null>(null);
+  // Pattern "adjust state during render" (React docs) — reage a mudanças de
+  // `novoParam` (hook reativo) sem violar a regra `react-hooks/set-state-in-effect`
+  // do React 19. Inicializa com `false` para que o primeiro render com
+  // `?novo=1` na URL dispare a abertura corretamente.
+  const [prevNovoParam, setPrevNovoParam] = useState(false);
+  if (prevNovoParam !== novoParam) {
+    setPrevNovoParam(novoParam);
+    if (novoParam) {
+      setFormInitialStartsAt(null);
+      setFormOpen(true);
+    }
+  }
 
   // Mobile default = day view (AC1.1). Não chamamos setState aqui — a
   // sincronização do state acontece via callback `datesSet` do FullCalendar
@@ -107,6 +124,22 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
   const handleAppointmentCreated = useCallback(() => {
     calendarRef.current?.getApi().refetchEvents();
   }, []);
+
+  // Quando o sheet fecha, limpa o `?novo=1` para que o próximo toque no FAB
+  // gere uma nova navegação (e o useEffect dispare a reabertura). Sem isso,
+  // tocar `+` duas vezes seguidas no mesmo URL não tem efeito.
+  const handleFormOpenChange = useCallback(
+    (open: boolean) => {
+      setFormOpen(open);
+      if (!open && novoParam) {
+        const next = new URLSearchParams(searchParams?.toString() ?? '');
+        next.delete('novo');
+        const query = next.toString();
+        router.replace(`/agenda${query ? `?${query}` : ''}`, { scroll: false });
+      }
+    },
+    [novoParam, router, searchParams],
+  );
 
   const fetchEvents = useCallback(
     async (
@@ -203,7 +236,7 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
 
       <AgendamentoForm
         open={formOpen}
-        onOpenChange={setFormOpen}
+        onOpenChange={handleFormOpenChange}
         pickers={pickers}
         initialStartsAt={formInitialStartsAt}
         initialProfessionalId={selectedProfessionalId}

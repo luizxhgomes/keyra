@@ -2,10 +2,11 @@ import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { Clock, Wallet } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import { getCashflow, getLast30DaysPeriod } from '../actions';
-import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ start?: string; end?: string }>;
@@ -27,9 +28,11 @@ export default async function FluxoCaixaPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">
-            Período máximo: 365 dias. Encurte o intervalo para visualizar.
-          </p>
+          <EmptyState
+            icon={Clock}
+            title="Período muito longo para uma única consulta"
+            description="O fluxo de caixa mostra até 365 dias por vez para ficar leve. Escolha um intervalo menor no filtro acima."
+          />
         </CardContent>
       </Card>
     );
@@ -128,7 +131,11 @@ export default async function FluxoCaixaPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {tableRows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem movimentos no período.</p>
+            <EmptyState
+              icon={Wallet}
+              title="Sem movimentos no período"
+              description="Pagamentos de comandas e despesas registradas aparecem aqui dia a dia. Tente ampliar o intervalo no filtro acima."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

@@ -9,8 +9,12 @@ import { cn } from '@/lib/utils';
 /**
  * Mobile bottom navigation (< lg). Mirrors `docs/ux/wireframes/05-navegacao.md` §5.
  *
- * 5 slots: Dashboard, Agenda, FAB (contextual), Pacientes, Mais. The FAB is a
- * placeholder click target until Story 2.4 wires the contextual create modal.
+ * 5 slots: Dashboard, Agenda, FAB (contextual), Pacientes, Mais.
+ *
+ * Story 5.7 — FAB ganhou destino real: `/agenda?novo=1` abre o sheet de
+ * novo agendamento direto, fechando a J2 (criar agendamento mobile sem
+ * passar por desktop). FAB **contextual por rota** (Sprint 6.5) entrega
+ * label/destino diferentes em cada tela.
  */
 const ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -31,13 +35,13 @@ export function BottomNav() {
         <NavButton key={item.href} item={item} isActive={pathname?.startsWith(item.href) ?? false} />
       ))}
 
-      <button
-        type="button"
-        aria-label="Criar"
+      <Link
+        href="/agenda?novo=1"
+        aria-label="Criar novo agendamento"
         className="relative -mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-colors hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />
-      </button>
+      </Link>
 
       {ITEMS.slice(2).map((item) => (
         <NavButton key={item.href} item={item} isActive={pathname?.startsWith(item.href) ?? false} />

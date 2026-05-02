@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { UserCog } from 'lucide-react';
+import { Mail, UserCog } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -92,9 +92,12 @@ export default async function TeamIndexPage() {
         </CardHeader>
         <CardContent>
           {(!pendingInvites || pendingInvites.length === 0) ? (
-            <p className="text-sm text-muted-foreground">
-              Nenhum convite aguardando resposta. Vá em <strong>Convites</strong> para enviar um novo.
-            </p>
+            <EmptyState
+              icon={Mail}
+              title="Nenhum convite aguardando resposta"
+              description="Quando você enviar um convite por email, ele aparece aqui até a pessoa aceitar (72h pra expirar)."
+              action={{ label: 'Enviar convite', href: '/team/convites' }}
+            />
           ) : (
             <ul className="divide-y divide-border">
               {pendingInvites.map((inv) => {

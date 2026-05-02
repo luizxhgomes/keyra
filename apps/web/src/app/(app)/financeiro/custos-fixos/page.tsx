@@ -3,6 +3,8 @@ import { ptBR } from 'date-fns/locale';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { Repeat } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import { getDefaultPeriod, listExpenses } from '../actions';
@@ -38,12 +40,15 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
   });
 
   if (!currentRes.ok || !historyRes.ok) {
+    const errorDetail = !currentRes.ok
+      ? currentRes.error
+      : !historyRes.ok
+        ? historyRes.error
+        : 'desconhecido';
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">
-            Erro: {currentRes.ok ? historyRes.ok ? 'desconhecido' : historyRes.error : currentRes.error}
-          </p>
+          <ErrorMessage detail={errorDetail} />
         </CardContent>
       </Card>
     );
@@ -140,11 +145,12 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {fixedThisPeriod.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Sem custos fixos no período. Use o botão acima para clonar do mês passado
-              ou cadastre nova despesa em <strong>Despesas → Nova despesa</strong> com a
-              flag &quot;Custo fixo&quot; marcada.
-            </p>
+            <EmptyState
+              icon={Repeat}
+              title="Sem custos fixos no período"
+              description="Aluguel, salários, internet… Use o botão acima para clonar do mês passado ou cadastre uma nova despesa marcando a flag “Custo fixo”."
+              action={{ label: 'Cadastrar custo fixo', href: '/financeiro/despesas/nova' }}
+            />
           ) : (
             <ul className="divide-y divide-border">
               {fixedThisPeriod.map((r) => (

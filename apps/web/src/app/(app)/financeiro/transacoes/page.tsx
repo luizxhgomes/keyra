@@ -5,6 +5,8 @@ import { ptBR } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { Wallet } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import {
@@ -63,7 +65,7 @@ export default async function TransacoesPage({ searchParams }: PageProps) {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-sm text-destructive">Erro: {txRes.error}</p>
+          <ErrorMessage detail={txRes.error} />
         </CardContent>
       </Card>
     );
@@ -193,9 +195,11 @@ export default async function TransacoesPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Sem transações no período/filtro selecionado.
-            </p>
+            <EmptyState
+              icon={Wallet}
+              title="Sem transações nesse filtro"
+              description="Pagamentos de comandas, despesas manuais e ajustes aparecem aqui. Tente ampliar o período ou limpar os filtros."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {rows.map((r) => (

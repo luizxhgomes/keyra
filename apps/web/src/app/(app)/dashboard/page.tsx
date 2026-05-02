@@ -1,5 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { ErrorMessage, KPICard } from '@/components/keyra';
+import { EmptyState, ErrorMessage, KPICard } from '@/components/keyra';
+import { Sparkles } from 'lucide-react';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
 
 import { getDashboardKpis } from './actions';
@@ -77,11 +78,11 @@ export default async function DashboardPage() {
       {noData ? (
         <Card>
           <CardContent className="py-6">
-            <p className="text-sm text-muted-foreground">
-              <strong>Conclua atendimentos e registre pagamentos</strong> para ver os
-              números aparecerem aqui. O dashboard mostra receita realizada, despesas
-              e lucro do mês corrente em tempo real, conforme a operação acontece.
-            </p>
+            <EmptyState
+              icon={Sparkles}
+              title="Conclua atendimentos para ver os números"
+              description="O dashboard mostra receita realizada, despesas e lucro do mês corrente em tempo real, conforme você marca atendimentos como concluídos e registra pagamentos."
+            />
           </CardContent>
         </Card>
       ) : null}

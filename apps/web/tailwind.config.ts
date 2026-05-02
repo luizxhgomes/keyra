@@ -91,6 +91,20 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      spacing: {
+        // Tokens semânticos KEYRA (Story 5.5).
+        // Modelados a partir do Gestek (densidade `roomy`) ajustados para
+        // dashboard editorial. Documentação: docs/ux/PLANO-SPRINT-5-6.md.
+        'card-x': '1.5rem', // 24px — padding lateral interno do Card
+        'card-y': '1.5rem', // 24px — padding vertical interno do Card
+        'card-x-hero': '2rem', // 32px — padding em KPICard variant=hero
+        'card-y-hero': '2rem', // 32px
+        'stack-tight': '0.5rem', // 8px — gap entre label + valor
+        stack: '1rem', // 16px — gap entre items relacionados em uma lista
+        'stack-loose': '1.5rem', // 24px — gap entre items em narrativa (DRE)
+        section: '2rem', // 32px — gap entre cards de uma mesma seção
+        page: '3rem', // 48px — gap entre seções de página
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

@@ -43,11 +43,17 @@ export function Skeleton({ variant = 'text', className }: SkeletonProps) {
  * Skeleton específico para KPICard — espelha layout (label pequeno +
  * valor grande + comparativo opcional). Usar quando ainda não há dados
  * mas a estrutura já é conhecida (dashboard, DRE).
+ *
+ * Story 5.7 — usa tokens semânticos de spacing (`px-card-x` / `py-card-y`
+ * para `secondary`, `px-card-x-hero` / `py-card-y-hero` para `hero`)
+ * espelhando o `KPICard`. Sem strings mágicas.
  */
 export function KPICardSkeleton({ variant = 'secondary' }: { variant?: 'hero' | 'secondary' }) {
   const valueHeight = variant === 'hero' ? 'h-12' : 'h-9';
+  const padding =
+    variant === 'hero' ? 'px-card-x-hero py-card-y-hero' : 'px-card-x py-card-y';
   return (
-    <div className="rounded-lg border border-border bg-card p-6">
+    <div className={cn('rounded-lg border border-border bg-card', padding)}>
       <Skeleton className="mb-3 h-3 w-24" />
       <div className={cn('mb-2 w-2/3 animate-pulse rounded bg-muted', valueHeight)} />
       <Skeleton className="h-3 w-1/2" />

@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { BarChart3 } from 'lucide-react';
 import { formatCentsBRL } from '@/lib/money';
 
 import { getIndicators } from './actions';
-import { ErrorMessage } from '@/components/keyra';
 
 export async function IndicadoresCard() {
   const result = await getIndicators();
@@ -27,9 +28,11 @@ export async function IndicadoresCard() {
       </CardHeader>
       <CardContent>
         {!i.hasData ? (
-          <p className="text-sm text-muted-foreground">
-            Sem dados ainda. Conclua atendimentos e registre pagamentos.
-          </p>
+          <EmptyState
+            icon={BarChart3}
+            title="Indicadores aparecem após o primeiro atendimento pago"
+            description="Ticket médio, top serviço e taxa de comparecimento ganham vida assim que você concluir atendimentos e registrar pagamentos."
+          />
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Cell

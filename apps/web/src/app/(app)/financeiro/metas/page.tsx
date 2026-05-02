@@ -2,11 +2,12 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { Target } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import { listGoals } from '../actions';
 import { MetaForm } from './meta-form';
-import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ year?: string }>;
@@ -57,7 +58,11 @@ export default async function MetasPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {goals.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem metas cadastradas em {year}.</p>
+            <EmptyState
+              icon={Target}
+              title={`Sem metas cadastradas em ${year}`}
+              description="Use o formulário acima para definir metas mensais de receita, lucro ou atendimentos. O dashboard mostra quanto falta a cada dia."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {goals.map((g) => (

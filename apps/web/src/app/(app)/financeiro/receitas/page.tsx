@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { TrendingUp } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import { getDefaultPeriod, getRevenueByProfessional } from '../actions';
-import { ErrorMessage } from '@/components/keyra';
 
 type PageProps = {
   searchParams: Promise<{ start?: string; end?: string }>;
@@ -84,10 +85,11 @@ export default async function ReceitasPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {byProfessional.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Sem receitas no período. Conclua atendimentos e registre pagamentos para
-              ver os números aqui.
-            </p>
+            <EmptyState
+              icon={TrendingUp}
+              title="Sem receitas no período"
+              description="Conclua atendimentos e registre pagamentos para ver a receita por profissional aparecer aqui."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {byProfessional.map((p) => (
@@ -126,7 +128,11 @@ export default async function ReceitasPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {byCostCenter.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Sem receitas no período.</p>
+            <EmptyState
+              icon={TrendingUp}
+              title="Sem receitas no período"
+              description="Receitas agrupadas por centro de custo aparecem aqui depois que você cadastra centros nos profissionais e registra pagamentos."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {byCostCenter.map((c) => (

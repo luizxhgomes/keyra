@@ -3,6 +3,8 @@ import { ptBR } from 'date-fns/locale';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/keyra';
+import { Mail } from 'lucide-react';
 import { requireAuth } from '@/lib/auth/require-auth';
 import type { MembershipRole } from '@/lib/auth/roles';
 import { createServerClient } from '@/lib/supabase/server';
@@ -36,7 +38,11 @@ export default async function ConvitesPage() {
           </CardHeader>
           <CardContent>
             {pending.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum convite pendente.</p>
+              <EmptyState
+                icon={Mail}
+                title="Nenhum convite pendente"
+                description="Use o formulário ao lado para convidar alguém por email — o convite expira em 72 horas."
+              />
             ) : (
               <ul className="divide-y divide-border">
                 {pending.map((inv) => {

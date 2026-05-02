@@ -4,7 +4,8 @@ import { ptBR } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ErrorMessage, StatusBadge, movementTypeToBadge } from '@/components/keyra';
+import { EmptyState, ErrorMessage, StatusBadge, movementTypeToBadge } from '@/components/keyra';
+import { ArrowDownCircle } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
 import { listInventoryMovements } from '../actions';
@@ -66,10 +67,11 @@ export default async function MovimentacoesPage({ searchParams }: PageProps) {
         </CardHeader>
         <CardContent>
           {rows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Sem movimentações ainda. Conclua um atendimento e pague a comanda para
-              ver o consumo automático aparecer aqui.
-            </p>
+            <EmptyState
+              icon={ArrowDownCircle}
+              title="Sem movimentações ainda"
+              description="Quando você concluir um atendimento e pagar a comanda, o KEYRA registra automaticamente o consumo de cada insumo da BOM aqui."
+            />
           ) : (
             <ul className="divide-y divide-border">
               {rows.map((m) => {

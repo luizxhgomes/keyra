@@ -17,6 +17,12 @@ export interface AlertCardProps {
   title: string;
   subtitle?: string;
   action?: { label: string; href: string };
+  /**
+   * Botão secundário (Story 6.3 — ex.: "Silenciar 7 dias"). Renderizado ao
+   * lado da action principal. Use para ações destrutivas/auxiliares que não
+   * são o "próximo passo natural" do alerta.
+   */
+  secondaryAction?: { label: string; onClick: () => void };
   className?: string;
 }
 
@@ -53,6 +59,7 @@ export function AlertCard({
   title,
   subtitle,
   action,
+  secondaryAction,
   className,
 }: AlertCardProps) {
   const cfg = SEVERITY[severity];
@@ -72,13 +79,26 @@ export function AlertCard({
       <div className="flex flex-1 flex-col gap-1">
         <p className="text-sm font-medium text-foreground">{title}</p>
         {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
-        {action && (
-          <Link
-            href={action.href}
-            className="mt-1 inline-flex w-fit text-sm font-medium text-primary hover:underline"
-          >
-            {action.label} →
-          </Link>
+        {(action || secondaryAction) && (
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            {action && (
+              <Link
+                href={action.href}
+                className="inline-flex w-fit text-sm font-medium text-primary hover:underline"
+              >
+                {action.label} →
+              </Link>
+            )}
+            {secondaryAction && (
+              <button
+                type="button"
+                onClick={secondaryAction.onClick}
+                className="inline-flex w-fit text-sm text-muted-foreground hover:text-foreground"
+              >
+                {secondaryAction.label}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

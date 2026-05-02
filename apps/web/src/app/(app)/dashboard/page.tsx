@@ -1,19 +1,27 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { ErrorMessage, KPICard } from '@/components/keyra';
+import { Sparkles } from 'lucide-react';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
 
 import { getDashboardKpis } from './actions';
+import { AgendaHojeCard } from './agenda-hoje-card';
 import { AlertasCard } from './alertas-card';
+import { IndicadoresCard } from './indicadores-card';
+import { MetaCard } from './meta-card';
 
 /**
- * Story 4.4 — Dashboard tela única (HOTFIX 2026-05-02 BISECT).
+ * Story 4.4 — Dashboard tela única (restaurado pós-HOTFIX 2026-05-02).
  *
- * Versão MINIMAL para isolar bug de hidratação digest 3213099672.
- * Removidos temporariamente: AlertasCard, AgendaHojeCard, IndicadoresCard,
- * MetaCard, EmptyState (no-data branch). Mantidos apenas: 4 KPICard.
+ * Pós-HOTFIX:
+ * - `ScrollFadeRise` removido (motion volta em story dedicada com pattern
+ *   correto pra hidratação Next 16).
+ * - `EmptyState` (no-data branch) substituído por `InlineEmptyState` (Server-safe
+ *   sem motion).
+ * - `useDismissedAlerts` (em AlertasList) reescrito sem `useSyncExternalStore`.
  *
- * Se esta versão carregar → bug está em algum dos cards removidos.
- * Se ainda quebrar → bug é no KPICard ou no shell mesmo.
+ * Server Component. KPIs reais via `v_dashboard_kpis` + comparativo absoluto
+ * vs mês passado (Story 4.7). Cards filhos: AlertasCard, AgendaHojeCard,
+ * IndicadoresCard, MetaCard.
  */
 export default async function DashboardPage() {
   const result = await getDashboardKpis();
@@ -58,6 +66,12 @@ export default async function DashboardPage() {
     'revenue',
   );
 
+  const noData =
+    k.revenueMtdCents === 0 &&
+    k.expensesMtdCents === 0 &&
+    k.expectedRevenueMtdCents === 0 &&
+    k.appointmentsToday === 0;
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
@@ -66,6 +80,14 @@ export default async function DashboardPage() {
           Visão única do seu mês — números absolutos, sem gráfico.
         </p>
       </header>
+
+      {noData ? (
+        <Card>
+          <CardContent className="py-6">
+            <NoDataInline />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <section
         aria-label="Indicadores financeiros do mês"
@@ -95,6 +117,38 @@ export default async function DashboardPage() {
       </section>
 
       <AlertasCard />
+
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <AgendaHojeCard />
+        <IndicadoresCard />
+      </section>
+
+      <MetaCard />
+    </div>
+  );
+}
+
+/**
+ * Empty state inline (Server-safe) para o "noData" branch.
+ * Substitui import do `<EmptyState>` global, evitando passar Lucide
+ * `Sparkles` (forwardRef) através de fronteira RSC.
+ */
+function NoDataInline() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
+      <div className="mb-1 rounded-full bg-muted p-3">
+        <Sparkles
+          className="h-6 w-6 text-muted-foreground"
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
+      </div>
+      <h3 className="text-base font-semibold tracking-tight text-foreground">
+        Conclua atendimentos para ver os números
+      </h3>
+      <p className="max-w-sm text-sm text-muted-foreground">
+        O dashboard mostra receita realizada, despesas e lucro do mês corrente em tempo real, conforme você marca atendimentos como concluídos e registra pagamentos.
+      </p>
     </div>
   );
 }

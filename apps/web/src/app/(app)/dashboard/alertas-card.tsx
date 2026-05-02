@@ -39,7 +39,7 @@ export async function AlertasCard() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <AlertasList orgId={orgId} />
+        <AlertasList alerts={result.data} orgId={orgId} />
       </CardContent>
     </Card>
   );

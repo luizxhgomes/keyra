@@ -1,26 +1,22 @@
 'use client';
 
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { safeLocalStorage } from '@/lib/storage';
 
 /**
- * `useDismissedAlerts` (Story 6.3) — hook SSR-safe para gerenciar alertas
- * silenciados pela usuária.
+ * `useDismissedAlerts` — gerencia alertas silenciados pela usuária.
  *
- * Pattern canônico React 18+ via `useSyncExternalStore` que casa SSR e
- * client de forma síncrona, sem hydration mismatch warning e sem
- * `useEffect` mutativo (compliance React 19 — `react-hooks/set-state-in-effect`).
+ * **HOTFIX 2026-05-02:** reescrito sem `useSyncExternalStore`. A versão
+ * anterior (Story 6.3) usava `useSyncExternalStore` para evitar hydration
+ * mismatch, mas em Next 16 + React 19 o pattern estava causando erro de
+ * hidratação em produção (digest 3213099672 no Dashboard).
  *
- * - **SSR snapshot**: array vazio. Server renderiza com zero alertas
- *   silenciados — comportamento correto pois localStorage não existe
- *   no server. Hidratação aplica filtro real sem flicker.
- * - **Client snapshot**: lê localStorage com cleanup automático on-read
- *   (entries cujo `dismissedUntil` já expirou são descartadas).
- * - **Subscribe**: ouve `storage` event do window — silenciar em uma aba
- *   reflete em outra automaticamente. Para a própria aba que escreve,
- *   `dismiss()` dispara `StorageEvent` manual (browsers não emitem
- *   `storage` na origem da escrita por design).
+ * Trade-off aceito: SSR renderiza com `dismissedIds` vazio. Client lê
+ * localStorage no `useEffect` após mount e atualiza state. Pode haver flash
+ * de ~50ms onde alertas silenciados aparecem antes de sumir — aceitável
+ * porque (a) raramente há alertas silenciados em produção real, (b)
+ * confiabilidade > microoptimização visual.
  *
  * Persistência: chave `keyra:dismissed-alerts:{orgId}`. TTL de 7 dias.
  */
@@ -49,14 +45,6 @@ function readEntries(orgId: string): DismissedEntry[] {
   });
 }
 
-function subscribe(callback: () => void): () => void {
-  if (typeof window === 'undefined') return () => undefined;
-  window.addEventListener('storage', callback);
-  return () => window.removeEventListener('storage', callback);
-}
-
-const EMPTY_SNAPSHOT: DismissedEntry[] = [];
-
 export interface UseDismissedAlertsResult {
   dismissedIds: Set<string>;
   dismiss: (alertId: string) => void;
@@ -64,19 +52,32 @@ export interface UseDismissedAlertsResult {
 }
 
 export function useDismissedAlerts(orgId: string): UseDismissedAlertsResult {
-  const entries = useSyncExternalStore<DismissedEntry[]>(
-    subscribe,
-    () => readEntries(orgId),
-    () => EMPTY_SNAPSHOT,
-  );
+  // Server snapshot e primeiro client render: vazio. Sem hydration mismatch.
+  const [entries, setEntries] = useState<DismissedEntry[]>([]);
 
-  // Memoiza o Set para que `isDismissed` (useCallback abaixo) tenha
-  // dependência estável quando `entries` não muda — evita warning
-  // `react-hooks/exhaustive-deps`.
-  const dismissedIds = useMemo(
-    () => new Set(entries.map((e) => e.alertId)),
-    [entries],
-  );
+  // Após mount, lê localStorage assincronamente para evitar cascading render
+  // (regra `react-hooks/set-state-in-effect` do projeto). `queueMicrotask`
+  // adia o setState pro próximo microtask sem visual delay perceptível.
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) setEntries(readEntries(orgId));
+    });
+
+    // Listener para sincronizar entre abas.
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === getStorageKey(orgId) || e.key === null) {
+        queueMicrotask(() => {
+          if (!cancelled) setEntries(readEntries(orgId));
+        });
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, [orgId]);
 
   const dismiss = useCallback(
     (alertId: string) => {
@@ -87,26 +88,17 @@ export function useDismissedAlerts(orgId: string): UseDismissedAlertsResult {
         ...current.filter((e) => e.alertId !== alertId),
         { alertId, dismissedUntil },
       ];
-      const key = getStorageKey(orgId);
-      safeLocalStorage.setJSON(key, next);
-      // Browsers não emitem `storage` event na própria aba que escreveu.
-      // Dispatch manual força re-leitura via `useSyncExternalStore` aqui
-      // E também notifica outras abas (que receberiam o evento natural).
-      try {
-        window.dispatchEvent(new StorageEvent('storage', { key }));
-      } catch {
-        // Fallback para browsers antigos: força reflow via setItem(key, value)
-        // — `useSyncExternalStore` re-lê. Custo zero em browsers modernos.
-        const raw = safeLocalStorage.getItem(key);
-        if (raw !== null) safeLocalStorage.setItem(key, raw);
-      }
+      safeLocalStorage.setJSON(getStorageKey(orgId), next);
+      setEntries(next);
     },
     [orgId],
   );
 
+  const dismissedIds = new Set(entries.map((e) => e.alertId));
   const isDismissed = useCallback(
     (alertId: string) => dismissedIds.has(alertId),
-    [dismissedIds],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [entries],
   );
 
   return { dismissedIds, dismiss, isDismissed };

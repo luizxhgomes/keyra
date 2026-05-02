@@ -2,7 +2,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState, ErrorMessage, KPICard } from '@/components/keyra';
 import { Sparkles } from 'lucide-react';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
-import { ScrollFadeRise } from '@/lib/motion/scroll-fade-rise';
 
 import { getDashboardKpis } from './actions';
 import { AgendaHojeCard } from './agenda-hoje-card';
@@ -128,24 +127,17 @@ export default async function DashboardPage() {
         />
       </section>
 
-      {/* Story 6.2 (AC2.9) — cards abaixo do fold entram com fadeRise
-          quando entram no viewport (`once: true` para não re-animar). */}
-      <ScrollFadeRise>
-        <AlertasCard />
-      </ScrollFadeRise>
+      {/* HOTFIX 2026-05-02: ScrollFadeRise removido temporariamente para
+          isolar bug de hidratação no Dashboard (digest 3213099672 persiste
+          após fix do EmptyState). Animação volta após root cause confirmado. */}
+      <AlertasCard />
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <ScrollFadeRise>
-          <AgendaHojeCard />
-        </ScrollFadeRise>
-        <ScrollFadeRise>
-          <IndicadoresCard />
-        </ScrollFadeRise>
+        <AgendaHojeCard />
+        <IndicadoresCard />
       </section>
 
-      <ScrollFadeRise>
-        <MetaCard />
-      </ScrollFadeRise>
+      <MetaCard />
     </div>
   );
 }

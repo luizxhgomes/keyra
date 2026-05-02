@@ -1,6 +1,8 @@
 # KEYRA — Onde Paramos (snapshot executivo)
 
-> **Data deste snapshot:** 2026-05-02 — 🎉🎉 **SPRINT 6 FECHADA — 100% (25/25 pts). DS editorial completa, Motion + Painel visual interativo, Navegação contextual.** Phases 1+2+3+4 = 100% + Sprint 5 + 5.7 + Sprint 6 (6.0+6.1+6.2+6.3+6.4+6.5). **Story 6.5 (Sidebar 7+2 + FAB contextual)** fechada — Sidebar reorganizada em 7 primários (Dashboard, Agenda, Comandas, Pacientes, Serviços, Financeiro, Estoque) + 2 secundários (Time, Configurações) separados por `border-t`; BottomNav FAB ganhou função pura `getFabAction(pathname)` exportada com 6 mapeamentos contextuais (paciente/serviço/despesa/insumo/comanda) + fallback `/agenda?novo=1`. **Phase 2.5 segunda story a herdar a regra com gates limpos** — sem pre-work cirúrgico, story enxuta (S 3 pts) confirmada como contraponto da 6.2 (M+ 6 pts com pre-work pesado). Os 4 gates G1-G4 não acrescentam — diagnosticam complexidade real. Anti-grep G1 (toFixed(N)%) zerado em layout. **Próxima ação**: considerar Story 6.2.1 (deferred ACs 2.3 stagger + 2.5 layoutId) ou avançar para Pós-MVP (Phases 5-7).
+> **Data deste snapshot:** 2026-05-02 — 🚨 **Sprint 7 ATIVADA (Auth UX & Reliability) após validação manual em mobile descobrir 4 issues HIGH+CRITICAL bloqueando go-to-market.** Sprint 6 ✅ Done (DS editorial + Motion + Navegação contextual + Phase 2.5 Gates), mas validação real em `usekeyra.com` revelou: (1) `/dashboard` explode pós-login com `digest 3213099672` opaco — Sentry capture nunca foi habilitado no `error.tsx` da Story 5.2 (TODO esquecido); (2) `/mais` BottomNav e `/configuracoes` Sidebar linkados mas sem rota implementada (404 + browser error); (3) Email magic link em inglês total (viola pt-BR inegociável); (4) Tela "Confira seu e-mail" estática sem auto-detect. **EPIC-7 ativo** ([`docs/stories/EPIC-7-AUTH-RELIABILITY.md`](stories/EPIC-7-AUTH-RELIABILITY.md)) com 7 stories sequenciadas em 7 dias. Story 7.0 URGENTE (30min) habilita Sentry para desbloquear debug. Phase 2.6 (5 gates G5-G10) será instaurada como regra permanente.
+
+> **Data anterior:** 2026-05-02 — 🎉🎉 **SPRINT 6 FECHADA — 100% (25/25 pts). DS editorial completa, Motion + Painel visual interativo, Navegação contextual.** Phases 1+2+3+4 = 100% + Sprint 5 + 5.7 + Sprint 6 (6.0+6.1+6.2+6.3+6.4+6.5). **Story 6.5 (Sidebar 7+2 + FAB contextual)** fechada — Sidebar reorganizada em 7 primários (Dashboard, Agenda, Comandas, Pacientes, Serviços, Financeiro, Estoque) + 2 secundários (Time, Configurações) separados por `border-t`; BottomNav FAB ganhou função pura `getFabAction(pathname)` exportada com 6 mapeamentos contextuais (paciente/serviço/despesa/insumo/comanda) + fallback `/agenda?novo=1`. **Phase 2.5 segunda story a herdar a regra com gates limpos** — sem pre-work cirúrgico, story enxuta (S 3 pts) confirmada como contraponto da 6.2 (M+ 6 pts com pre-work pesado). Os 4 gates G1-G4 não acrescentam — diagnosticam complexidade real. Anti-grep G1 (toFixed(N)%) zerado em layout. **Próxima ação**: considerar Story 6.2.1 (deferred ACs 2.3 stagger + 2.5 layoutId) ou avançar para Pós-MVP (Phases 5-7).
 > **Última entrega:** **Sprint 3 fechada** — todas as 8 stories de Automação Financeira (3.1-3.8) entregues em uma sessão com QA gate PASS. O ciclo do diferencial KEYRA está vivo end-to-end: `criar agendamento → concluir → comanda automática → pagamento (com cálculo de fee) → transação automática → rateio de estoque`. Migrations 024 (`seed_chart_on_org_create` que faz seed das orgs novas + backfill nas existentes) e 025 (`professionals.cost_center`) aplicadas. UI nova: `/comandas`, `/comandas/[id]` (com PaymentsCard + ConsumoCard), `/financeiro/transacoes`, `/financeiro/receitas`, `/financeiro/despesas` (CRUD), `/financeiro/custos-fixos` (com clone do mês passado), `/financeiro/fluxo-caixa` (saldo + tabela diária + projeção), `/financeiro/categorias`. **Decisão de arquitetura central: zero cálculo na aplicação** — todos os totais são mantidos por triggers (`trg_command_items_recompute`, `trg_payments_to_transaction`, `_consume_command_inventory`) e GENERATED columns. App só dispara INSERT/UPDATE/DELETE; banco cuida do resto. RLS dupla (filtro explícito + security_invoker da migration 023). Smoke transacional via psql + ROLLBACK validou todos os 3 ciclos críticos (comanda gerada, pagamento → transação, rateio de insumos).
 >
 > **Próxima ação recomendada:** **Sprint 4 — Lucro + Dashboard** (~38 pts, fecha o MVP). 9 drafts criados pelo @sm, todas validadas pelo @po (GO 9-10/10) e Ready: 4.1 DRE básica · 4.2 DRE por serviço (diferencial vs Conta Azul) · 4.3 Lucro por profissional · **4.4 Dashboard tela única ⭐ (story-anchor)** · 4.5 Agenda do dia · 4.6 Indicadores · 4.7 Comparativo mês vs anterior · 4.8 Comparativo vs meta · 4.9 Alertas. Recomendação tática: começar pela **4.4** (vitrine + slots para 4.5-4.9) e construir as outras encaixando no dashboard.
@@ -22,7 +24,8 @@
 | **Phase 3 — Automação Financeira** | ✅ **100% (32/32 pts)** | 8 stories Done. Ciclo do diferencial KEYRA vivo end-to-end. Migrations 024+025. |
 | **Phase 4 — Lucro + Dashboard** | ✅ **100% (~38 pts)** | **9 stories ✅ Done em uma sessão**: 4.1 DRE básica · 4.2 DRE por serviço (diferencial) · 4.3 Lucro por profissional · 4.4 Dashboard tela única · 4.5 Agenda do dia · 4.6 Indicadores · 4.7 ComparativoTexto · 4.8 Metas · 4.9 Alertas. **MVP FEATURE-COMPLETE.** |
 | **Sprint 5 — Higienização visual** | ✅ **100% (~28 pts)** | 5.1-5.7 todas Done. Score saiu de 6.8 para alvo 8.0+. |
-| **Sprint 6 — Editorial + Motion** | ✅ **100% (25/25 pts)** | **Sprint 6 FECHADA.** 6.0 + 6.1 + 6.2 + 6.3 + 6.4 + 6.5 Done. DS editorial + Motion + Painel visual interativo + Navegação contextual. Phase 2.5 Anti-Regression Gates instaurada como regra permanente. **AC2.3 e AC2.5 deferidos** para Story 6.2.1 (stagger fields RHF + Sidebar layoutId — bundle budget). |
+| **Sprint 6 — Editorial + Motion** | ✅ **100% (25/25 pts)** | **Sprint 6 FECHADA.** 6.0 + 6.1 + 6.2 + 6.3 + 6.4 + 6.5 Done. DS editorial + Motion + Painel visual interativo + Navegação contextual. Phase 2.5 Anti-Regression Gates instaurada. AC2.3 e AC2.5 deferidos para Story 6.2.1. |
+| **Sprint 7 — Auth UX & Reliability** | 🟡 **5% (1/22 pts)** | **7.0 ✅ Done** (Sentry capture habilitado em `(app)/error.tsx` — desbloqueia debug do digest opaco). EPIC-7 aberto após validação manual real revelar: dashboard explodindo pós-login, `/mais` e `/configuracoes` 404, email em inglês, tela "Confira seu e-mail" estática. Restam 6 stories: 7.1 Auth UX (M+) → 7.2 Email pt-BR (S) → 7.3 Rotas faltantes (S) → 7.4 not-found+audit (XS, instaura Phase 2.6) → 7.5 Reliability backend (M) → 7.6 Home cleanup (S opcional). |
 | **Phases 5–7 — Pós-MVP** | ⏸️ 0% UI | Phase 5 = Precificação inteligente, pacotes, alertas de recompra, Stripe. Phase 6 = Projeções, prontuário financeiro. Phase 7 = OCR, Asaas Pix, WhatsApp, NFS-e. |
 | **Testes automatizados** | 🔴 0 | Nenhum arquivo `.test.*` ou `.spec.*` no repo. Validação manual + typecheck + lint + build apenas |
 
@@ -137,16 +140,34 @@ Nenhum impede a próxima Story (2.4 — Agenda); cada um trava uma Story especí
 
 ## 6. Próxima Ação Concreta — Luiz
 
-**🎉 Sprint 6 FECHADA — 100% (25/25 pts).** MVP feature-complete + camada visual editorial completa: tipografia Inter Variable, motion system com 10 momentos canônicos, alert hierarchy 3+5+5 com dismiss, refactor visual DRE, sidebar 7+2 + FAB contextual, gates anti-regressão permanentes (Phase 2.5).
+🚨 **Sprint 7 ATIVADA — Auth UX & Reliability.** Validação manual real em mobile (2026-05-02) revelou **4 issues HIGH+CRITICAL** + 9 LOWs na jornada de login + navegação primária. **Bloqueador absoluto de go-to-market.**
 
-**Próximas opções:**
+**Documento canônico:** [`docs/stories/EPIC-7-AUTH-RELIABILITY.md`](stories/EPIC-7-AUTH-RELIABILITY.md)
 
-1. **Story 6.2.1 (irmã da 6.2)** — destravar AC2.3 (stagger nos 3 fields do agendamento-form via refactor RHF) e AC2.5 (Sidebar layoutId com `<m.div layout>` exigindo `domMax` features +30KB). Fica condicionada a budget de bundle adequado (ou alternativa motion-mini).
-2. **Pós-MVP — Phase 5** (Precificação inteligente, pacotes, alertas de recompra, Stripe billing). Stack 100% pronta para começar.
-3. **Pós-MVP — Phase 6** (Projeções, what-if, prontuário financeiro, sugestões upsell).
-4. **Go-to-market** — produto está funcionalmente completo + visualmente sofisticado. Falta apenas validar com Camila real e iterar baseado em feedback.
+**Issues confirmados (4 HIGH+CRITICAL):**
+1. 🔴 HIGH — `/login` "Confira seu e-mail" sem auto-detect (5-8 toques + troca de app)
+2. 🔴 CRITICAL — `/dashboard` explode pós-login (`digest 3213099672` opaco — Sentry capture nunca foi habilitado)
+3. 🔴 HIGH — `/mais` (BottomNav) → 404 (rota linkada sem implementação)
+4. 🔴 HIGH — `/configuracoes` (Sidebar) → browser error (rota linkada sem implementação)
+5. 🔴 HIGH — Email magic link em **inglês total** (viola pt-BR inegociável CON-UX-01)
 
-Recomendação: validar primeiro com persona real (Camila) antes de abrir Phase 5 — feedback de campo pode reorientar prioridades.
+**Stories da Sprint 7 (sequencialmente):**
+
+| Story | T-shirt | Foco |
+|-------|---------|------|
+| **7.0** Sentry capture (URGENTE — 30min) | XS | `Sentry.captureException(error)` em `(app)/error.tsx` — pré-requisito de tudo |
+| **7.1** Auth UX (anti-fricção) | M+ | `onAuthStateChange` polling + reenviar + timer + callback loading + placeholder |
+| **7.2** Email templates pt-BR (URGENTE) | S | Customizar 4 templates Supabase Auth com branding KEYRA |
+| **7.3** Rotas faltantes /mais e /configuracoes | S | Páginas mínimas viáveis + getFabAction atualizado |
+| **7.4** not-found.tsx + Dead Link Audit | XS | NotFound customizado + script CI |
+| **7.5** Reliability backend | M | Defensive fetch + boundaries granulares (escopo definido pós-Sentry) |
+| 7.6 Home cleanup (cosmético) | S | Remover "EM CONSTRUÇÃO" + tokens 6.1 nas rotas públicas |
+
+**Phase 2.6 — Auth Reliability Gates** será instaurada na Story 7.4: G5 (Auth UX Smoke), G6 (Sentry capture obrigatório), G7 (Email pt-BR), G8 (Server Component defensive fetch), G9 (Boundary granular), G10 (Dead Link Audit).
+
+**Cronograma:** ~7 dias úteis. Validação manual da idealizadora encerra a Sprint 7.
+
+**Próximo comando:** `@aiox-master *workflow keyra-sdc-com-gate-financeiro` ou direto `@sm *draft 7.0` para iniciar.
 
 ### Caminho para Sprint 6 (camada editorial)
 

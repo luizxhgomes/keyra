@@ -3,16 +3,22 @@
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { AlertOctagon } from 'lucide-react';
+import * as Sentry from '@sentry/nextjs';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 /**
- * Catch-all de erro não tratado dentro do app autenticado (Story 5.2).
+ * Catch-all de erro não tratado dentro do app autenticado (Story 5.2 + 7.0).
  *
  * Próxima das rotas, captura erros que escaparam dos `try`/`catch` das
  * Server Actions. Tom de mentora confiável (não técnico, não maternal).
  * Botão "Tentar novamente" usa `reset()` do Next App Router.
+ *
+ * Story 7.0 — `Sentry.captureException(error)` envia stacktrace completo
+ * para o Sentry. Sem isso, `error.digest` mostrado na UI é opaco e não
+ * correlaciona com nenhuma fonte de debug. SDK já faz scrubbing de PII
+ * (tokens, emails, cookies) por padrão (ADR-021).
  */
 export default function AppError({
   error,
@@ -22,7 +28,7 @@ export default function AppError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // TODO: Sentry capture quando configurado em produção
+    Sentry.captureException(error);
     console.error('[KEYRA] Unhandled error:', error);
   }, [error]);
 

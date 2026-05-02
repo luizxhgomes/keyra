@@ -17,7 +17,7 @@ import { AlertasList } from './alertas-list';
  * `useDismissedAlerts` com `useSyncExternalStore`).
  */
 export async function AlertasCard() {
-  const { orgId } = await requireAuth();
+  await requireAuth();
   const result = await getActiveAlerts();
 
   if (!result.ok) {
@@ -39,7 +39,7 @@ export async function AlertasCard() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <AlertasList alerts={result.data} orgId={orgId} />
+        <AlertasList />
       </CardContent>
     </Card>
   );

@@ -2,8 +2,6 @@
 
 import { CheckCircle2 } from 'lucide-react';
 
-import type { Alert } from './actions';
-
 /**
  * AlertasList — versão MINIMAL bisect (HOTFIX 2026-05-02).
  *
@@ -16,7 +14,7 @@ import type { Alert } from './actions';
  * Se esta versão carregar → bug está em um dos itens acima → re-adiciono
  * peça por peça. Se ainda quebrar → bug é mais fundo (AlertasCard parent).
  */
-export function AlertasList({ alerts: _alerts, orgId: _orgId }: { alerts: Alert[]; orgId: string }) {
+export function AlertasList() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
       <div className="mb-1 rounded-full bg-muted p-3">

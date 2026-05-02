@@ -41,7 +41,7 @@ export default async function MovimentacoesPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">Movimentações</h2>
+        <h2 className="text-h2">Movimentações</h2>
         <p className="text-sm text-muted-foreground">
           {total} {total === 1 ? 'movimento' : 'movimentos'} registrados.
           {commandFilter ? (

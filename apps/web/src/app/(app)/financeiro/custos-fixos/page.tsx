@@ -3,7 +3,7 @@ import { ptBR } from 'date-fns/locale';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmptyState, ErrorMessage } from '@/components/keyra';
+import { ComparativoTexto, EmptyState, ErrorMessage } from '@/components/keyra';
 import { Repeat } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
@@ -70,18 +70,22 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
       ? monthlyValues.reduce((a, b) => a + b, 0) / monthlyValues.length
       : 0;
 
-  // Variação vs média
+  // Variação vs média móvel (Story 6.4 — usa <ComparativoTexto>).
+  // delta em centavos para o componente. sentiment:
+  //   - custo caiu (variationAbsolute < 0) = positive (favorável para clínica)
+  //   - custo subiu = negative
+  //   - sem variação = neutral
   const variationAbsolute = totalFixed - movingAverage;
-  const variationText =
-    movingAverage === 0
-      ? 'sem histórico'
-      : `${variationAbsolute >= 0 ? '+' : ''}${formatBRL(variationAbsolute)} vs média móvel`;
+  const variationDeltaCents = Math.round(variationAbsolute * 100);
+  const variationSentiment: 'positive' | 'negative' | 'neutral' =
+    variationAbsolute < 0 ? 'positive' : variationAbsolute > 0 ? 'negative' : 'neutral';
+  const hasHistory = movingAverage > 0;
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Custos fixos</h2>
+          <h2 className="text-h2">Custos fixos</h2>
           <p className="text-sm text-muted-foreground">
             Despesas marcadas como fixas (categoria `fixed_cost` ou flag manual no
             lançamento). Recorrência manual via botão de clone.
@@ -93,11 +97,21 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SummaryCell label="Total no período" value={formatBRL(totalFixed)} />
         <SummaryCell label="Média móvel (3m)" value={formatBRL(movingAverage)} />
-        <SummaryCell
-          label="Variação"
-          value={variationText}
-          positive={variationAbsolute < 0}
-        />
+        <div className="rounded-md border border-border bg-card p-4">
+          <p className="text-label uppercase text-muted-foreground">Variação</p>
+          {hasHistory ? (
+            <div className="mt-1">
+              <ComparativoTexto
+                delta={variationDeltaCents}
+                period="média móvel"
+                sentiment={variationSentiment}
+                format="full"
+              />
+            </div>
+          ) : (
+            <p className="text-xl text-muted-foreground">sem histórico</p>
+          )}
+        </div>
       </div>
 
       <Card>

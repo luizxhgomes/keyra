@@ -64,7 +64,7 @@ export default async function DespesasPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Despesas</h2>
+          <h2 className="text-h2">Despesas</h2>
           <p className="text-sm text-muted-foreground">
             {total} {total === 1 ? 'lançamento' : 'lançamentos'} no período · Total{' '}
             <span className="font-semibold tabular-nums">{formatBRL(totalNet)}</span>

@@ -40,7 +40,7 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">DRE por profissional — {periodLabel}</h2>
+        <h2 className="text-h2">DRE por profissional — {periodLabel}</h2>
         <p className="text-sm text-muted-foreground">
           Performance individual. Use para decisões de retenção, promoção e ajuste de
           comissão.
@@ -66,36 +66,36 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-muted-foreground">
-                    <th className="py-2 pr-3 font-medium">Profissional</th>
-                    <th className="py-2 pr-3 font-medium">Centro</th>
-                    <th className="py-2 pr-3 text-right font-medium">Atend.</th>
-                    <th className="py-2 pr-3 text-right font-medium">Ticket médio</th>
-                    <th className="py-2 pr-3 text-right font-medium">Receita</th>
-                    <th className="py-2 pr-3 text-right font-medium">Comissão</th>
-                    <th className="py-2 text-right font-medium">Lucro</th>
+                    <th className="py-stack-loose pr-3 font-medium">Profissional</th>
+                    <th className="py-stack-loose pr-3 font-medium">Centro</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Atend.</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Ticket médio</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Receita</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Comissão</th>
+                    <th className="py-stack-loose text-right font-medium">Lucro</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.professional_id} className="border-b border-border">
-                      <td className="py-2 pr-3 font-medium">{r.professional_name}</td>
-                      <td className="py-2 pr-3 text-muted-foreground">
+                      <td className="py-stack-loose pr-3 font-medium">{r.professional_name}</td>
+                      <td className="py-stack-loose pr-3 text-muted-foreground">
                         {r.cost_center ?? '—'}
                       </td>
-                      <td className="py-2 pr-3 text-right tabular-nums">
+                      <td className="py-stack-loose pr-3 text-right tabular-nums">
                         {r.items_count}
                       </td>
-                      <td className="py-2 pr-3 text-right tabular-nums">
+                      <td className="py-stack-loose pr-3 text-right tabular-nums">
                         {formatBRL(r.ticket_medio)}
                       </td>
-                      <td className="py-2 pr-3 text-right tabular-nums">
+                      <td className="py-stack-loose pr-3 text-right tabular-nums">
                         {formatBRL(r.revenue_gross)}
                       </td>
-                      <td className="py-2 pr-3 text-right tabular-nums text-destructive">
+                      <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                         {formatBRL(r.commission_to_pay)}
                       </td>
                       <td
-                        className={`py-2 text-right tabular-nums font-semibold ${
+                        className={`py-stack-loose text-right tabular-nums font-semibold ${
                           r.gross_profit >= 0 ? 'text-emerald-700' : 'text-destructive'
                         }`}
                       >
@@ -106,16 +106,16 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
                 </tbody>
                 <tfoot>
                   <tr className="bg-muted/50 font-semibold">
-                    <td className="py-2 pr-3" colSpan={4}>
+                    <td className="py-stack-loose pr-3" colSpan={4}>
                       Total
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums">
+                    <td className="py-stack-loose pr-3 text-right tabular-nums">
                       {formatBRL(totals.revenue)}
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums text-destructive">
+                    <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                       {formatBRL(totals.commission)}
                     </td>
-                    <td className="py-2 text-right tabular-nums text-emerald-700">
+                    <td className="py-stack-loose text-right tabular-nums text-emerald-700">
                       {formatBRL(totals.profit)}
                     </td>
                   </tr>

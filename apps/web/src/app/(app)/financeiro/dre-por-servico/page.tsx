@@ -43,7 +43,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">DRE por serviço — {periodLabel}</h2>
+        <h2 className="text-h2">DRE por serviço — {periodLabel}</h2>
         <p className="text-sm text-muted-foreground">
           Lucro de cada procedimento individualmente. <strong>Diferencial KEYRA:</strong>{' '}
           Conta Azul/Omie não entregam isso.
@@ -70,13 +70,13 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left text-muted-foreground">
-                    <th className="py-2 pr-3 font-medium">Serviço</th>
-                    <th className="py-2 pr-3 text-right font-medium">Atend.</th>
-                    <th className="py-2 pr-3 text-right font-medium">Receita</th>
-                    <th className="py-2 pr-3 text-right font-medium">Custo</th>
-                    <th className="py-2 pr-3 text-right font-medium">Comissão</th>
-                    <th className="py-2 pr-3 text-right font-medium">Lucro</th>
-                    <th className="py-2 text-right font-medium">Margem</th>
+                    <th className="py-stack-loose pr-3 font-medium">Serviço</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Atend.</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Receita</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Custo</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Comissão</th>
+                    <th className="py-stack-loose pr-3 text-right font-medium">Lucro</th>
+                    <th className="py-stack-loose text-right font-medium">Margem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -86,7 +86,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                     const isLoss = r.gross_profit < 0;
                     return (
                       <tr key={r.service_id} className="border-b border-border">
-                        <td className="py-2 pr-3">
+                        <td className="py-stack-loose pr-3">
                           <span className="inline-flex items-center gap-2">
                             {r.service_name}
                             {isTop ? (
@@ -112,26 +112,26 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                             ) : null}
                           </span>
                         </td>
-                        <td className="py-2 pr-3 text-right tabular-nums">
+                        <td className="py-stack-loose pr-3 text-right tabular-nums">
                           {r.items_count}
                         </td>
-                        <td className="py-2 pr-3 text-right tabular-nums">
+                        <td className="py-stack-loose pr-3 text-right tabular-nums">
                           {formatBRL(r.revenue_gross)}
                         </td>
-                        <td className="py-2 pr-3 text-right tabular-nums text-destructive">
+                        <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                           {formatBRL(r.variable_cost)}
                         </td>
-                        <td className="py-2 pr-3 text-right tabular-nums text-destructive">
+                        <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                           {formatBRL(r.commissions)}
                         </td>
                         <td
-                          className={`py-2 pr-3 text-right tabular-nums font-semibold ${
+                          className={`py-stack-loose pr-3 text-right tabular-nums font-semibold ${
                             r.gross_profit >= 0 ? 'text-emerald-700' : 'text-destructive'
                           }`}
                         >
                           {formatBRL(r.gross_profit)}
                         </td>
-                        <td className="py-2 text-right tabular-nums">
+                        <td className="py-stack-loose text-right tabular-nums">
                           {r.margin_percent.toFixed(1)}%
                         </td>
                       </tr>
@@ -140,27 +140,27 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                 </tbody>
                 <tfoot>
                   <tr className="bg-muted/50 font-semibold">
-                    <td className="py-2 pr-3">Total</td>
-                    <td className="py-2 pr-3 text-right tabular-nums">
+                    <td className="py-stack-loose pr-3">Total</td>
+                    <td className="py-stack-loose pr-3 text-right tabular-nums">
                       {rows.reduce((a, r) => a + r.items_count, 0)}
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums">
+                    <td className="py-stack-loose pr-3 text-right tabular-nums">
                       {formatBRL(totals.revenue)}
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums text-destructive">
+                    <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                       {formatBRL(totals.variableCost)}
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums text-destructive">
+                    <td className="py-stack-loose pr-3 text-right tabular-nums text-destructive">
                       {formatBRL(totals.commissions)}
                     </td>
                     <td
-                      className={`py-2 pr-3 text-right tabular-nums ${
+                      className={`py-stack-loose pr-3 text-right tabular-nums ${
                         totals.profit >= 0 ? 'text-emerald-700' : 'text-destructive'
                       }`}
                     >
                       {formatBRL(totals.profit)}
                     </td>
-                    <td className="py-2 text-right tabular-nums">
+                    <td className="py-stack-loose text-right tabular-nums">
                       {totals.revenue > 0
                         ? `${((totals.profit / totals.revenue) * 100).toFixed(1)}%`
                         : '—'}

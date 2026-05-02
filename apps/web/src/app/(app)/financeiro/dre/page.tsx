@@ -42,7 +42,7 @@ export default async function DrePage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">DRE — {periodLabel}</h2>
+        <h2 className="text-h2">DRE — {periodLabel}</h2>
         <p className="text-sm text-muted-foreground">
           Demonstrativo do Resultado do Exercício. Compare absoluto com o mês anterior
           para enxergar tendências.
@@ -60,10 +60,10 @@ export default async function DrePage({ searchParams }: PageProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-left text-muted-foreground">
-                <th className="py-2 pr-3 font-medium">Conta</th>
-                <th className="py-2 pr-3 text-right font-medium">Mês corrente</th>
-                <th className="py-2 pr-3 text-right font-medium">% sobre receita</th>
-                <th className="py-2 text-right font-medium">vs {period}</th>
+                <th className="py-stack-loose pr-3 font-medium">Conta</th>
+                <th className="py-stack-loose pr-3 text-right font-medium">Mês corrente</th>
+                <th className="py-stack-loose pr-3 text-right font-medium">% sobre receita</th>
+                <th className="py-stack-loose text-right font-medium">vs {period}</th>
               </tr>
             </thead>
             <tbody>
@@ -72,29 +72,37 @@ export default async function DrePage({ searchParams }: PageProps) {
                 const delta = line.amount - line.amountLastMonth;
                 const isFinal = emphasis === 'final';
                 const isSubtotal = emphasis === 'subtotal';
+                // Story 6.4 — hierarquia visual:
+                // - subtotal (`revenueNet`): bg-muted/30 + text-h3 (20px / 600) + border-t-2
+                // - final (`netProfit`): bg-muted/50 + text-h2 (24px / 600) + cor por sinal + border-t-2
+                // - linhas regulares: ritmo `py-stack-loose` (24px) — DRE é tela de leitura
+                const rowEmphasisClass = isFinal
+                  ? 'bg-muted/50 text-h2 border-t-2 border-border'
+                  : isSubtotal
+                    ? 'bg-muted/30 text-h3 border-t-2 border-border'
+                    : '';
+                const finalAmountColorClass = isFinal
+                  ? line.amount >= 0
+                    ? 'text-secondary'
+                    : 'text-destructive'
+                  : '';
                 return (
                   <tr
                     key={key}
-                    className={`border-b border-border ${
-                      isFinal
-                        ? 'bg-muted/50 font-bold'
-                        : isSubtotal
-                          ? 'bg-muted/30 font-semibold'
-                          : ''
-                    }`}
+                    className={`border-b border-border ${rowEmphasisClass}`}
                   >
-                    <td className="py-2 pr-3">{line.label}</td>
+                    <td className={`py-stack-loose pr-3 ${finalAmountColorClass}`}>
+                      {line.label}
+                    </td>
                     <td
-                      className={`py-2 pr-3 text-right tabular-nums ${
-                        isFinal && line.amount < 0 ? 'text-destructive' : ''
-                      } ${isFinal && line.amount >= 0 ? 'text-emerald-700' : ''}`}
+                      className={`py-stack-loose pr-3 text-right tabular-nums ${finalAmountColorClass}`}
                     >
                       {formatBRL(line.amount)}
                     </td>
-                    <td className="py-2 pr-3 text-right tabular-nums text-muted-foreground">
+                    <td className="py-stack-loose pr-3 text-right tabular-nums text-muted-foreground">
                       {line.percentOfRevenue.toFixed(1)}%
                     </td>
-                    <td className="py-2 text-right">
+                    <td className="py-stack-loose text-right">
                       {line.amountLastMonth === 0 && line.amount === 0 ? (
                         <span className="text-muted-foreground">—</span>
                       ) : (

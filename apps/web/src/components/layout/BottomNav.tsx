@@ -11,10 +11,10 @@ import { cn } from '@/lib/utils';
  *
  * 5 slots: Dashboard, Agenda, FAB (contextual), Pacientes, Mais.
  *
- * Story 5.7 — FAB ganhou destino real: `/agenda?novo=1` abre o sheet de
- * novo agendamento direto, fechando a J2 (criar agendamento mobile sem
- * passar por desktop). FAB **contextual por rota** (Sprint 6.5) entrega
- * label/destino diferentes em cada tela.
+ * Story 5.7 — FAB ganhou destino real (`/agenda?novo=1`).
+ * Story 6.5 (AC2) — FAB **contextual por rota**: em `/pacientes` cadastra
+ * paciente, em `/financeiro/despesas` cria despesa, etc. `getFabAction`
+ * mapeia 6 rotas + fallback default.
  */
 const ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -23,8 +23,38 @@ const ITEMS = [
   { href: '/mais', label: 'Mais', icon: MoreHorizontal },
 ] as const;
 
+/**
+ * Story 6.5 (AC2) — função pura para mapear pathname → ação contextual do FAB.
+ *
+ * Testabilidade futura: snapshot tests cobrindo cada branch sem montar componente.
+ * Default: `/agenda?novo=1` (criar agendamento — ação mais frequente da Camila).
+ */
+export function getFabAction(pathname: string | null): { href: string; label: string } {
+  if (!pathname) return { href: '/agenda?novo=1', label: 'Criar novo agendamento' };
+  if (pathname.startsWith('/pacientes')) {
+    return { href: '/pacientes/novo', label: 'Cadastrar novo paciente' };
+  }
+  if (pathname.startsWith('/servicos')) {
+    return { href: '/servicos/novo', label: 'Cadastrar novo serviço' };
+  }
+  if (pathname.startsWith('/financeiro/despesas')) {
+    return { href: '/financeiro/despesas/nova', label: 'Cadastrar nova despesa' };
+  }
+  if (pathname.startsWith('/estoque/insumos')) {
+    return { href: '/estoque/insumos/novo', label: 'Cadastrar novo insumo' };
+  }
+  if (pathname.startsWith('/comandas')) {
+    return {
+      href: '/agenda?novo=1',
+      label: 'Criar agendamento (gera comanda automática)',
+    };
+  }
+  return { href: '/agenda?novo=1', label: 'Criar novo agendamento' };
+}
+
 export function BottomNav() {
   const pathname = usePathname();
+  const fabAction = getFabAction(pathname);
 
   return (
     <nav
@@ -36,8 +66,8 @@ export function BottomNav() {
       ))}
 
       <Link
-        href="/agenda?novo=1"
-        aria-label="Criar novo agendamento"
+        href={fabAction.href}
+        aria-label={fabAction.label}
         className="relative -mt-8 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-colors hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />

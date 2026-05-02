@@ -1,34 +1,18 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { EmptyState, ErrorMessage, KPICard } from '@/components/keyra';
-import { Sparkles } from 'lucide-react';
+import { ErrorMessage, KPICard } from '@/components/keyra';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
 
 import { getDashboardKpis } from './actions';
-import { AgendaHojeCard } from './agenda-hoje-card';
-import { AlertasCard } from './alertas-card';
-import { IndicadoresCard } from './indicadores-card';
-import { MetaCard } from './meta-card';
 
 /**
- * Story 4.4 — Dashboard tela única.
+ * Story 4.4 — Dashboard tela única (HOTFIX 2026-05-02 BISECT).
  *
- * Server Component. KPIs reais via `v_dashboard_kpis` + comparativo
- * absoluto vs mês passado (Story 4.7). Slots para 4.5-4.9 ficam como
- * placeholders enquanto stories irmãs não chegam — mantêm a estrutura
- * viva sem bloquear esta entrega.
+ * Versão MINIMAL para isolar bug de hidratação digest 3213099672.
+ * Removidos temporariamente: AlertasCard, AgendaHojeCard, IndicadoresCard,
+ * MetaCard, EmptyState (no-data branch). Mantidos apenas: 4 KPICard.
  *
- * **Ordem dos elementos (Story 6.0 / decisão da idealizadora):**
- * 1. KPIs hero (Receita realizada, Receita prevista, Despesas, Lucro) —
- *    indicadores agregados que comunicam saúde do mês em 1 olhada.
- * 2. AlertasCard — sinais que merecem atenção; aparece com empty state
- *    positivo quando não há alertas (Story 5.7).
- * 3. Grid 2 cols: AgendaHojeCard + IndicadoresCard — segundo nível de
- *    leitura, detalhamento operacional do dia.
- * 4. MetaCard — progressão da meta do mês.
- *
- * AgendaHojeCard é **lista detalhada** (horários do dia), não **KPI agregado**
- * (número absoluto único). Por isso fica abaixo dos KPIs hero. Decisão
- * registrada após auditoria `@baziotti` 2026-05-02 questionar a ordem.
+ * Se esta versão carregar → bug está em algum dos cards removidos.
+ * Se ainda quebrar → bug é no KPICard ou no shell mesmo.
  */
 export default async function DashboardPage() {
   const result = await getDashboardKpis();
@@ -73,12 +57,6 @@ export default async function DashboardPage() {
     'revenue',
   );
 
-  const noData =
-    k.revenueMtdCents === 0 &&
-    k.expensesMtdCents === 0 &&
-    k.expectedRevenueMtdCents === 0 &&
-    k.appointmentsToday === 0;
-
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
@@ -87,18 +65,6 @@ export default async function DashboardPage() {
           Visão única do seu mês — números absolutos, sem gráfico.
         </p>
       </header>
-
-      {noData ? (
-        <Card>
-          <CardContent className="py-6">
-            <EmptyState
-              icon={Sparkles}
-              title="Conclua atendimentos para ver os números"
-              description="O dashboard mostra receita realizada, despesas e lucro do mês corrente em tempo real, conforme você marca atendimentos como concluídos e registra pagamentos."
-            />
-          </CardContent>
-        </Card>
-      ) : null}
 
       <section
         aria-label="Indicadores financeiros do mês"
@@ -126,18 +92,6 @@ export default async function DashboardPage() {
           {...(profitComp ? { comparison: profitComp } : {})}
         />
       </section>
-
-      {/* HOTFIX 2026-05-02: ScrollFadeRise removido temporariamente para
-          isolar bug de hidratação no Dashboard (digest 3213099672 persiste
-          após fix do EmptyState). Animação volta após root cause confirmado. */}
-      <AlertasCard />
-
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AgendaHojeCard />
-        <IndicadoresCard />
-      </section>
-
-      <MetaCard />
     </div>
   );
 }

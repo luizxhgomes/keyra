@@ -104,7 +104,7 @@ KEYRA é o "primeiro financeiro operacional para estética": a agenda dispara o 
 - AWS (Amplify/Cognito/RDS) — over-engineering para MVP solo-dev; setup 10x mais lento.
 - Convex — muito acoplado; sem Postgres = sem audit trail SQL nativo nem futura migração contábil.
 
-**[DECISÃO PENDENTE — input Luiz]:** Confirmar se Vercel Pro ($20/mês) é aceitável desde o dia 1 ou começar Hobby até primeiro paying customer.
+**[DECISÃO RESOLVIDA — D1 fechada 2026-04-16]:** Vercel **Hobby (Free)** durante MVP. Upgrade para **Pro ($20/mês)** obrigatório antes do 1º paying customer (commercial-use license requer Pro). Story `h8.2` da Sprint 8 cobre a migração + rotação de credenciais expostas em chat. Detalhes em INFRA-STATUS.md §2.
 
 ---
 
@@ -132,7 +132,9 @@ KEYRA é o "primeiro financeiro operacional para estética": a agenda dispara o 
 - **Date:** `date-fns` (não Moment, não Day.js — tree-shakeable, locale-pt-br nativo)
 - **Calendar/Agenda:** `@fullcalendar/react` (visualização diária/semanal/mensal pronta) — **VALIDAR custo de licença comercial** (FullCalendar Standard é MIT, Premium é pago para timeline view).
 
-**[DECISÃO PENDENTE — input Luiz]:** FullCalendar Standard (MIT, suficiente para visualizações dia/semana/mês) vs alternativa custom com `react-big-calendar` ou `Schedule-X` (newer, mais leve)?
+**[DECISÃO RESOLVIDA — D2 fechada 2026-05-02]:** **FullCalendar Standard (MIT)** confirmado em prod desde Story 2.4 (entregue 2026-04-30). Decisão materializada de fato — sem reabrir. A view `resource-timegrid` (Premium pago) foi substituída por filtro via `Select` (tech debt registrado em Dev Decisions §1 da Story 2.4) — solução vive no MIT plan sem dependência paga. Migração para `Schedule-X` ou `react-big-calendar` só se houver bloqueador real específico que aparecer pós-MVP.
+
+**Decisão aprovada por:** `@aiox-master` (Orion) — registro retroativo, decisão já em produção há 2 semanas.
 
 ---
 
@@ -268,9 +270,9 @@ export function createAdminClient() // service_role key, BYPASS RLS — uso rest
 
 ### ADR-009 — Background Jobs: Inngest
 
-**Status:** ACCEPTED para Fases 4–7. **Não usado nas Fases 1–3.**
+**Status:** ACCEPTED para Fases 5–7 (atualizado 2026-05-02 após D3 fechada). **Não usado nas Fases 1–4.**
 
-**Contexto:** Fases 1–3 não têm jobs assíncronos reais (tudo é mutação síncrona). A partir da Fase 4 (recálculo de DRE/dashboard) e Fase 7 (OCR de PDFs, integrações), surgem jobs.
+**Contexto:** Fases 1–4 não tiveram jobs assíncronos reais (tudo é mutação síncrona ou view on-demand). A partir da Fase 5 (precificação inteligente + projeções iniciais) e Fase 7 (OCR de PDFs, integrações), surgem jobs com necessidade real de fan-out + retry + observability.
 
 **Decisão:** **Inngest** como orquestrador de jobs (queue + scheduler + retry + observability).
 
@@ -295,7 +297,9 @@ export function createAdminClient() // service_role key, BYPASS RLS — uso rest
 - (-) Mais um vendor. Mitigação: jobs como Inngest functions são funções TS puras — migração para BullMQ/Trigger.dev é mecânica.
 - (+) Free tier suporta MVP até ~500 orgs ativas.
 
-**[DECISÃO PENDENTE — input Luiz]:** Aceitar Inngest free tier como dependência da Phase 4 ou adiar jobs até Phase 5 (computar DRE on-demand)?
+**[DECISÃO RESOLVIDA — D3 fechada 2026-05-02]:** Inngest entra a partir da **Phase 5** (não Phase 4). Justificativa: Phase 4 entregou DRE on-demand via 6 views Postgres (`v_dre_monthly`, `v_dre_by_service`, `v_dre_by_professional`, `v_cashflow_daily`, `v_dashboard_kpis`, `v_receitas_previstas`) com `security_invoker=true`, e o feedback de Sprint 4 confirmou que performance é aceitável sem materialização agressiva. Postergar Inngest evita custo cognitivo + dependência sem necessidade — ele entra junto com a primeira projeção preditiva (Story `i6.1` weekly-profit-projection) e o pipeline OCR (Story `g7.1`). Casos `recompute-monthly-dre` e `dashboard-metrics-warm` migram para Phase 5 ou descartados se views continuarem dentro do budget.
+
+**Decisão aprovada por:** `@aiox-master` (Orion) — registro autônomo, justificado por dado empírico de Sprint 4 (typecheck/lint/build verdes + smoke RLS + 5 deploys READY sem job assíncrono).
 
 ---
 
@@ -498,7 +502,7 @@ erDiagram
 
 ### ADR-014 — Edge Functions Supabase + Inngest fan-out + Google Document AI
 
-**Status:** PROPOSED (Phase 7)
+**Status:** ACCEPTED (Phase 7) — promovido de PROPOSED em 2026-05-02 após D4 fechada.
 
 **Decisão:**
 
@@ -534,7 +538,9 @@ Upload PDF (Server Action)
 - Bancos: Itaú, Bradesco, Nubank, Inter (cobrem ~80% do público estética).
 - Maquininhas: Cielo, Stone, PagSeguro, Mercado Pago.
 
-**[DECISÃO PENDENTE — input Luiz]:** Phase 7 OCR usa Document AI (preciso, caro) ou GPT-4o-mini (barato, requer prompts bem-tunados)? Sugiro PoC paralelo na Phase 7 sprint 1.
+**[DECISÃO RESOLVIDA — D4 fechada 2026-05-02]:** **PoC paralelo Document AI vs GPT-4o-mini** na primeira story `g7.1` (Upload e Parsing PDFs). Métricas obrigatórias da PoC: (1) precisão por banco (Itaú, Nubank, Cielo — top 3 do público estética), com 3 extratos reais cada; (2) custo por PDF processado; (3) latência média p95; (4) score de confiança calibrado contra ground truth manual. Decisão final do provider em até 14 dias após start da PoC. Vencedor entra como dependência única; perdedor fica como fallback documentado se houver outage.
+
+**Decisão aprovada por:** `@aiox-master` (Orion) — alinhado com recomendação Aria. Squad responsável: `squad-keyra-integrations` via `@document-processor` (Íris).
 
 ---
 
@@ -613,7 +619,11 @@ Stripe Subscription → Webhook → INSERT/UPDATE em subscriptions (mirror local
 
 **Trade-off:** Dois providers, dois SDKs. Aceito porque servem propósitos ortogonais.
 
-**[DECISÃO PENDENTE — input Luiz]:** Confirmar Stripe vs alternativa nacional (Iugu, Vindi) para SaaS billing? Considerar fricção de cartão internacional.
+**[DECISÃO RESOLVIDA — D5 fechada 2026-05-02]:** **Stripe** confirmado como provider principal para SaaS billing. Iugu/Vindi ficam como **fallback documentado** caso fricção de cartão internacional vire problema real (≥10% das tentativas de checkout falhando por cartão BR não aceito, medido após 30 dias do go-live comercial). Justificativa: (1) Subscription mgmt + Customer Portal + dunning automático = ganho operacional alto; (2) Stripe Tax calcula imposto SaaS por estado BR; (3) Pix recorrente lançado em 2025 já cobre o caso de uso brasileiro nativo; (4) Webhook idempotency robusto + signature HMAC ergonômico.
+
+**Trigger de revisão:** se métricas de checkout `payment_failed_card_declined` >= 10% após 30 dias com >= 50 paying customers, abrir story de migração para Iugu como provider primário (esquema mirror já é genérico — só troca SDK).
+
+**Decisão aprovada por:** `@aiox-master` (Orion) — alinhado com recomendação Aria.
 
 ---
 
@@ -671,18 +681,26 @@ CREATE INDEX audit_log_resource_idx ON audit_log(resource_type, resource_id);
 
 ---
 
-### ADR-019 — LGPD compliance toolkit (Phase 4)
+### ADR-019 — LGPD compliance toolkit (Sprint 8 / Pré-Phase 5)
 
-**Status:** PROPOSED
+**Status:** ACCEPTED — promovido de PROPOSED em 2026-05-02. Reposicionado para **Sprint 8 (hardening)** como pré-condição obrigatória do go-live comercial.
 
-**Funcionalidades obrigatórias (Phase 4):**
-- **Consentimento:** registro de aceite (timestamp + IP + versão dos termos) em `consent_records`.
-- **Direito de acesso:** export JSON de todos os dados do paciente (Server Action `exportCustomerData(customerId)`).
-- **Direito ao esquecimento:** anonimização (não DELETE) — substitui PII por hashes, mantém estatísticas.
-- **DPO contact:** página `/legal/dpo` com email do encarregado.
-- **Termos + Política de Privacidade:** versionados, signed (forçar re-aceite ao mudar versão).
+**Reposicionamento:** originalmente alocado em Phase 4. Como Phases 1-4 fecharam sem implementar este toolkit (gap real flagrado no relatório PO Master 2026-05-02), o trabalho foi **escalado para Sprint 8** junto com testes TS, Vercel Pro e PostHog. Nada do MVP é colocado em produção pública sem este toolkit ativo.
 
-**Validação @compliance-br (Temis):** revisar antes do go-live público.
+**Funcionalidades obrigatórias (entregáveis da Sprint 8):**
+
+| Funcionalidade | Story | Tabela | Server Action |
+|----------------|-------|--------|---------------|
+| Registro de consentimento | `h8.4` | `consent_records (org_id, user_id, version, accepted_at, ip, user_agent)` | `recordConsent(version)` no signup/onboarding |
+| Direito de acesso (export) | `h8.5` | — (lê todas as 21 tabelas filtrando por user_id/org_id) | `exportUserData(userId)` retorna ZIP com JSON + CSV |
+| Direito ao esquecimento | `h8.6` | (extensão de tabelas existentes com `anonymized_at`) | `anonymizeCustomer(customerId)` substitui PII por hash determinístico, preserva agregados |
+| DPO contact | `h8.7` | — (página estática `/legal/dpo`) | — |
+| Termos + Política versionados | `h8.8` | `terms_versions (id, content_md, published_at)` + `consent_records.version` | `getCurrentTermsVersion()` + force re-aceite no boundary `requireAuth` |
+| Audit log de exports/exclusões | (já existe) | `audit_log` com `action='export'` ou `'anonymize'` | log via trigger + Server Action explícita |
+
+**Gate compliance obrigatório:** toda story `h8.4`-`h8.8` passa por `@compliance-br *lgpd-audit` antes do `@qa` (Phase 3.5 já formalizado).
+
+**Decisão aprovada por:** `@aiox-master` (Orion).
 
 ---
 
@@ -922,30 +940,45 @@ apps/web/src/
 | **Phase 1** (1.1–1.5) | Setup, orgs, profissionais, RLS, layout | ADR-001 a ADR-012 + base estrutura |
 | **Phase 2** (2.1–2.7) | CRUD pacientes, serviços, agenda | ADR-013 entidades core, FullCalendar |
 | **Phase 3** (3.1–3.8) | Comanda, pagamentos, transações, estoque | Triggers Postgres, materialização DRE |
-| **Phase 4** (4.1–4.9) | DRE, dashboard, comparativos, alertas | ADR-009 Inngest, ADR-015 PostHog, performance budget |
-| **Phase 5** (5.1–5.5) | Precificação, alertas estoque | Pricing engine module, materialized views complexas |
-| **Phase 6** (6.1–6.7) | Projeções, what-if, prontuário | Inngest projeções, possivelmente OpenAI para upsell |
-| **Phase 7** (7.1–7.6) | OCR PDFs, Asaas, WhatsApp, NFS-e | ADR-014 OCR pipeline, monorepo promotion if needed |
+| **Phase 4** (4.1–4.9) | DRE, dashboard, comparativos, alertas | DRE on-demand via 6 views Postgres + `security_invoker=true` (sem Inngest — D3) |
+| **Sprint 8 — Hardening** (h8.1–h8.8) | Testes TS, Vercel Pro, rotação credentials, cron healthcheck, PostHog, ADR-019 LGPD toolkit | Vitest ≥70%, Vercel Pro, BetterStack uptime, PostHog 5 eventos canônicos |
+| **Phase 5 = EPIC-INTELLIGENCE** (i5.1–i5.7) | Motor precificação, pacotes, simulação, alertas estoque, Stripe billing | ADR-009 Inngest entra aqui, ADR-016 Stripe, pricing engine module |
+| **Phase 6 = EPIC-INTELLIGENCE** (i6.1–i6.7) | Projeções, what-if, rentabilidade horário/profissional, prontuário, upsell | Inngest projeções, materialized views complexas, possivelmente OpenAI para upsell (v2) |
+| **Phase 7 = EPIC-INTEGRATIONS** (g7.1–g7.5) | OCR PDFs (Document AI vs GPT-4o-mini PoC), Asaas Pix, WhatsApp Business | ADR-014 OCR pipeline, monorepo promotion if needed. **NFS-e movida para Phase 8** (D11) |
+| **Phase 8** (m8.1–m8.x) | NFS-e + Marketplace fornecedores | Postergado — complexidade fiscal por município |
 
 **Garantia arquitetural:** Phases 1–4 NÃO requerem refator estrutural. Phases 5–7 requerem **adições** (novos módulos, jobs, providers) mas zero mudança em entidades core.
 
 ---
 
-## 17. Decisões Pendentes — Inputs do Luiz Necessários
+## 17. Decisões — Status Consolidado (2026-05-02)
 
-| # | Decisão | Opções | Recomendação Aria | Bloqueia |
-|---|---------|--------|-------------------|----------|
-| ~~**D1**~~ | ~~Vercel Pro desde dia 1?~~ | ~~Hobby (grátis) vs Pro ($20/mês)~~ | **DECIDIDO 2026-04-16: Hobby (Free)**. Upgrade para Pro quando atingir 70% de bandwidth ou aceitar 1º pagante (commercial-use license obriga). | — |
-| **D2** | FullCalendar Standard vs Schedule-X? | FullCalendar (maduro, MIT) vs Schedule-X (newer, lighter) | **FullCalendar Standard** (zero risco, comunidade grande) | Story 2.4 |
-| **D3** | Inngest desde Phase 4 ou adiar para Phase 5? | Inngest now vs DRE on-demand inicial | **Inngest na Phase 4** (Free tier suficiente, evita refator) | Story 4.1 |
-| **D4** | OCR: Document AI ou GPT-4o-mini? | $0.30/pág vs $0.005/PDF | **PoC paralela na Phase 7** | Story 7.1 |
-| **D5** | Billing: Stripe ou Iugu/Vindi? | Stripe (global, maduro) vs Iugu/Vindi (BR-native) | **Stripe** (subscription mgmt + Customer Portal) | Story 1 do paywall |
-| **D6** | Trial-first (paywall na Phase 5) ou paywall MVP? | Free MVP + trial 14d depois vs trial Phase 1 | **Free MVP** até primeiros 5 design partners; paywall na Phase 5 | Strategy decision |
-| **D7** | MFA TOTP no MVP? | Sim (segurança) vs Não (fricção onboarding) | **Não no MVP** (estética = perfil baixo-risco; ativar Phase 5 + opt-in) | Story 1.1 |
-| **D8** | i18n desde o dia 1? | Sim (next-intl) vs Não (pt-BR hardcoded) | **Não** (mercado BR-only no roadmap; adicionar quando expandir) | Story 1.5 |
-| **D9** | Mobile: PWA, React Native ou web responsive? | PWA (uma codebase) vs RN (app nativo) vs só responsive | **Web responsive + PWA install** (Phase 4); RN só na Phase 8+ | Story 4.4 |
-| **D10** | Plano de contas: pré-configurado fixo ou customizável desde MVP? | Fixo MVP / custom Phase 5 vs custom MVP | **Pré-configurado fixo MVP** com 1-2 templates estética; custom Phase 5 | Story 3.5 |
-| **D11** | NFS-e Phase 7 ou postpose? | Phase 7 vs Phase 8 | **Phase 8** (complexidade fiscal por município é enorme; muitos esteticistas são MEI sem NFS-e) | Phase 7 scope |
+> Última atualização: 2026-05-02 — round de unblock para abrir Phases 5/7. Decisões D2-D5 + D11 promovidas a `RESOLVIDA`. Pendências reais ficam apenas em D6-D10 (decisões de produto/estratégia, não bloqueiam código).
+
+### Decisões resolvidas
+
+| # | Decisão | Veredito | Resolvida em | Aprovador |
+|---|---------|----------|--------------|-----------|
+| ~~**D1**~~ | ~~Vercel Pro desde dia 1?~~ | **Hobby Free** até 1º pagante (commercial-use obriga upgrade depois). Story `h8.2` (Sprint 8) migra para Pro antes de go-live | 2026-04-16 | Luiz |
+| **D2** | FullCalendar Standard vs Schedule-X? | **FullCalendar Standard (MIT)** — adotado em prod desde Story 2.4. Tech debt `resource-timegrid` resolvido via filtro `Select` | 2026-05-02 (retroativo) | `@aiox-master` |
+| **D3** | Inngest desde Phase 4 ou adiar para Phase 5? | **Phase 5** — Phase 4 entregou DRE on-demand sem job, scaling via materialized view só se medir necessidade. Inngest entra com `i6.1` weekly-projection | 2026-05-02 | `@aiox-master` |
+| **D4** | OCR: Document AI ou GPT-4o-mini? | **PoC paralela na primeira story `g7.1`** (3 extratos × 3 bancos × 2 providers) com decisão final em até 14 dias. Métricas obrigatórias: precisão, custo/PDF, latência p95, score de confiança | 2026-05-02 | `@aiox-master` |
+| **D5** | Billing: Stripe ou Iugu/Vindi? | **Stripe** confirmado. Iugu/Vindi como fallback documentado se cartão internacional virar fricção real (≥10% checkout failures após 30d com 50+ paying customers) | 2026-05-02 | `@aiox-master` |
+| **D11** | NFS-e Phase 7 ou postpose? | **Phase 8** (postergada). Phase 7 cobre OCR + Asaas + WhatsApp apenas. Justificativa: complexidade fiscal por município (5570 municípios, padrões variados ABRASF v1.0/v2.x/proprietários), maioria do público é MEI sem obrigação de emissão | 2026-05-02 | `@aiox-master` |
+
+### Decisões de produto pendentes (não bloqueiam código — `[INPUT-PENDENTE]`)
+
+| # | Decisão | Opções | Recomendação Aria | Story bloqueada |
+|---|---------|--------|-------------------|-----------------|
+| **D6** | Trial-first (paywall na Phase 5) ou paywall MVP? | Free MVP + trial 14d depois vs trial Phase 1 | **Free MVP** até primeiros 5 design partners; paywall na Phase 5 | `i5.5` (Stripe billing UI) |
+| **D7** | MFA TOTP no MVP? | Sim (segurança) vs Não (fricção onboarding) | **Não no MVP** (estética = perfil baixo-risco; ativar Phase 5 + opt-in) | `i5.6` (MFA opt-in) |
+| **D8** | i18n desde o dia 1? | Sim (next-intl) vs Não (pt-BR hardcoded) | **Não** (mercado BR-only no roadmap; adicionar quando expandir) | (futuro) |
+| **D9** | Mobile: PWA, React Native ou web responsive? | PWA (uma codebase) vs RN (app nativo) vs só responsive | **Web responsive + PWA install** (Phase 4); RN só na Phase 8+ | (entregue como responsive em Sprint 4-6) |
+| **D10** | Plano de contas: pré-configurado fixo ou customizável desde MVP? | Fixo MVP / custom Phase 5 vs custom MVP | **Pré-configurado fixo MVP** com 1-2 templates estética; custom Phase 5 | `i5.7` (custom chart of accounts) |
+| **D-PR1** | Pricing absoluto dos planos | R$ 79/149/299 (recomendação Aria) vs outro | Validar com idealizadora | `i5.5` |
+| **D-PR2** | Comissionamento por senioridade | Hierarquia `%` por nível vs flat configurável | Decisão da idealizadora | `i6.4` |
+| **D-PR3** | Devolução/estorno na DRE | Linha "Estornos" separada vs absorver no negativo | Decisão da idealizadora | `g7.2` (Asaas refund webhook) |
+| **D-PR4** | Mentoria no plano Autoridade | Quantas sessões/mês? 1:1 ou em grupo? | Comercial — não bloqueia código | (comercial) |
 
 ---
 
@@ -999,6 +1032,7 @@ apps/web/src/
 | 2026-04-16 | 1.1 | Story 0.1 implementada: Vercel Hobby + GitHub repo + Supabase sa-east-1 + domínio `keyra.app` provisionados. D1 fechado (Hobby). Seção 14 atualizada com URLs reais. Companion `docs/INFRA-STATUS.md` criado. | @aiox-master (Orion) |
 | 2026-04-16 | 1.2 | Bloco **Companion Documents** adicionado no header (14 docs em 4 grupos: produto, pesquisa, operacionais, squads). Substitui linha "Companion docs:" simples. | @aiox-master (Orion) |
 | 2026-04-16 | 1.3 | Story 0.4 entregue: schema aplicado no banco real (`oapdfhivzojyahvphebs` sa-east-1). 19 migrations, 21 tabelas, 21/21 RLS, 6 views, 2 triggers de automação. SCHEMA.md adicionado ao Companion Documents. Cross-link com IMPLEMENTATION-MAP.md (matriz viva). | @aiox-master (Orion) |
+| 2026-05-02 | 1.4 | **Round de unblock para Phases 5/7.** ADR-009 (Inngest) status atualizado para "Phases 5-7" (não 4) após D3 fechada. ADR-014 (OCR) promovido PROPOSED → ACCEPTED com D4 fechada (PoC paralelo Document AI vs GPT-4o-mini). ADR-016 (Stripe) com D5 fechada (Stripe + fallback Iugu). ADR-019 (LGPD toolkit) promovido PROPOSED → ACCEPTED + reposicionado para Sprint 8 (era Phase 4, virou pré-condição de go-live comercial). D2 (FullCalendar Standard) fechada retroativamente. D11 (NFS-e) movida para Phase 8. §16 reformulado mapeando Sprint 8 + EPIC-INTELLIGENCE (i5.x/i6.x) + EPIC-INTEGRATIONS (g7.x). §17 reorganizada: 6 decisões resolvidas vs 4 decisões de produto pendentes (D6-D10) + 4 decisões de negócio da idealizadora (`D-PR1` a `D-PR4`). | `@aiox-master` (Orion) |
 
 ---
 

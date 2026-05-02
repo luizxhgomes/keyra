@@ -2,19 +2,18 @@
 
 import { CheckCircle2 } from 'lucide-react';
 
+import { useDismissedAlerts } from '@/lib/hooks/use-dismissed-alerts';
+
 /**
- * AlertasList — versão MINIMAL bisect (HOTFIX 2026-05-02).
+ * AlertasList — bisect step 2: hook adicionado, mas resultado ignorado.
  *
- * Versão completa (com useDismissedAlerts + AlertCard motion + EmptyState
- * importado de Server) está em git. Esta versão isola se o bug é:
- * - hook `useSyncExternalStore` (`useDismissedAlerts`)
- * - componente `<AlertCard>` (Client com framer-motion)
- * - import Client → Server (`EmptyState`)
- *
- * Se esta versão carregar → bug está em um dos itens acima → re-adiciono
- * peça por peça. Se ainda quebrar → bug é mais fundo (AlertasCard parent).
+ * Se ainda renderizar → bug é no `<AlertCard>` (framer-motion).
+ * Se quebrar → bug é no `useSyncExternalStore` do `useDismissedAlerts`.
  */
-export function AlertasList() {
+export function AlertasList({ orgId }: { orgId: string }) {
+  // Chama o hook mas ignora resultado — só pra testar hidratação.
+  useDismissedAlerts(orgId);
+
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
       <div className="mb-1 rounded-full bg-muted p-3">

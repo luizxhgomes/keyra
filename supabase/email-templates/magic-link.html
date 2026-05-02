@@ -1,0 +1,166 @@
+<!--
+  KEYRA · template de magic link em pt-BR (Story 7.2).
+
+  Variáveis Supabase disponíveis:
+    {{ .ConfirmationURL }}  — URL one-time-code de login (apontará para
+                              ${SITE_URL}/auth/callback?code=...)
+    {{ .Email }}            — destinatário
+    {{ .SiteURL }}          — URL canônica do app (https://usekeyra.com)
+    {{ .Token }}            — token cru (não usar — preferimos URL pronto)
+    {{ .TokenHash }}        — hash do token (debug)
+
+  Aplicação:
+    Supabase Dashboard → keyra-br → Authentication → Email Templates →
+    "Magic Link" → cola o conteúdo abaixo (não o XML/comentário).
+
+  Por que template inline e simples:
+    1. Spam filters são duros com email transacional cheio de imagens —
+       texto-pesado + 1 botão = melhor deliverability.
+    2. Sem CDN/imagens externas → sem erros de carregamento offline.
+    3. Tipografia native stack ("system-ui") respeita SO do destinatário,
+       sem precisar embedar fontes (fontes em email é caos).
+    4. Cores neutras suficientes pra render em dark/light mode dos
+       clientes de email (Gmail, Apple Mail, Outlook).
+-->
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Seu link de acesso ao KEYRA</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #fafaf9;
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      color: #1a1a1a;
+      line-height: 1.55;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #fafaf9; padding: 32px 16px;"
+    >
+      <tr>
+        <td align="center">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              max-width: 480px;
+              background-color: #ffffff;
+              border: 1px solid #eaeaea;
+              border-radius: 12px;
+              padding: 40px 32px;
+            "
+          >
+            <tr>
+              <td style="padding-bottom: 24px;">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 14px;
+                    font-weight: 600;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #6b7280;
+                  "
+                >
+                  KEYRA
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <h1
+                  style="
+                    margin: 0 0 16px;
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: #1a1a1a;
+                    line-height: 1.25;
+                  "
+                >
+                  Seu link de acesso chegou.
+                </h1>
+                <p style="margin: 0 0 24px; font-size: 16px; color: #4b5563;">
+                  Olá, {{ .Email }}. Para entrar na sua conta KEYRA, clique no
+                  botão abaixo. O link é válido por 1 hora e funciona apenas
+                  uma vez.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" style="padding: 8px 0 24px;">
+                <a
+                  href="{{ .ConfirmationURL }}"
+                  target="_blank"
+                  rel="noopener"
+                  style="
+                    display: inline-block;
+                    padding: 14px 28px;
+                    background-color: #1a1a1a;
+                    color: #ffffff;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-size: 15px;
+                    font-weight: 600;
+                  "
+                >
+                  Entrar no KEYRA
+                </a>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <p
+                  style="
+                    margin: 0 0 8px;
+                    font-size: 13px;
+                    color: #6b7280;
+                  "
+                >
+                  Se o botão não abrir, copie e cole este endereço no navegador:
+                </p>
+                <p
+                  style="
+                    margin: 0 0 24px;
+                    font-size: 12px;
+                    color: #4b5563;
+                    word-break: break-all;
+                    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+                  "
+                >
+                  {{ .ConfirmationURL }}
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="border-top: 1px solid #eaeaea; padding-top: 24px;">
+                <p style="margin: 0 0 8px; font-size: 13px; color: #6b7280;">
+                  Não foi você que pediu este acesso? Pode ignorar este email
+                  com segurança — sem clicar em nada, ninguém entra na sua
+                  conta.
+                </p>
+                <p style="margin: 16px 0 0; font-size: 12px; color: #9ca3af;">
+                  KEYRA · financeiro operacional para clínicas de estética
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

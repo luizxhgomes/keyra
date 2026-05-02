@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -12,6 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import { signInWithOtpAction } from './actions';
+
+const RESEND_COOLDOWN_SECONDS = 60;
 
 const formSchema = z.object({
   email: z.string().trim().email({ message: 'Digite um e-mail válido' }),
@@ -38,7 +40,9 @@ type LoginFormProps = {
  */
 export function LoginForm({ next }: LoginFormProps) {
   const [emailSent, setEmailSent] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(0);
   const [pending, startTransition] = useTransition();
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const {
     register,
@@ -50,11 +54,41 @@ export function LoginForm({ next }: LoginFormProps) {
     defaultValues: { email: '' },
   });
 
+  /**
+   * Story 7.1 — countdown de reenvio.
+   *
+   * Quando email é enviado, dispara contagem regressiva de
+   * `RESEND_COOLDOWN_SECONDS`. Botão "Reenviar" só fica clicável quando
+   * cooldown chega a zero. Protege:
+   *   • Rate limit do Supabase (~30s entre OTPs)
+   *   • Custo desnecessário no Resend
+   *   • UX de impaciência (usuária clica 5x sem ler que email já chegou)
+   */
+  useEffect(() => {
+    if (cooldown <= 0) {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+        cooldownRef.current = null;
+      }
+      return;
+    }
+    cooldownRef.current = setInterval(() => {
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+        cooldownRef.current = null;
+      }
+    };
+  }, [cooldown]);
+
   function onSubmit(values: FormValues) {
     startTransition(async () => {
       const result = await signInWithOtpAction({ ...values, next: next ?? undefined });
       if (result.success) {
         setEmailSent(values.email);
+        setCooldown(RESEND_COOLDOWN_SECONDS);
         toast.success('Link enviado!', {
           description: 'Verifique sua caixa de entrada (e o spam).',
         });
@@ -64,7 +98,26 @@ export function LoginForm({ next }: LoginFormProps) {
     });
   }
 
+  function onResend() {
+    if (!emailSent || cooldown > 0 || pending) return;
+    startTransition(async () => {
+      const result = await signInWithOtpAction({
+        email: emailSent,
+        next: next ?? undefined,
+      });
+      if (result.success) {
+        setCooldown(RESEND_COOLDOWN_SECONDS);
+        toast.success('Link reenviado', {
+          description: 'Confira novamente sua caixa de entrada.',
+        });
+      } else {
+        toast.error('Não foi possível reenviar', { description: result.error });
+      }
+    });
+  }
+
   if (emailSent) {
+    const canResend = cooldown <= 0 && !pending;
     return (
       <div
         className="flex flex-col items-center gap-4 text-center"
@@ -80,17 +133,45 @@ export function LoginForm({ next }: LoginFormProps) {
             mesmo dispositivo para entrar.
           </p>
         </div>
+
+        <Button
+          type="button"
+          variant="default"
+          className="w-full"
+          disabled={!canResend}
+          onClick={onResend}
+        >
+          {pending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              Reenviando...
+            </>
+          ) : cooldown > 0 ? (
+            `Reenviar em ${cooldown}s`
+          ) : (
+            <>
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+              Reenviar link
+            </>
+          )}
+        </Button>
+
         <Button
           type="button"
           variant="outline"
           className="w-full"
           onClick={() => {
             setEmailSent(null);
+            setCooldown(0);
             reset({ email: '' });
           }}
         >
           Usar outro e-mail
         </Button>
+
+        <p className="text-xs text-muted-foreground">
+          Não chegou? Verifique a pasta de spam ou tente reenviar.
+        </p>
       </div>
     );
   }

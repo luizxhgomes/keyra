@@ -49,7 +49,7 @@ export default async function ComandaDetailPage({ params }: PageProps) {
 
       <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-display">
             Comanda · {cmd.customer_name ?? 'Cliente avulso'}
           </h1>
           <p className="text-sm text-muted-foreground">

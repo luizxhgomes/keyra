@@ -270,7 +270,7 @@ export function EventDetailSheet({ event, onOpenChange, onChanged }: Props) {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs uppercase tracking-wide text-muted-foreground">
+      <span className="text-label uppercase text-muted-foreground">
         {label}
       </span>
       <span className="text-foreground">{value}</span>

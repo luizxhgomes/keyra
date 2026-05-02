@@ -22,7 +22,7 @@ export default async function TeamLayout({ children }: { children: React.ReactNo
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Time</h1>
+        <h1 className="text-display">Time</h1>
         <p className="text-sm text-muted-foreground">
           Gerencie membros, convites e profissionais da organização.
         </p>

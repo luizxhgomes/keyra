@@ -25,7 +25,7 @@ export async function ReceitaCard() {
       aria-label="Receita prevista"
       className="sticky top-0 z-10 -mx-4 -mt-4 border-b border-border bg-card/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6"
     >
-      <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <h2 className="mb-2 text-label uppercase text-muted-foreground">
         Receita prevista
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -40,7 +40,7 @@ export async function ReceitaCard() {
 function ValueCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="text-xs uppercase tracking-wide text-muted-foreground">
+      <span className="text-label uppercase text-muted-foreground">
         {label}
       </span>
       <span className="text-xl font-semibold tabular-nums text-foreground">

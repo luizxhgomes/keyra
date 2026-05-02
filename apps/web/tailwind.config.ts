@@ -105,6 +105,24 @@ const config: Config = {
         section: '2rem', // 32px — gap entre cards de uma mesma seção
         page: '3rem', // 48px — gap entre seções de página
       },
+      fontSize: {
+        // Escala tipográfica editorial KEYRA (Story 6.1).
+        // Inter Variable com weights extremos (200 display, 600 headings/KPI).
+        // Modelada a partir do Gestek + ajustes para sobriedade KEYRA.
+        // Sintaxe Tailwind 3.4+: [size, { lineHeight, letterSpacing, fontWeight }]
+        // — fontWeight aqui é o DEFAULT quando a classe é aplicada sozinha.
+        // Classes utility (font-bold, font-medium) sobrepõem se aplicadas junto.
+        'display-hero': ['56px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '200' }],
+        'display': ['40px', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '200' }],
+        'h1': ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'h2': ['24px', { lineHeight: '1.25', letterSpacing: '0', fontWeight: '600' }],
+        'h3': ['20px', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }],
+        'kpi-hero': ['56px', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'kpi': ['40px', { lineHeight: '1', letterSpacing: '-0.015em', fontWeight: '600' }],
+        'body': ['16px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
+        'body-sm': ['14px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
+        'label': ['12px', { lineHeight: '1.2', letterSpacing: '0.05em', fontWeight: '600' }],
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

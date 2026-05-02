@@ -311,7 +311,7 @@ export function AgendamentoForm({
           <div className="rounded-md bg-muted/40 p-3 text-sm">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                <span className="text-label uppercase text-muted-foreground">
                   Término previsto
                 </span>
                 <p className="font-medium text-foreground">
@@ -319,7 +319,7 @@ export function AgendamentoForm({
                 </p>
               </div>
               <div>
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                <span className="text-label uppercase text-muted-foreground">
                   Receita prevista
                 </span>
                 <p className="font-medium text-foreground">
@@ -327,7 +327,7 @@ export function AgendamentoForm({
                 </p>
               </div>
               <div className="col-span-2">
-                <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                <span className="text-label uppercase text-muted-foreground">
                   Comissão (snapshot)
                 </span>
                 <p className="font-medium text-foreground">

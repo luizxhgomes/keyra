@@ -32,7 +32,7 @@ export default function AppError({
         <CardHeader>
           <div className="mb-2 flex items-center gap-2 text-destructive">
             <AlertOctagon className="h-5 w-5" aria-hidden="true" />
-            <span className="text-xs font-semibold uppercase tracking-wide">
+            <span className="text-label uppercase">
               Algo deu errado
             </span>
           </div>

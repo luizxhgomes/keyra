@@ -6,6 +6,14 @@ import { cn } from '@/lib/utils';
 
 import './globals.css';
 
+/**
+ * Inter Variable (Story 6.1) — sem `weight` explícito, o Next carrega a versão
+ * variable que cobre 100–900 num único arquivo (axis `wght`). Avaliado adicionar
+ * `axes: ['opsz']` para optical sizing, mas o tradeoff de bundle (+124KB de
+ * subsets) não compensou o ganho perceptual em escalas KEYRA (display-hero
+ * 56px → label 12px). Inter wght variable cobre toda a hierarquia 200–600
+ * sem custo extra.
+ */
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',

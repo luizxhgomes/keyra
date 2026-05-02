@@ -35,9 +35,12 @@ const VARIANT_PADDING: Record<NonNullable<KPICardProps['variant']>, string> = {
   compact: 'p-4',
 };
 
+// Story 6.1 — tokens semânticos `text-kpi-hero` (56px / 1.0 / 600) e
+// `text-kpi` (40px / 1.0 / 600) substituem `text-5xl`/`text-4xl`. `compact`
+// permanece sem token (caso de uso secundário, não mapeado).
 const VARIANT_VALUE_TEXT: Record<NonNullable<KPICardProps['variant']>, string> = {
-  hero: 'text-5xl',
-  secondary: 'text-4xl',
+  hero: 'text-kpi-hero',
+  secondary: 'text-kpi',
   compact: 'text-2xl',
 };
 
@@ -60,7 +63,7 @@ export function KPICard({
       aria-label={label}
       className={cn('flex flex-col gap-3', VARIANT_PADDING[variant], className)}
     >
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-label uppercase text-muted-foreground">{label}</p>
 
       {loading ? (
         <div className={cn('h-12 w-2/3 animate-pulse rounded bg-muted', variant === 'hero' && 'h-16')} />
@@ -68,7 +71,7 @@ export function KPICard({
         <span
           aria-live="polite"
           data-kpi-value
-          className={cn('font-bold text-foreground tabular-nums', VARIANT_VALUE_TEXT[variant])}
+          className={cn('text-foreground tabular-nums', VARIANT_VALUE_TEXT[variant])}
         >
           {formatted}
         </span>

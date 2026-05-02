@@ -24,7 +24,7 @@ export default async function DashboardPage() {
     return (
       <div className="flex flex-col gap-6">
         <header>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+          <h1 className="text-display-hero text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">
             Visão única do seu mês — números absolutos, sem gráfico.
           </p>
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+        <h1 className="text-display-hero text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
           Visão única do seu mês — números absolutos, sem gráfico.
         </p>

@@ -12,7 +12,7 @@ export default async function FinanceiroLayout({ children }: { children: ReactNo
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Financeiro</h1>
+        <h1 className="text-display">Financeiro</h1>
         <p className="text-sm text-muted-foreground">
           Transações, receitas, despesas e fluxo de caixa.
         </p>

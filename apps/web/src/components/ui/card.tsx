@@ -31,7 +31,9 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-lg font-semibold leading-none tracking-tight', className)}
+      // Story 6.1 — token `text-h3` (20px / 1.3 / 600) substitui `text-lg font-semibold`.
+      // `leading-none` removido — token define lineHeight 1.3 para respiração editorial.
+      className={cn('text-h3', className)}
       {...props}
     />
   ),

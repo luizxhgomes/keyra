@@ -81,7 +81,7 @@ export async function IndicadoresCard() {
 function Cell({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="rounded-md border border-border bg-muted/30 p-3">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-label uppercase text-muted-foreground">{label}</p>
       <p className="text-base font-semibold tabular-nums truncate">{value}</p>
       {hint ? <p className="text-xs text-muted-foreground truncate">{hint}</p> : null}
     </div>

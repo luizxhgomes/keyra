@@ -285,7 +285,7 @@ function SummaryCell({
 }) {
   return (
     <div className="rounded-md border border-border bg-card p-4">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-label uppercase text-muted-foreground">{label}</p>
       <p
         className={`text-xl font-semibold tabular-nums ${
           positive === true

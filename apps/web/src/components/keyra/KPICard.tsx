@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { AnimatePresence, m } from 'framer-motion';
 
 import { Card } from '@/components/ui/card';
 import { ComparativoTexto, type ComparativoTextoProps } from '@/components/keyra/ComparativoTexto';
+import { variants } from '@/lib/motion/tokens';
 import { formatCentsBRL } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -61,20 +65,38 @@ export function KPICard({
     <Card
       role="group"
       aria-label={label}
-      className={cn('flex flex-col gap-3', VARIANT_PADDING[variant], className)}
+      className={cn(
+        // Story 6.2 (AC2.10) — sombra animada em hover sinaliza interatividade
+        // do KPICard. Usa transform implícito do `transition-shadow` (não toca
+        // dimensão — AC2.12 preservado).
+        'flex flex-col gap-3 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md',
+        VARIANT_PADDING[variant],
+        className,
+      )}
     >
       <p className="text-label uppercase text-muted-foreground">{label}</p>
 
       {loading ? (
         <div className={cn('h-12 w-2/3 animate-pulse rounded bg-muted', variant === 'hero' && 'h-16')} />
       ) : (
-        <span
-          aria-live="polite"
-          data-kpi-value
-          className={cn('text-foreground tabular-nums', VARIANT_VALUE_TEXT[variant])}
-        >
-          {formatted}
-        </span>
+        // Story 6.2 (AC2.1 + P5) — `AnimatePresence mode="wait"` força fade-out
+        // completo antes do fade-in do novo valor. Princípio CON-UX-01: nunca
+        // animar morphing entre valores numéricos (poderia parecer percentual
+        // ou intermediário). Cada valor é um snapshot discreto.
+        <AnimatePresence mode="wait" initial={false}>
+          <m.span
+            key={formatted}
+            variants={variants.fadeRiseExitUp}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            aria-live="polite"
+            data-kpi-value
+            className={cn('text-foreground tabular-nums', VARIANT_VALUE_TEXT[variant])}
+          >
+            {formatted}
+          </m.span>
+        </AnimatePresence>
       )}
 
       {helper && <p className="text-xs text-muted-foreground">{helper}</p>}

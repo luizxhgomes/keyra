@@ -1,3 +1,6 @@
+'use client';
+
+import { m } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowDownCircle,
@@ -20,6 +23,7 @@ import {
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { variants } from '@/lib/motion/tokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -191,21 +195,32 @@ export function StatusBadge({
   const Icon = cfg.icon;
 
   return (
-    <Badge
-      className={cn(
-        cfg.className,
-        size === 'sm' && 'px-2 py-0 text-[10px]',
-        className,
-      )}
+    // Story 6.2 (AC2.2) — `subtleScale` (1 → 1.04 → 1, 200ms) dispara quando
+    // status muda. `key={status}` força remount do `<m.span>` a cada novo
+    // valor, ativando a variant `animate` sem morphing.
+    <m.span
+      key={status}
+      variants={variants.subtleScale}
+      initial="initial"
+      animate="animate"
+      className="inline-flex"
     >
-      {showIcon && (
-        <Icon
-          className={cn(size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5')}
-          aria-hidden="true"
-        />
-      )}
-      <span>{label ?? cfg.label}</span>
-    </Badge>
+      <Badge
+        className={cn(
+          cfg.className,
+          size === 'sm' && 'px-2 py-0 text-[10px]',
+          className,
+        )}
+      >
+        {showIcon && (
+          <Icon
+            className={cn(size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5')}
+            aria-hidden="true"
+          />
+        )}
+        <span>{label ?? cfg.label}</span>
+      </Badge>
+    </m.span>
   );
 }
 

@@ -92,3 +92,34 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+/**
+ * Story 6.2 P4 — `prefers-reduced-motion` em camada CSS.
+ *
+ * Cobre Tailwind animations (`animate-pulse`, `animate-spin`,
+ * `animate-in`/`animate-out` do tailwindcss-animate), CSS transitions
+ * inline, sonner toast e qualquer animação fora do controle do
+ * `<m.div>` framer-motion. Defesa em camadas com o hook
+ * `useMotionPreference` (P3).
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/**
+ * Story 6.2 AC2.6 — Toast sucesso re-tematizado para sálvia (text-secondary).
+ * Sonner usa CSS vars `--success-bg`, `--success-text`, `--success-border`.
+ * Override aqui mantém branding KEYRA (sem emerald-600 default do sonner).
+ */
+[data-sonner-toaster] {
+  --success-bg: hsl(var(--secondary));
+  --success-text: hsl(var(--secondary-foreground));
+  --success-border: hsl(var(--secondary));
+}

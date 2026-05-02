@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { m } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { variants } from '@/lib/motion/tokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -36,7 +40,12 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <div
+    // Story 6.2 (AC2.8) — fadeRiseSlow (400ms, expo-out) no mount inicial.
+    // Camila percebe que o card "apareceu", não que estava lá.
+    <m.div
+      variants={variants.fadeRiseSlow}
+      initial="hidden"
+      animate="visible"
       className={cn(
         'flex flex-col items-center justify-center gap-3 py-12 text-center',
         className,
@@ -69,6 +78,6 @@ export function EmptyState({
         )
       ) : null}
       {hint ? <div className="mt-1 text-xs text-muted-foreground">{hint}</div> : null}
-    </div>
+    </m.div>
   );
 }

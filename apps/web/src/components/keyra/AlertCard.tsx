@@ -1,6 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { m } from 'framer-motion';
 import { AlertOctagon, AlertTriangle, Info, type LucideIcon } from 'lucide-react';
 
+import { variants } from '@/lib/motion/tokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -65,9 +69,18 @@ export function AlertCard({
   const cfg = SEVERITY[severity];
   const Icon = icon ?? cfg.icon;
 
+  // Story 6.2 (AC2.4 + AC2.11) — severity=critical usa `criticalEntrance`
+  // (slideInDown 300ms seguido de pulseOnce 1500ms — atenção pontual sem
+  // virar ruído). warning/info usam `fadeRise` base.
+  const motionVariants =
+    severity === 'critical' ? variants.criticalEntrance : variants.fadeRise;
+
   return (
-    <div
+    <m.div
       role={cfg.role}
+      variants={motionVariants}
+      initial="hidden"
+      animate="visible"
       className={cn(
         'flex items-start gap-3 rounded-lg border p-4',
         cfg.bg,
@@ -104,6 +117,6 @@ export function AlertCard({
           </div>
         )}
       </div>
-    </div>
+    </m.div>
   );
 }

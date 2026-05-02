@@ -2,6 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState, ErrorMessage, KPICard } from '@/components/keyra';
 import { Sparkles } from 'lucide-react';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
+import { ScrollFadeRise } from '@/lib/motion/scroll-fade-rise';
 
 import { getDashboardKpis } from './actions';
 import { AgendaHojeCard } from './agenda-hoje-card';
@@ -127,14 +128,24 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <AlertasCard />
+      {/* Story 6.2 (AC2.9) — cards abaixo do fold entram com fadeRise
+          quando entram no viewport (`once: true` para não re-animar). */}
+      <ScrollFadeRise>
+        <AlertasCard />
+      </ScrollFadeRise>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <AgendaHojeCard />
-        <IndicadoresCard />
+        <ScrollFadeRise>
+          <AgendaHojeCard />
+        </ScrollFadeRise>
+        <ScrollFadeRise>
+          <IndicadoresCard />
+        </ScrollFadeRise>
       </section>
 
-      <MetaCard />
+      <ScrollFadeRise>
+        <MetaCard />
+      </ScrollFadeRise>
     </div>
   );
 }

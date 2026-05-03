@@ -2,7 +2,7 @@
 
 ## Status
 
-InProgress
+Ready for Review
 
 ## Story
 
@@ -85,9 +85,14 @@ InProgress
 - [x] Atualizar `scripts/sync-env.sh` para consumir `.keyra-secrets/turnstile-*.key`
 - [x] Criar `scripts/configure-supabase-auth-prod.sh` (idempotente, dry-run validado, payload via Management API único PATCH)
 - [x] Adicionar ADR-022 em `docs/architecture/ARCHITECTURE.md` (seção 11.2)
-- [ ] **AGUARDA IDEALIZADORA:** criar conta Cloudflare Turnstile + entregar site key + secret key
-- [ ] **AGUARDA AUTORIZAÇÃO IDEALIZADORA:** rodar `scripts/configure-supabase-auth-prod.sh` em prod (mudança em sistema externo — não executei sem aprovação explícita)
-- [ ] Após receber keys: salvar em `.keyra-secrets/`, rodar `sync-env.sh`, provisionar Vercel envs (Production+Preview+Development) com fallback REST
+- [x] **Idealizadora criou widget Turnstile** — `keyra`, Managed, hostnames `usekeyra.com`+`localhost`. Site key `0x4AAAAAADInYyDxMZrFCHAX` + secret `0x4AAAAAADInY_o3GM54cxunP2HA3_rpMug` salvas em `.keyra-secrets/turnstile-{site,secret}.key` (chmod 600)
+- [x] **Secret validada via API Cloudflare** — `POST /turnstile/v0/siteverify` retornou `invalid-input-response` (secret reconhecida; seria `invalid-input-secret` se inválida)
+- [x] `./scripts/sync-env.sh` rodado — vars chegaram em `.env.local` raiz + `apps/web/.env.local`
+- [x] Vercel envs provisionadas via REST API v10 — `NEXT_PUBLIC_TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` em Production+Preview+Development (validado via GET /v9/projects/{id}/env)
+- [x] **Idealizadora autorizou execução em prod** (2026-05-03 22:32 UTC)
+- [x] **Script `configure-supabase-auth-prod.sh` rodado em prod** — `mailer_autoconfirm=false` (R1), `password_min_length=10` (R2), `password_required_characters` com lower+upper+digits (R2), `security_update_password_require_reauthentication=true` (R11), `mailer_otp_exp=1800` (R12), `rate_limit_email_sent=30` (R20), `refresh_token_rotation_enabled=true` (R22 parcial). Todos validados via GET API.
+- [x] **Descoberta operacional:** PATCH Supabase silently dropa campos com naming errado (retorna 200 mesmo ignorando). Script atualizado com naming canônico (`security_update_password_require_reauthentication`, `sessions_timebox`, `sessions_inactivity_timeout`) + validação GET integrada (defesa contra silent-drop). Memory `feedback_supabase_patch_silent_drop.md` salva.
+- [x] **R22 parcialmente mitigado**: `sessions_timebox` + `sessions_inactivity_timeout` requerem Supabase Pro Plan (HTTP 402). Fica deferido junto com decisão Vercel Pro. Script trata como SKIPPED-not-failure.
 - [ ] Atualizar `docs/STATE.md` (§1 status macro, §6 próxima ação, §8 histórico) — feito junto deste commit
 - [x] `pnpm typecheck` ✅ verde · `pnpm lint --max-warnings 0` ✅ verde · `./scripts/check-rsc-boundaries.sh` ✅ PASS
 - [ ] Commit + push branch + verificar preview Vercel READY
@@ -161,3 +166,5 @@ _(a preencher pelo @qa após implementação)_
 | 2026-05-03 | 1.0 | Story criada como pré-requisito do EPIC-AUTH-V2. | `@aiox-master` (Orion) atuando como `@sm` |
 | 2026-05-03 | 1.1 | Validação @po concluída — 10/10 checklist, GO. Status Draft → Ready. ACs cobrem Sentry scrub, config Supabase via Management API, Turnstile envs, ADR-022, RLS regression-zero, branch+commit+push+preview. | `@aiox-master` (Orion) atuando como `@po` |
 | 2026-05-03 | 1.2 | Implementação @dev (parcial — sem dependências externas): Sentry scrub server+client com selftest verde, helper Turnstile server-only, env schema estendido, sync-env.sh consumindo `.keyra-secrets/turnstile-*.key`, script idempotente Management API com dry-run validado, ADR-022 publicado. Typecheck + lint + RSC audit verdes. **Pausado aguardando:** (1) idealizadora criar conta Cloudflare Turnstile, (2) autorização explícita pra rodar script de config Supabase em prod. | `@aiox-master` (Orion) atuando como `@dev` |
+| 2026-05-03 | 1.3 | Idealizadora criou widget Turnstile e entregou site key + secret key. Secret validada via API Cloudflare (resposta `invalid-input-response` em token de teste prova que a secret é válida). Chaves persistidas em `.keyra-secrets/turnstile-{site,secret}.key` (chmod 600). `sync-env.sh` rodado. Vercel envs provisionadas via REST API v10 nos 3 targets (Production+Preview+Development) e validadas via GET. **Single bloqueio restante:** autorização da idealizadora pra rodar `scripts/configure-supabase-auth-prod.sh` em prod (mudança em sistema externo, todas as outras tarefas da story completas). | `@aiox-master` (Orion) atuando como `@dev` |
+| 2026-05-03 | 1.4 | Idealizadora autorizou. Script rodado em prod com sucesso — 7/7 configs universais aplicadas e validadas via GET. Descoberta operacional: PATCH Supabase silenciosamente dropa campos com naming errado (`secure_password_change`, `session_timebox`, `session_inactivity_timeout` foram aceitos no body com HTTP 200 mas NÃO aplicados). Naming canônico real exposto pelo GET: `security_update_password_require_reauthentication`, `sessions_timebox`, `sessions_inactivity_timeout`. Script atualizado com naming correto + validação GET integrada (defesa contra silent-drop). Memory `feedback_supabase_patch_silent_drop.md` salva pra estender padrão "validar credenciais via API antes de provisionar" para "validar config aplicada via GET após PATCH". `sessions_timebox`+`sessions_inactivity_timeout` (R22) requerem Pro Plan (HTTP 402) — script trata como SKIPPED-not-failure, R22 fica parcialmente mitigado (`refresh_token_rotation_enabled=true` cobre o resto). Status InProgress → Ready for Review. **Pendente:** gate `@compliance-br` revisar PII scrubbing + email confirmation + CAPTCHA + termos antes de PR merge para main. | `@aiox-master` (Orion) atuando como `@dev` |

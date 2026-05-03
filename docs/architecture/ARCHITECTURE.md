@@ -773,6 +773,71 @@ CREATE INDEX audit_log_resource_idx ON audit_log(resource_type, resource_id);
 
 ---
 
+## 11.2 Auth UX V2 — cadastro estruturado + email/senha primário (ADR-022)
+
+### ADR-022 — Auth UX V2
+
+**Status:** ACCEPTED — 2026-05-03
+
+**Decisão:** O fluxo de auth do KEYRA muda de **passwordless puro** (magic link único método, ADR-010 original) para **multi-método com email+senha como primário**:
+
+| Método | Status | Uso |
+|--------|--------|-----|
+| Email + senha | **PRIMÁRIO** | Login padrão para usuários cadastrados |
+| Google OAuth | Secundário | Login social conveniente |
+| Magic link (OTP) | **Apenas em recovery** | Fluxo "Esqueci minha senha" |
+
+**Cadastro estruturado:** novo formulário em `/cadastro` coleta nome, celular, email, senha+confirmação, nome da clínica, CNPJ e aceite de Termos+Privacidade em uma única tela. Sem ele, dados do usuário-pessoa (nome, telefone) e do tenant (nome clínica, CNPJ) eram coletados de forma fragmentada — ou nunca.
+
+**Foundation de segurança:** o epic é precedido pela story `auth.0` que aplica configuração endurecida do Supabase Auth (confirmação de email obrigatória, senha mínima 10 chars com complexidade, OTP recovery em 30 minutos, signOut global em troca de senha, scrubbing de PII em Sentry, CAPTCHA Turnstile em signup/recovery/login após falhas).
+
+**Schema novo:**
+- `public.profiles (id FK auth.users, full_name, phone_encrypted bytea via pgp_sym_encrypt, phone_last_four)` com trigger `on_auth_user_created` garantindo invariante "todo auth.user tem profile"
+- `public.legal_documents (type, version, content_hash, content_md, published_at, deprecated_at)` — versionamento imutável de Termos e Privacidade
+- `public.user_consent_records (user_id, document_id, accepted_at, ip_address, user_agent)` — registro auditável imutável de aceite
+- `UNIQUE INDEX organizations_cnpj_unique` parcial — bloqueia duplicação de clínica
+
+**RPC unificada:** `signup_create_account_atomic(email, senha, nome, celular_encrypted, nome_clinica, cnpj, terms_version, privacy_version)` faz tudo em uma transação Postgres + compensating delete via service_role para `auth.users` órfão se falhar.
+
+**JWT custom claims:** `org_id` (existente) + `full_name` (novo). NÃO `phone` — PII em headers/logs/Sentry breadcrumb é vetor de vazamento.
+
+**Decisões de PII:**
+- Telefone: encrypted at column (`pgp_sym_encrypt`) + `phone_last_four` para exibição mascarada — alinhado com NFR-SE-04 do PRD e padrão `customers.cpf_*`
+- Email: armazenado em `auth.users.email` (já criptografado em repouso por Supabase nativo)
+- CPF: ainda só em `customers` (paciente da clínica, não user da plataforma)
+
+**Trade-offs:**
+
+| Vantagem | Custo |
+|----------|-------|
+| UX comercial real (login padrão familiar) | +44 pts de implementação distribuídos em 10 stories |
+| Cadastro estruturado coleta tudo em 1 tela | Story `auth.3` é a maior (L, 8 pts) |
+| Foundation de segurança herdada por todas as stories | Story `auth.0` precede tudo, bloqueia paralelismo da Fase A |
+| LGPD compliant desde dia 1 (consent versionado, re-aceite, retenção 30d) | Sobreposição parcial com `h8.4` original (LGPD toolkit) — `h8.4` agora é só anonymize+export+DPO |
+| Google OAuth aumenta conversão de signup | Requer OAuth client no Google Cloud Console + provider Supabase config |
+| `phone_encrypted` cumpre NFR-SE-04 | Custo de 1 query extra ao decriptar quando precisar exibir |
+
+**Riscos cobertos pela auditoria preventiva** (ver `docs/audit/auth-v2-security-audit.md`):
+- 7 críticos: confirmação email, senha fraca, sem CAPTCHA, órfãos auth.users, PII plain, PII em JWT, CNPJ duplicado
+- 9 altos: enumeration, ausência de consent_records, termos sem re-aceite, secure_password_change off, OTP 1h, before_user_created ausente, email bombing, tel sem validação, senha em logs Sentry
+- 4 médios: brute force distribuído, OAuth incompleto, RLS chicken-and-egg de profiles, rate limit baixo
+- 2 baixos: invite UNIQUE não considera revogação, sessão sem timebox
+
+**Riscos residuais aceitos:** brute force distribuído (mitigado por Turnstile + Vercel WAF; Cloudflare Pro WAF fora de escopo agora), phishing externo (user education), compromisso de dispositivo (out of scope).
+
+**Pendências jurídicas postergadas** (autorização da idealizadora 2026-05-03):
+- Personalidade jurídica que assina os Termos: **placeholder `[KEYRA — pessoa jurídica a constituir]`** até KEYRA virar empresa formal
+- Foro de jurisdição: **default São Paulo/SP**
+- Retenção pós-cancelamento: **30 dias** (decidido)
+
+**Traceability.** ADR-022 referenciado por:
+- `docs/audit/auth-v2-security-audit.md` (auditoria preventiva — fonte das decisões)
+- `docs/stories/EPIC-AUTH-V2.md` (epic com 10 stories)
+- Stories `auth.0` a `auth.9`
+- Substitui ADR-010 (passwordless único) com transição via Story `auth.5` que mantém magic link só em recovery
+
+---
+
 ## 12. Architectural Patterns Aplicados
 
 | Pattern | Onde | Razão |

@@ -38,6 +38,8 @@ GH=$(read_or_empty github.token)
 CEK=$(read_or_empty column-encryption-key.txt)
 RESEND=$(read_or_empty resend-api.key)
 EMAIL_FROM_VAL=$(read_line_or_empty email-from.txt)
+TURNSTILE_SITE=$(read_or_empty turnstile-site.key)
+TURNSTILE_SECRET=$(read_or_empty turnstile-secret.key)
 
 URL=""
 [[ -n "${REF}" ]] && URL="https://${REF}.supabase.co"
@@ -63,6 +65,10 @@ COLUMN_ENCRYPTION_KEY=${CEK}
 # ---- Email transacional (Resend, ADR-021) ----
 RESEND_API_KEY=${RESEND}
 EMAIL_FROM=${EMAIL_FROM_VAL}
+
+# ---- CAPTCHA (Cloudflare Turnstile, ADR-022 / Story auth.0) ----
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=${TURNSTILE_SITE}
+TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET}
 
 # ---- Vercel ----
 VERCEL_TOKEN=${VC}

@@ -38,6 +38,15 @@ const serverSchema = z.object({
     .min(3)
     .default('KEYRA <no-reply@usekeyra.com>'),
 
+  // CAPTCHA (ADR-022 / Story auth.0 — R3 da auditoria de segurança).
+  // Cloudflare Turnstile. Site key vai pro bundle do cliente (público); secret
+  // key fica server-only e é usada pelo helper `verify-turnstile.ts`.
+  // Opcionais até o widget ser provisionado pela idealizadora; quando o epic
+  // EPIC-AUTH-V2 fechar, ambas viram obrigatórias em produção (enforced via
+  // Vercel env presence).
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(10).optional(),
+  TURNSTILE_SECRET_KEY: z.string().min(10).optional(),
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
@@ -52,6 +61,8 @@ const parsed = serverSchema.safeParse({
   NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM,
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
   NODE_ENV: process.env.NODE_ENV,
 });
 

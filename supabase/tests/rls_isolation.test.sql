@@ -415,6 +415,128 @@ BEGIN
   RESET ROLE;
 END $$;
 
+-- =============================================================================
+-- Block G — Auth V2 schema (Story auth.1): profiles + user_consent_records
+--           + legal_documents
+-- =============================================================================
+-- Cobertura:
+--   G-1  user A não vê profile de user B (profiles_select_own)
+--   G-2  user A não consegue UPDATE profile de user B
+--   G-3  authenticated NÃO consegue INSERT direto em profiles (só trigger/service)
+--   G-4  user A não vê consent de user B (user_consent_records_select_own)
+--   G-5  user A não consegue UPDATE seus próprios consents (imutáveis)
+--   G-6  user A não consegue DELETE seus próprios consents (imutáveis)
+--   G-7  legal_documents é leitura pública para authenticated
+--   G-8  authenticated NÃO consegue INSERT em legal_documents (só service_role)
+
+DO $$
+DECLARE
+  v_user_a uuid := current_setting('tests.user_a')::uuid;
+  v_user_b uuid := current_setting('tests.user_b')::uuid;
+  v_count  int;
+  v_doc_id uuid;
+BEGIN
+  -- Setup como postgres (bypass RLS): garantir profiles seedados (caso o
+  -- trigger on_auth_user_created já tenha rodado na fixture; senão criar).
+  INSERT INTO public.profiles (id, full_name)
+    VALUES (v_user_a, 'TEST_UserA')
+    ON CONFLICT (id) DO UPDATE SET full_name = EXCLUDED.full_name;
+  INSERT INTO public.profiles (id, full_name)
+    VALUES (v_user_b, 'TEST_UserB')
+    ON CONFLICT (id) DO UPDATE SET full_name = EXCLUDED.full_name;
+
+  -- 1 documento legal de teste
+  INSERT INTO public.legal_documents (type, version, content_hash, content_md)
+    VALUES ('terms', 'TEST_v0.1', 'sha256_test_hash', '# Termos teste')
+    ON CONFLICT (type, version) DO UPDATE SET content_md = EXCLUDED.content_md
+    RETURNING id INTO v_doc_id;
+
+  -- Aceites de A e B
+  INSERT INTO public.user_consent_records (user_id, document_id, ip_address, user_agent)
+    VALUES (v_user_a, v_doc_id, '127.0.0.1'::inet, 'TEST agent A')
+    ON CONFLICT (user_id, document_id) DO NOTHING;
+  INSERT INTO public.user_consent_records (user_id, document_id, ip_address, user_agent)
+    VALUES (v_user_b, v_doc_id, '127.0.0.2'::inet, 'TEST agent B')
+    ON CONFLICT (user_id, document_id) DO NOTHING;
+
+  -- Assumir identidade de user A
+  PERFORM set_config('request.jwt.claim.sub',    v_user_a::text, true);
+  PERFORM set_config('request.jwt.claim.org_id', current_setting('tests.org_a'), true);
+  PERFORM set_config('request.jwt.claims',
+                     jsonb_build_object('sub', v_user_a::text,
+                                        'org_id', current_setting('tests.org_a'),
+                                        'role', 'authenticated')::text, true);
+  SET LOCAL role TO authenticated;
+
+  -- G-1
+  SELECT count(*) INTO v_count FROM public.profiles WHERE id IN (v_user_a, v_user_b);
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [G-1 profiles SELECT cross]: expected 1 (own only), got %', v_count;
+  END IF;
+
+  -- G-2
+  UPDATE public.profiles SET full_name = 'HACK_B' WHERE id = v_user_b;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [G-2 profiles UPDATE cross]: expected 0, got %', v_count;
+  END IF;
+
+  -- G-3
+  BEGIN
+    INSERT INTO public.profiles (id, full_name) VALUES (gen_random_uuid(), 'HACK_INSERT');
+    SELECT count(*) INTO v_count FROM public.profiles WHERE full_name = 'HACK_INSERT';
+    IF v_count <> 0 THEN
+      RAISE EXCEPTION 'RLS FAIL [G-3 profiles INSERT]: linha foi inserida silenciosamente';
+    END IF;
+  EXCEPTION
+    WHEN insufficient_privilege OR check_violation THEN
+      NULL; -- esperado
+  END;
+
+  -- G-4
+  SELECT count(*) INTO v_count FROM public.user_consent_records;
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [G-4 consent SELECT cross]: expected 1 (own only), got %', v_count;
+  END IF;
+
+  -- G-5
+  UPDATE public.user_consent_records SET ip_address = '0.0.0.0'::inet WHERE user_id = v_user_a;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [G-5 consent UPDATE own]: expected 0 (immutable), got %', v_count;
+  END IF;
+
+  -- G-6
+  DELETE FROM public.user_consent_records WHERE user_id = v_user_a;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [G-6 consent DELETE own]: expected 0 (immutable), got %', v_count;
+  END IF;
+
+  -- G-7
+  SELECT count(*) INTO v_count FROM public.legal_documents WHERE version = 'TEST_v0.1';
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [G-7 legal_documents SELECT]: expected 1, got %', v_count;
+  END IF;
+
+  -- G-8
+  BEGIN
+    INSERT INTO public.legal_documents (type, version, content_hash, content_md)
+      VALUES ('terms', 'HACK_v0.0', 'hack', 'hack');
+    SELECT count(*) INTO v_count FROM public.legal_documents WHERE version = 'HACK_v0.0';
+    IF v_count <> 0 THEN
+      RAISE EXCEPTION 'RLS FAIL [G-8 legal_documents INSERT]: linha inserida silenciosamente';
+    END IF;
+  EXCEPTION
+    WHEN insufficient_privilege THEN
+      NULL; -- esperado
+  END;
+
+  RAISE NOTICE 'RLS test block G (auth.1 schema — profiles + consent + legal_documents): PASSED';
+
+  RESET ROLE;
+END $$;
+
 ROLLBACK;
 
 -- Final message (ROLLBACK above keeps DB clean; NOTICES still surface)

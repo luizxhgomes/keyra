@@ -136,8 +136,26 @@ Estas decisões podem ser feitas no futuro com placeholder textual nos Termos se
 
 ---
 
+## Dependências cruzadas entre stories (registradas durante execução)
+
+### `auth.2` (Termos + Privacidade) deve documentar 6 subprocessors
+
+Originada do gate `@compliance-br` em `auth.0` (2026-05-03):
+
+| Subprocessor | Localização | Função | Base legal LGPD |
+|---|---|---|---|
+| Supabase Inc. | Singapore/US (dados sa-east-1 BR) | Banco + auth | Execução do contrato (Art. 7º V) |
+| Vercel Inc. | US | Hosting + edge | Execução do contrato (Art. 7º V) |
+| Resend | US | Emails transacionais | Execução do contrato (Art. 7º V) |
+| Cloudflare Inc. | Global | CAPTCHA Turnstile (cookie + IP, sem PII direta) | Legítimo interesse (Art. 7º IX) |
+| Sentry | US | Observabilidade (sem PII por scrubbing R16) | Legítimo interesse (Art. 7º IX) |
+| Google Cloud | US | OAuth Google (após `auth.6`) | Consentimento explícito (Art. 7º I) |
+
+**`auth.2` precisa nomear todos os 6 na seção "Compartilhamento de dados" da Política de Privacidade.** Sem isto, o Termos publicado fica em desconformidade com Art. 9º (transparência) da LGPD.
+
 ## Histórico
 
 | Data | Versão | Mudança | Autor |
 |------|--------|---------|-------|
 | 2026-05-03 | 1.0 | Epic criado a partir de mapeamento da idealizadora + auditoria preventiva. Branch `feat/auth-v2` criada a partir de `main`. | `@aiox-master` (Orion) |
+| 2026-05-03 | 1.1 | Story `auth.0` Ready for Review com gate `@compliance-br` APPROVE + 2 CONCERNS (Sentry e Cloudflare como subprocessors). CONCERNS propagados para escopo de `auth.2` como dependências cruzadas. | `@aiox-master` (Orion) atuando como `@compliance-br` |

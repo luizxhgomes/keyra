@@ -155,9 +155,44 @@ Sentry SDK v9 docs sobre `beforeSend`: https://docs.sentry.io/platforms/javascri
 
 A site key NÃO é segredo (vai no HTML do widget). A secret key é segredo (verificação server-side).
 
+## Phase 3.5 Specialist Gates
+
+### Gate `@compliance-br` (Têmis) — 2026-05-03 — APPROVE com 2 CONCERNS
+
+**Veredicto:** ✅ APPROVE — story implementa controles de segurança que cumprem LGPD Art. 46 e habilitam compliance subsequente. Não há tratamento de dados pessoais nesta story (vem em `auth.1`/`auth.3`), portanto direitos do titular Art. 18 ainda não aplicáveis aqui.
+
+**Checklist aplicado (18 critérios):**
+- L1 Princípio da segurança (Art. 6º VII e 46) ✅ — email confirmation, senha forte, CAPTCHA, reauth, OTP curto, rate limit
+- L2 Princípio da prevenção (Art. 6º VIII) ✅ — auditoria preventiva ANTES do código
+- L3 Não trata PII nesta story ✅ — coleta vem em `auth.1`/`auth.3`
+- L4 Sentry scrubbing protege PII em logs ✅ — selftest verde
+- L5 Subprocessor Sentry (US) declarado? ⚠️ CONCERNS — dependência de `auth.2`
+- L6 Subprocessor Cloudflare (Turnstile) declarado? ⚠️ CONCERNS — dependência de `auth.2`
+- L7-12 CON-LG-01..06 ✅/N/A — story habilita caminho de compliance
+- L13 NFR-SE-03 (rate limiting) ✅
+- L14 NFR-SE-04 (criptografia em repouso) ➖ N/A foundation
+- L15 Princípio da minimização aplicado a tempo de vida ✅ — OTP 1h→30min
+- L16 Logs de auditoria preservados ✅
+- L17 Compatibilidade com retenção 30d ✅
+- L18 Cross-border transfer (Art. 33) ✅ — Supabase sa-east-1, Cloudflare/Sentry sem PII por design
+
+**CONCERNS a propagar para `auth.2` (Termos + Privacidade):**
+
+1. **Lista de subprocessors a documentar:**
+   - Supabase Inc. (Singapore/US, dados em sa-east-1) — banco + auth — base legal: execução do contrato
+   - Vercel Inc. (US) — hosting — base legal: execução do contrato
+   - Resend (US) — emails transacionais — base legal: execução do contrato
+   - Cloudflare Inc. (US) — CAPTCHA Turnstile (cookie + IP) — base legal: legítimo interesse (Art. 7º IX)
+   - Sentry (US) — observabilidade (sem PII por scrubbing) — base legal: legítimo interesse (Art. 7º IX)
+   - Google Cloud (US) — após `auth.6`, OAuth Google — base legal: consentimento (Art. 7º I)
+
+2. **Texto canônico de subprocessors** deve estar na seção "Compartilhamento de dados" da Política de Privacidade.
+
+**Aprovação para PR:** sim — story cumpre Phase 3.5 e pode seguir para QA gate + PR open.
+
 ## QA Results
 
-_(a preencher pelo @qa após implementação)_
+_(a preencher pelo @qa após PR aberta)_
 
 ## Change Log
 
@@ -167,4 +202,5 @@ _(a preencher pelo @qa após implementação)_
 | 2026-05-03 | 1.1 | Validação @po concluída — 10/10 checklist, GO. Status Draft → Ready. ACs cobrem Sentry scrub, config Supabase via Management API, Turnstile envs, ADR-022, RLS regression-zero, branch+commit+push+preview. | `@aiox-master` (Orion) atuando como `@po` |
 | 2026-05-03 | 1.2 | Implementação @dev (parcial — sem dependências externas): Sentry scrub server+client com selftest verde, helper Turnstile server-only, env schema estendido, sync-env.sh consumindo `.keyra-secrets/turnstile-*.key`, script idempotente Management API com dry-run validado, ADR-022 publicado. Typecheck + lint + RSC audit verdes. **Pausado aguardando:** (1) idealizadora criar conta Cloudflare Turnstile, (2) autorização explícita pra rodar script de config Supabase em prod. | `@aiox-master` (Orion) atuando como `@dev` |
 | 2026-05-03 | 1.3 | Idealizadora criou widget Turnstile e entregou site key + secret key. Secret validada via API Cloudflare (resposta `invalid-input-response` em token de teste prova que a secret é válida). Chaves persistidas em `.keyra-secrets/turnstile-{site,secret}.key` (chmod 600). `sync-env.sh` rodado. Vercel envs provisionadas via REST API v10 nos 3 targets (Production+Preview+Development) e validadas via GET. **Single bloqueio restante:** autorização da idealizadora pra rodar `scripts/configure-supabase-auth-prod.sh` em prod (mudança em sistema externo, todas as outras tarefas da story completas). | `@aiox-master` (Orion) atuando como `@dev` |
+| 2026-05-03 | 1.5 | Gate Phase 3.5 `@compliance-br` (Têmis) executado: APPROVE com 2 CONCERNS não-bloqueantes (Sentry e Cloudflare como subprocessors precisam ser declarados em `auth.2` Política de Privacidade). Checklist de 18 critérios LGPD aplicado. Story habilita compliance subsequente sem criar débito retroativo. CONCERNS propagados para EPIC-AUTH-V2 como dependências cruzadas formais de `auth.2`. **Aprovada para QA gate + abertura de PR.** | `@aiox-master` (Orion) atuando como `@compliance-br` (Têmis) |
 | 2026-05-03 | 1.4 | Idealizadora autorizou. Script rodado em prod com sucesso — 7/7 configs universais aplicadas e validadas via GET. Descoberta operacional: PATCH Supabase silenciosamente dropa campos com naming errado (`secure_password_change`, `session_timebox`, `session_inactivity_timeout` foram aceitos no body com HTTP 200 mas NÃO aplicados). Naming canônico real exposto pelo GET: `security_update_password_require_reauthentication`, `sessions_timebox`, `sessions_inactivity_timeout`. Script atualizado com naming correto + validação GET integrada (defesa contra silent-drop). Memory `feedback_supabase_patch_silent_drop.md` salva pra estender padrão "validar credenciais via API antes de provisionar" para "validar config aplicada via GET após PATCH". `sessions_timebox`+`sessions_inactivity_timeout` (R22) requerem Pro Plan (HTTP 402) — script trata como SKIPPED-not-failure, R22 fica parcialmente mitigado (`refresh_token_rotation_enabled=true` cobre o resto). Status InProgress → Ready for Review. **Pendente:** gate `@compliance-br` revisar PII scrubbing + email confirmation + CAPTCHA + termos antes de PR merge para main. | `@aiox-master` (Orion) atuando como `@dev` |

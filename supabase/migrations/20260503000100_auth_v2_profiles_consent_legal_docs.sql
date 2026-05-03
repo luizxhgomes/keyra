@@ -1,12 +1,17 @@
 -- =============================================================================
--- KEYRA — Migration 026: Auth V2 schema (profiles + user_consent_records +
---                       legal_documents + UNIQUE CNPJ + Auth Hook estendido +
---                       trigger on_auth_user_created + hook anti-descartáveis)
+-- KEYRA — Migration 026 (parte 1 de 2): Auth V2 schema base
+--   profiles + user_consent_records + legal_documents + UNIQUE CNPJ +
+--   trigger on_auth_user_created + hook anti-descartáveis + backfill
 --
 -- Story auth.1 do EPIC-AUTH-V2.
--- Auditoria preventiva: docs/audit/auth-v2-security-audit.md (R5, R6, R7, R9,
+-- Auditoria preventiva: docs/audit/auth-v2-security-audit.md (R5, R7, R9,
 -- R10, R13, R19).
 -- ADR-022: docs/architecture/ARCHITECTURE.md §11.2.
+--
+-- DEVOPS REVIEW (2026-05-03): split em 2 migrations recomendado pra desacoplar
+-- a parte reversível-com-DROP (esta) da parte que toca a Auth Hook crítica
+-- (migration 027). Isto permite janela de validação intermediária antes de
+-- alterar custom_access_token_hook em produção live.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -195,66 +200,23 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_auth_user();
 
 -- -----------------------------------------------------------------------------
--- 6. Auth Hook custom_access_token_hook estendido com full_name (R6, prepara auth.7)
+-- 6. (REMOVIDO desta migration) — custom_access_token_hook update foi MOVIDO
+--    para migration 027 (auth_v2_hook_update.sql) por recomendação do
+--    DevOps review (2026-05-03). Esta migration só prepara o terreno (schema,
+--    trigger, GRANT em profiles para supabase_auth_admin). A migration 027
+--    faz o CREATE OR REPLACE da hook propriamente dito.
+--
+--    Por que: permite janela de validação intermediária (~1-2 min) entre
+--    apply do schema e a alteração da função crítica em produção live.
+--    Reduz blast radius de eventual problema.
 -- -----------------------------------------------------------------------------
--- Adiciona claim full_name lendo de profiles. NÃO inclui phone (PII em JWT
--- vaza em logs/Sentry — D5 da auditoria). Backward-compatible: usuários
--- antigos sem profile continuam logando, só não recebem o claim.
 
-CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
-  RETURNS jsonb
-  LANGUAGE plpgsql
-  STABLE
-  SECURITY DEFINER
-  SET search_path = public, pg_temp
-AS $$
-DECLARE
-  claims        jsonb := COALESCE(event->'claims', '{}'::jsonb);
-  target_user   uuid  := (event->>'user_id')::uuid;
-  resolved_org  uuid;
-  v_full_name   text;
-BEGIN
-  -- Pick preferred active org if any
-  SELECT up.active_org_id INTO resolved_org
-    FROM public.user_preferences up
-   WHERE up.user_id = target_user
-     AND up.active_org_id IS NOT NULL;
-
-  -- Fallback: oldest active membership
-  IF resolved_org IS NULL THEN
-    SELECT m.org_id INTO resolved_org
-      FROM public.memberships m
-     WHERE m.user_id = target_user
-       AND m.deleted_at IS NULL
-     ORDER BY m.created_at ASC
-     LIMIT 1;
-  END IF;
-
-  IF resolved_org IS NOT NULL THEN
-    claims := jsonb_set(claims, '{org_id}', to_jsonb(resolved_org::text), true);
-  END IF;
-
-  -- Story auth.1 (R6, D5): full_name em claim para reconhecimento sem query
-  -- extra. Phone NÃO incluído (vaza PII em logs).
-  SELECT p.full_name INTO v_full_name
-    FROM public.profiles p
-   WHERE p.id = target_user;
-
-  IF v_full_name IS NOT NULL THEN
-    claims := jsonb_set(claims, '{full_name}', to_jsonb(v_full_name), true);
-  END IF;
-
-  RETURN jsonb_build_object('claims', claims);
-END;
-$$;
-
-COMMENT ON FUNCTION public.custom_access_token_hook(jsonb) IS
-  'KEYRA ADR-012 + Story auth.1: Supabase Auth hook injetando org_id e full_name custom claims em todo JWT. Phone NÃO incluído por design (D5 — PII em headers vaza em logs).';
-
+-- GRANT SELECT em profiles para supabase_auth_admin precisa estar AQUI (não
+-- na 027) porque a migration 027 vai REPLACE a função pra começar a ler de
+-- profiles — o GRANT precisa estar pronto antes.
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_auth_admin') THEN
-    GRANT EXECUTE ON FUNCTION public.custom_access_token_hook(jsonb) TO supabase_auth_admin;
     GRANT SELECT ON public.profiles TO supabase_auth_admin;
   END IF;
 END
@@ -326,10 +288,32 @@ END
 $$;
 
 -- -----------------------------------------------------------------------------
--- Fim da migration. ACs do Story auth.1 atendidos pela DDL acima:
+-- 8. Backfill — criar profile (vazio, só com id) para usuários já existentes
+-- -----------------------------------------------------------------------------
+-- Sem isto, usuários existentes ficam sem row em profiles até trocarem
+-- algum dado. Backfill garante invariante "todo auth.user tem profile" para
+-- a base atual também — não só para signups novos.
+--
+-- ON CONFLICT DO NOTHING garante idempotência: re-rodar a migration não
+-- duplica e não falha.
+
+INSERT INTO public.profiles (id)
+  SELECT u.id
+    FROM auth.users u
+   WHERE NOT EXISTS (
+     SELECT 1 FROM public.profiles p WHERE p.id = u.id
+   )
+ON CONFLICT (id) DO NOTHING;
+
+-- -----------------------------------------------------------------------------
+-- Fim da migration 026 (parte 1 de 2).
+--
+-- ACs do Story auth.1 atendidos POR ESTA MIGRATION:
 --   AC1 profiles, AC2 legal_documents, AC3 user_consent_records,
 --   AC4 organizations_cnpj_unique, AC5 trigger on_auth_user_created,
---   AC6 custom_access_token_hook estendido,
---   AC7 before_user_created_block_disposable_emails.
--- AC8 (suíte RLS) e AC9 (typegen) tratados em arquivos separados.
+--   AC7 before_user_created_block_disposable_emails (função; registro via script).
+--
+-- AC6 (custom_access_token_hook estendido) = migration 027 separada (DevOps split).
+-- AC8 (suíte RLS) = supabase/tests/rls_isolation.test.sql Block G.
+-- AC9 (typegen)   = `pnpm typegen` após apply.
 -- =============================================================================

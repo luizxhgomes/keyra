@@ -1,7 +1,25 @@
 # Runbook — Rollback da Story `auth.1`
 
-**Migration:** `20260503000100_auth_v2_profiles_consent_legal_docs.sql`
+**Migrations:**
+- `20260503000100_auth_v2_profiles_consent_legal_docs.sql` (parte 1 — schema + trigger)
+- `20260503000200_auth_v2_hook_update_full_name_claim.sql` (parte 2 — hook update)
+
+**Split em 2 migrations** por recomendação do DevOps review (2026-05-03) pra desacoplar a parte reversível-com-DROP da alteração da Auth Hook.
+
 **Cenário de uso:** quebra grave detectada após apply em produção (ex.: login falhando, JWT sem org_id, app caindo).
+
+## Rollback de EMERGÊNCIA da Auth Hook (<30s, via psql direto)
+
+Se Sentry detectar erros 42501 / "row-level security" em massa após apply da Migration 027 (parte 2), restaurar IMEDIATAMENTE a versão pré-mudança usando o snapshot capturado:
+
+```bash
+# Snapshot da hook antiga em .keyra-secrets/auth-hook-snapshot-pre-027.sql
+psql "$SUPABASE_DB_URL" -f .keyra-secrets/auth-hook-snapshot-pre-027.sql
+```
+
+NÃO usar `supabase db push` para rollback de emergência — é mais lento e pode bater em outras migrations pendentes. `psql` direto restaura a função em <1 segundo.
+
+JWTs em vôo continuam válidos por até 1h (`jwt_expiry=3600`), então a janela pra rollback após detecção é aproximadamente esse tempo até começar a refrescar massa de tokens.
 
 ## Pré-condição
 

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { createServerClient as createSSRClient, type CookieOptions } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -74,6 +75,23 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // ---- Sentry breadcrumb pra detecção Tier 1 do Auth Hook (Story auth.1) --
+  // Recomendação do DevOps review: logar primeiro 8 chars do org_id (não-PII)
+  // pra detectar rapidamente se a custom_access_token_hook parou de injetar
+  // o claim. Se este breadcrumb sumir em massa = hook quebrada.
+  if (user) {
+    type AppMeta = { org_id?: unknown };
+    const orgIdClaim = (user.app_metadata as AppMeta | undefined)?.org_id;
+    const orgIdSample = typeof orgIdClaim === 'string' ? orgIdClaim.slice(0, 8) : 'absent';
+    Sentry.addBreadcrumb({
+      category: 'auth',
+      type: 'info',
+      level: 'info',
+      message: `proxy auth check (org_id=${orgIdSample})`,
+      data: { pathname },
+    });
+  }
 
   // ---- Auth gating ----------------------------------------------------
 

@@ -76,3 +76,7 @@ __pycache__/
 
 # TypeScript incremental build
 *.tsbuildinfo
+
+# Diretórios de outras branches/squads — não devem ser comitados aqui
+.firecrawl/
+design-system/

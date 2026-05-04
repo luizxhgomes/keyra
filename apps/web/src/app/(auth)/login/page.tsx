@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { SignInGlassCard } from '@/components/auth/SignInGlassCard';
+import { SignInCard } from '@/components/auth/SignInCard';
 import { getSafeNext } from '@/lib/auth/safe-next';
 
 export const metadata: Metadata = {
@@ -24,5 +24,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const rawNext = Array.isArray(sp.next) ? sp.next[0] : sp.next;
   const next = getSafeNext(rawNext);
 
-  return <SignInGlassCard next={next} />;
+  return <SignInCard next={next} />;
 }

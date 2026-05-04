@@ -658,6 +658,36 @@ export type Database = {
           },
         ]
       }
+      legal_documents: {
+        Row: {
+          content_hash: string
+          content_md: string
+          deprecated_at: string | null
+          id: string
+          published_at: string
+          type: string
+          version: string
+        }
+        Insert: {
+          content_hash: string
+          content_md: string
+          deprecated_at?: string | null
+          id?: string
+          published_at?: string
+          type: string
+          version: string
+        }
+        Update: {
+          content_hash?: string
+          content_md?: string
+          deprecated_at?: string | null
+          id?: string
+          published_at?: string
+          type?: string
+          version?: string
+        }
+        Relationships: []
+      }
       memberships: {
         Row: {
           accepted_at: string | null
@@ -1071,6 +1101,33 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          phone_encrypted: string | null
+          phone_last_four: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone_encrypted?: string | null
+          phone_last_four?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone_encrypted?: string | null
+          phone_last_four?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_categories: {
         Row: {
           color: string | null
@@ -1429,6 +1486,48 @@ export type Database = {
           },
         ]
       }
+      user_consent_records: {
+        Row: {
+          accepted_at: string
+          document_id: string
+          id: string
+          ip_address: unknown
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          document_id: string
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          document_id?: string
+          id?: string
+          ip_address?: unknown
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_consent_records_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "legal_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_consent_records_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "legal_documents_current"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           active_org_id: string | null
@@ -1470,6 +1569,17 @@ export type Database = {
       }
     }
     Views: {
+      legal_documents_current: {
+        Row: {
+          content_hash: string | null
+          content_md: string | null
+          id: string | null
+          published_at: string | null
+          type: string | null
+          version: string | null
+        }
+        Relationships: []
+      }
       v_cashflow_daily: {
         Row: {
           day: string | null
@@ -1662,6 +1772,10 @@ export type Database = {
         Returns: undefined
       }
       accept_organization_invite: { Args: { p_token: string }; Returns: string }
+      before_user_created_block_disposable_emails: {
+        Args: { event: Json }
+        Returns: Json
+      }
       count_org_owners: { Args: { p_org_id: string }; Returns: number }
       create_organization_with_owner: {
         Args: { p_cnpj?: string; p_name: string }

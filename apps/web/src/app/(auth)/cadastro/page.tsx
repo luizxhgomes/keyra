@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { SignUpGlassCard } from '@/components/auth/SignUpGlassCard';
+import { SignUpCard } from '@/components/auth/SignUpCard';
 import { getCurrentUser } from '@/lib/auth/get-current-user';
 
 export const metadata = {
@@ -14,5 +14,5 @@ export default async function CadastroPage() {
     redirect('/dashboard');
   }
 
-  return <SignUpGlassCard />;
+  return <SignUpCard />;
 }

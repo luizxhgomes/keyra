@@ -6,31 +6,30 @@ export const metadata = {
 
 /**
  * Placeholder até a Story auth.5 implementar `resetPasswordForEmail`.
- * Visual coerente com SignInGlassCard / SignUpGlassCard (dark glass).
+ * Visual coerente com SignInCard / SignUpCard (cores light KEYRA).
  */
 export default function EsqueciSenhaPage() {
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#121212] px-4 py-12">
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-4 py-12">
       <div
-        className="pointer-events-none absolute inset-0 opacity-30"
+        className="pointer-events-none absolute inset-0 opacity-50"
         style={{
-          background:
-            'radial-gradient(circle at 50% 0%, rgba(189,125,77,0.15), transparent 50%)',
+          background: 'radial-gradient(circle at 50% 0%, hsl(21 56% 50% / 0.08), transparent 60%)',
         }}
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-8 text-center shadow-2xl ring-1 ring-white/10 backdrop-blur-md animate-in fade-in zoom-in-95 duration-500">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 shadow-lg ring-1 ring-white/20 transition-transform duration-300 ease-out hover:scale-110">
-          <span className="text-xl font-bold tracking-tight text-white">K</span>
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 text-center shadow-xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
+          <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
-        <h2 className="mb-1 text-xl font-semibold text-white">Recuperação de senha</h2>
-        <p className="mt-3 text-sm text-white/70">
+        <h2 className="mb-1 text-xl font-semibold text-foreground">Recuperação de senha</h2>
+        <p className="mt-3 text-sm text-muted-foreground">
           A recuperação automática estará disponível em breve. Enquanto isso, escreva pra{' '}
           <a
             href="mailto:suporte@usekeyra.com"
-            className="font-medium text-white underline underline-offset-2 transition-colors duration-150 hover:text-white/80"
+            className="font-semibold text-primary underline underline-offset-2 transition-colors duration-150 hover:text-primary-700"
           >
             suporte@usekeyra.com
           </a>{' '}
@@ -39,7 +38,7 @@ export default function EsqueciSenhaPage() {
 
         <Link
           href="/login"
-          className="mt-6 inline-block w-full rounded-full bg-white/10 px-5 py-3 text-sm font-medium text-white shadow transition-all duration-200 hover:bg-white/[0.18] hover:shadow-lg"
+          className="mt-6 inline-block w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
         >
           Voltar ao login
         </Link>

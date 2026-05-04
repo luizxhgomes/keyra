@@ -59,15 +59,15 @@ function maskPhone(value: string): string {
 }
 
 const inputClass =
-  'w-full rounded-xl border-0 bg-white/10 px-5 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-1 ring-white/10 transition-all duration-200 focus:bg-white/[0.13] focus:ring-2 focus:ring-white/30';
+  'w-full rounded-xl border border-input bg-muted/40 px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 outline-none transition-all duration-200 focus:bg-background focus:ring-2 focus:ring-ring';
 
 /**
- * Tela de cadastro dark glassmorphism estilo HextaUI, adaptada à identidade
- * KEYRA. Mesmo motor visual de SignInGlassCard, com 8 campos do form.
+ * Tela de cadastro — estrutura HextaUI com cores KEYRA (light, cream + primary
+ * marrom). Mesmo motor visual de SignInCard, com 8 campos do form.
  *
- * Story auth.3 visual revamp (Fase B do EPIC-AUTH-V2 incrementada 2026-05-04).
+ * Story auth.3 visual revamp incrementado em 2026-05-04.
  */
-export function SignUpGlassCard() {
+export function SignUpCard() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -114,30 +114,32 @@ export function SignUpGlassCard() {
     });
   }
 
-  const cardWrapper =
-    'relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#121212] px-4 py-12';
+  const wrapper =
+    'relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-4 py-12';
+  const radial = (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-50"
+      style={{
+        background: 'radial-gradient(circle at 50% 0%, hsl(21 56% 50% / 0.08), transparent 60%)',
+      }}
+      aria-hidden="true"
+    />
+  );
 
   if (emailSent) {
     return (
-      <div className={cardWrapper}>
-        <div
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 0%, rgba(189,125,77,0.15), transparent 50%)',
-          }}
-          aria-hidden="true"
-        />
-        <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-8 text-center shadow-2xl ring-1 ring-white/10 backdrop-blur-md animate-in fade-in zoom-in-95 duration-500">
-          <CheckCircle2 className="h-10 w-10 text-emerald-400" aria-hidden="true" />
-          <h2 className="mt-4 text-xl font-semibold text-white">Confira seu e-mail</h2>
-          <p className="mt-3 text-sm text-white/70">
-            Enviamos um link de confirmação para <strong>{emailSent}</strong>. Após confirmar, você
-            poderá fazer login com sua senha.
+      <div className={wrapper}>
+        {radial}
+        <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 text-center shadow-xl animate-in fade-in zoom-in-95 duration-500">
+          <CheckCircle2 className="h-10 w-10 text-emerald-600" aria-hidden="true" />
+          <h2 className="mt-4 text-xl font-semibold text-foreground">Confira seu e-mail</h2>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Enviamos um link de confirmação para <strong className="text-foreground">{emailSent}</strong>.
+            Após confirmar, você poderá fazer login com sua senha.
           </p>
           <button
             onClick={() => router.push('/login')}
-            className="mt-6 w-full rounded-full bg-white/10 px-5 py-3 text-sm font-medium text-white shadow transition-all duration-200 hover:bg-white/[0.18] hover:shadow-lg"
+            className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
           >
             Ir para o login
           </button>
@@ -147,25 +149,16 @@ export function SignUpGlassCard() {
   }
 
   return (
-    <div className={cardWrapper}>
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          background:
-            'radial-gradient(circle at 50% 0%, rgba(189,125,77,0.15), transparent 50%)',
-        }}
-        aria-hidden="true"
-      />
+    <div className={wrapper}>
+      {radial}
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-8 shadow-2xl ring-1 ring-white/10 backdrop-blur-md animate-in fade-in zoom-in-95 duration-500">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 shadow-lg ring-1 ring-white/20 transition-transform duration-300 ease-out hover:scale-110">
-          <span className="text-xl font-bold tracking-tight text-white">K</span>
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
+          <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
-        <h2 className="mb-1 text-center text-2xl font-semibold tracking-tight text-white">
-          KEYRA
-        </h2>
-        <p className="mb-6 text-center text-xs text-white/60">Criar sua conta</p>
+        <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-primary">KEYRA</h2>
+        <p className="mb-6 text-center text-xs text-muted-foreground">Criar sua conta</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-3" noValidate>
           <div>
@@ -177,7 +170,7 @@ export function SignUpGlassCard() {
               aria-invalid={Boolean(errors.fullName)}
             />
             {errors.fullName && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.fullName.message}
               </p>
             )}
@@ -198,7 +191,7 @@ export function SignUpGlassCard() {
               aria-invalid={Boolean(errors.phone)}
             />
             {errors.phone && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.phone.message}
               </p>
             )}
@@ -214,7 +207,7 @@ export function SignUpGlassCard() {
               aria-invalid={Boolean(errors.email)}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.email.message}
               </p>
             )}
@@ -233,14 +226,14 @@ export function SignUpGlassCard() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-all duration-150 hover:scale-110 hover:text-white/90"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-150 hover:scale-110 hover:text-foreground"
                 aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.password.message}
               </p>
             )}
@@ -259,22 +252,22 @@ export function SignUpGlassCard() {
               <button
                 type="button"
                 onClick={() => setShowConfirm((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-all duration-150 hover:scale-110 hover:text-white/90"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-150 hover:scale-110 hover:text-foreground"
                 aria-label={showConfirm ? 'Ocultar senha' : 'Mostrar senha'}
               >
                 {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.confirmPassword.message}
               </p>
             )}
           </div>
 
-          <hr className="my-1 border-white/10" />
+          <hr className="my-1 border-border" />
 
-          <p className="text-[10px] font-medium uppercase tracking-wider text-white/40">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Sua clínica
           </p>
 
@@ -286,7 +279,7 @@ export function SignUpGlassCard() {
               aria-invalid={Boolean(errors.clinicName)}
             />
             {errors.clinicName && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.clinicName.message}
               </p>
             )}
@@ -306,21 +299,21 @@ export function SignUpGlassCard() {
             />
           </div>
 
-          <hr className="my-1 border-white/10" />
+          <hr className="my-1 border-border" />
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-white/[0.04] p-3 ring-1 ring-white/10 transition-all duration-200 hover:bg-white/[0.07]">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-muted/30 p-3 transition-all duration-200 hover:bg-muted/50">
             <input
               type="checkbox"
               {...register('acceptedTerms' as never)}
               onChange={(e) => setValue('acceptedTerms', e.target.checked as never)}
-              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-white/20 bg-white/10 text-white accent-white"
+              className="mt-0.5 h-4 w-4 cursor-pointer rounded border-input bg-background accent-primary"
             />
-            <span className="text-xs leading-snug text-white/70">
+            <span className="text-xs leading-snug text-foreground">
               Li e aceito os{' '}
               <Link
                 href="/termos"
                 target="_blank"
-                className="text-white underline underline-offset-2 transition-colors duration-150 hover:text-white/80"
+                className="font-semibold text-primary underline underline-offset-2 transition-colors duration-150 hover:text-primary-700"
               >
                 Termos de Uso
               </Link>{' '}
@@ -328,7 +321,7 @@ export function SignUpGlassCard() {
               <Link
                 href="/privacidade"
                 target="_blank"
-                className="text-white underline underline-offset-2 transition-colors duration-150 hover:text-white/80"
+                className="font-semibold text-primary underline underline-offset-2 transition-colors duration-150 hover:text-primary-700"
               >
                 Política de Privacidade
               </Link>{' '}
@@ -336,7 +329,7 @@ export function SignUpGlassCard() {
             </span>
           </label>
           {errors.acceptedTerms && (
-            <p className="text-xs text-red-400" role="alert">
+            <p className="text-xs text-destructive" role="alert">
               {(errors.acceptedTerms as { message?: string }).message}
             </p>
           )}
@@ -346,7 +339,7 @@ export function SignUpGlassCard() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-1 w-full rounded-full bg-white/10 px-5 py-3 text-sm font-medium text-white shadow transition-all duration-200 hover:bg-white/[0.18] hover:shadow-lg disabled:opacity-50 disabled:hover:bg-white/10"
+            className="mt-1 w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md disabled:opacity-50 disabled:hover:bg-primary"
           >
             {pending ? (
               <span className="inline-flex items-center justify-center gap-2">
@@ -357,11 +350,11 @@ export function SignUpGlassCard() {
             )}
           </button>
 
-          <p className="mt-2 text-center text-xs text-white/50">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Já tem conta?{' '}
             <Link
               href="/login"
-              className="text-white/85 underline underline-offset-2 transition-colors duration-150 hover:text-white"
+              className="font-semibold text-foreground transition-colors duration-150 hover:text-primary"
             >
               Entrar
             </Link>

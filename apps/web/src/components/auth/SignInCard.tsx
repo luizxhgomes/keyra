@@ -23,19 +23,11 @@ type Props = {
 };
 
 /**
- * Tela de login dark glassmorphism estilo HextaUI, adaptada à identidade KEYRA.
- *
- * Story auth.4 visual revamp (parte da Fase B do EPIC-AUTH-V2 incrementada
- * em 2026-05-04). Lógica reusa `signInWithPasswordAction` — só trocamos o
- * "casco visual" (sem magic link, mantém Turnstile, mantém validações Zod).
- *
- * Animações:
- * - Logo: hover scale 110%, transition 300ms ease-out
- * - Botões: hover bg lighter + shadow elevation, transition 200ms
- * - Eye toggle: hover scale 110%, transition 150ms
- * - Card: subtle entrance fade-in via Tailwind animate-in
+ * Tela de login — estrutura HextaUI (card centralizado, animações hover)
+ * com cores KEYRA (light, cream/bege + primary marrom). Story auth.4
+ * visual revamp incrementado em 2026-05-04.
  */
-export function SignInGlassCard({ next }: Props) {
+export function SignInCard({ next }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -68,26 +60,22 @@ export function SignInGlassCard({ next }: Props) {
   }
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-[#121212] px-4 py-12">
-      {/* Subtle radial gradient pra dar profundidade */}
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-background px-4 py-12">
       <div
-        className="pointer-events-none absolute inset-0 opacity-30"
+        className="pointer-events-none absolute inset-0 opacity-50"
         style={{
-          background:
-            'radial-gradient(circle at 50% 0%, rgba(189,125,77,0.15), transparent 50%)',
+          background: 'radial-gradient(circle at 50% 0%, hsl(21 56% 50% / 0.08), transparent 60%)',
         }}
         aria-hidden="true"
       />
 
-      {/* Glass card */}
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-8 shadow-2xl ring-1 ring-white/10 backdrop-blur-md animate-in fade-in zoom-in-95 duration-500">
-        {/* Logo K em círculo glass */}
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-white/10 shadow-lg ring-1 ring-white/20 transition-transform duration-300 ease-out hover:scale-110">
-          <span className="text-xl font-bold tracking-tight text-white">K</span>
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
+          <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
-        <h2 className="mb-1 text-center text-2xl font-semibold tracking-tight text-white">KEYRA</h2>
-        <p className="mb-6 text-center text-xs text-white/60">
+        <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-primary">KEYRA</h2>
+        <p className="mb-6 text-center text-xs text-muted-foreground">
           Entre no seu financeiro operacional
         </p>
 
@@ -98,12 +86,12 @@ export function SignInGlassCard({ next }: Props) {
               autoComplete="email"
               autoFocus
               placeholder="E-mail"
-              className="w-full rounded-xl border-0 bg-white/10 px-5 py-3 text-sm text-white placeholder:text-white/40 outline-none ring-1 ring-white/10 transition-all duration-200 focus:bg-white/[0.13] focus:ring-2 focus:ring-white/30"
+              className="w-full rounded-xl border border-input bg-muted/40 px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 outline-none transition-all duration-200 focus:bg-background focus:ring-2 focus:ring-ring"
               {...register('email')}
               aria-invalid={Boolean(errors.email)}
             />
             {errors.email && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.email.message}
               </p>
             )}
@@ -115,21 +103,21 @@ export function SignInGlassCard({ next }: Props) {
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="Senha"
-                className="w-full rounded-xl border-0 bg-white/10 px-5 py-3 pr-12 text-sm text-white placeholder:text-white/40 outline-none ring-1 ring-white/10 transition-all duration-200 focus:bg-white/[0.13] focus:ring-2 focus:ring-white/30"
+                className="w-full rounded-xl border border-input bg-muted/40 px-5 py-3 pr-12 text-sm text-foreground placeholder:text-muted-foreground/70 outline-none transition-all duration-200 focus:bg-background focus:ring-2 focus:ring-ring"
                 {...register('password')}
                 aria-invalid={Boolean(errors.password)}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-all duration-150 hover:scale-110 hover:text-white/90"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-all duration-150 hover:scale-110 hover:text-foreground"
                 aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-xs text-red-400" role="alert">
+              <p className="mt-1 text-xs text-destructive" role="alert">
                 {errors.password.message}
               </p>
             )}
@@ -138,7 +126,7 @@ export function SignInGlassCard({ next }: Props) {
           <div className="-mt-1 flex justify-end">
             <Link
               href="/esqueci-senha"
-              className="text-xs text-white/50 transition-colors duration-150 hover:text-white/90"
+              className="text-xs text-muted-foreground transition-colors duration-150 hover:text-foreground"
             >
               Esqueci minha senha
             </Link>
@@ -146,12 +134,12 @@ export function SignInGlassCard({ next }: Props) {
 
           <TurnstileWidget onToken={setTurnstileToken} />
 
-          <hr className="my-1 border-white/10" />
+          <hr className="my-1 border-border" />
 
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-full bg-white/10 px-5 py-3 text-sm font-medium text-white shadow transition-all duration-200 hover:bg-white/[0.18] hover:shadow-lg disabled:opacity-50 disabled:hover:bg-white/10"
+            className="w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md disabled:opacity-50 disabled:hover:bg-primary"
           >
             {pending ? (
               <span className="inline-flex items-center justify-center gap-2">
@@ -162,39 +150,40 @@ export function SignInGlassCard({ next }: Props) {
             )}
           </button>
 
-          {/* Google OAuth — desabilitado até auth.6 sair */}
           <button
             type="button"
             disabled
             title="Login com Google estará disponível em breve"
-            className="mb-1 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#232526] to-[#2d2e30] px-5 py-3 text-sm font-medium text-white/70 shadow ring-1 ring-white/10 transition-all duration-200 hover:brightness-110"
+            className="mb-1 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-muted-foreground shadow-sm transition-all duration-200 hover:bg-muted/60"
           >
             <GoogleIcon className="h-5 w-5" />
             Continuar com Google
-            <span className="ml-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white/60">
+            <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               em breve
             </span>
           </button>
 
-          <p className="mt-2 text-center text-xs text-white/50">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Ainda não tem conta?{' '}
             <Link
               href="/cadastro"
-              className="text-white/85 underline underline-offset-2 transition-colors duration-150 hover:text-white"
+              className="font-semibold text-foreground transition-colors duration-150 hover:text-primary"
             >
               Crie sua conta
             </Link>
           </p>
         </form>
       </div>
+
+      <p className="relative z-10 mt-6 text-xs text-muted-foreground">
+        <Link href="/" className="transition-colors duration-150 hover:text-foreground">
+          ← Voltar para a página inicial
+        </Link>
+      </p>
     </div>
   );
 }
 
-/**
- * Google G logo inline SVG — evita dep de imagem externa e mantém ícone
- * coloreado mesmo no tema dark.
- */
 function GoogleIcon({ className }: { className?: string }) {
   return (
     <svg

@@ -6,9 +6,10 @@ import { UserMenu } from '@/components/layout/UserMenu';
 /**
  * Authenticated app shell — sidebar + top bar + content area.
  *
- * The parent `(app)/layout.tsx` (a Server Component) resolves the current
- * user via `requireAuth()` and passes the email down so we can render the
- * user menu without a client-side Supabase fetch.
+ * O Server Component pai `(app)/layout.tsx` resolve user + display name
+ * via `requireAuth()` + `getCurrentUserDisplayName()` (Story auth.7) e
+ * passa pra cá. Display name vem do JWT custom claim `full_name` (sem
+ * query extra) com fallback no email.
  *
  * OrgSwitcher hydrates its own data client-side (Server Action). Keeping
  * it a Client Component lets the dropdown animate + update locally on
@@ -17,9 +18,11 @@ import { UserMenu } from '@/components/layout/UserMenu';
 export function AppShell({
   children,
   userEmail,
+  displayName,
 }: {
   children: React.ReactNode;
   userEmail: string;
+  displayName: string;
 }) {
   return (
     <div className="flex min-h-screen bg-background">
@@ -32,7 +35,10 @@ export function AppShell({
           </div>
 
           <div className="flex items-center gap-3">
-            <UserMenu email={userEmail} />
+            <span className="hidden text-sm text-muted-foreground sm:inline">
+              Olá, <span className="font-medium text-foreground">{displayName}</span>
+            </span>
+            <UserMenu email={userEmail} displayName={displayName} />
           </div>
         </header>
 

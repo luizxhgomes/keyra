@@ -1,4 +1,5 @@
 import { AppShell } from '@/components/layout/AppShell';
+import { getCurrentUserDisplayName } from '@/lib/auth/get-current-user';
 import { requireAuth } from '@/lib/auth/require-auth';
 import { MotionProvider } from '@/lib/motion/lazy-motion';
 
@@ -9,20 +10,19 @@ import { MotionProvider } from '@/lib/motion/lazy-motion';
  *   - No session → redirect('/login')
  *   - Session but no org → redirect('/onboarding/nova-organizacao')
  *
- * Middleware (`middleware.ts`) catches most cases earlier, but we still
- * enforce at the layout level because Next caches route segments and the
- * middleware could miss edge cases (e.g. membership deleted mid-session).
- *
- * Story 6.2 (AC1) — `<MotionProvider>` envolvendo `AppShell` habilita
- * `<m.div>` em qualquer componente filho via LazyMotion + domAnimation
- * (~21KB vs 50KB do `<motion>` cheio).
+ * Story auth.7: `getCurrentUserDisplayName()` decoda o JWT custom claim
+ * `full_name` (emitido pelo `custom_access_token_hook` da Story auth.1) com
+ * fallback no email. Resultado vai pro AppShell sem query extra.
  */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { user } = await requireAuth();
+  const displayName = await getCurrentUserDisplayName();
 
   return (
     <MotionProvider>
-      <AppShell userEmail={user.email ?? 'você'}>{children}</AppShell>
+      <AppShell userEmail={user.email ?? 'você'} displayName={displayName}>
+        {children}
+      </AppShell>
     </MotionProvider>
   );
 }

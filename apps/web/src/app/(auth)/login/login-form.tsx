@@ -1,217 +1,141 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { signInWithPasswordAction } from './actions';
+import { TurnstileWidget } from '@/components/auth/TurnstileWidget';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import { signInWithOtpAction } from './actions';
-
-const RESEND_COOLDOWN_SECONDS = 60;
-
 const formSchema = z.object({
-  email: z.string().trim().email({ message: 'Digite um e-mail válido' }),
+  email: z.string().trim().email({ message: 'E-mail inválido' }),
+  password: z.string().min(1, { message: 'Senha obrigatória' }),
 });
 type FormValues = z.infer<typeof formSchema>;
 
 type LoginFormProps = {
-  /** Caminho relativo (ex.: `/invites/abc`) para o qual o usuário deve voltar
-   * após autenticar via magic link. Já validado pelo Server Component pai
-   * com `getSafeNext()`. */
   next: string | null;
 };
 
 /**
- * Client-side login form — magic link flow.
+ * Login form — email + senha.
  *
- * States (mutually exclusive):
- *   1. idle        → show email input + submit button
- *   2. submitting  → disable inputs, show spinner in button
- *   3. sent        → replace form with success message + "usar outro e-mail"
+ * Story auth.4 do EPIC-AUTH-V2. Magic link REMOVIDO da plataforma. Recovery
+ * (Esqueci senha) usa fluxo `resetPasswordForEmail` na story auth.5.
  *
- * Error state is surfaced via `sonner` toast AND inline (aria-live) so it's
- * both noisy-enough and a11y-compliant.
+ * Sucesso → router.push pra `next` se safe, senão `/dashboard`.
  */
 export function LoginForm({ next }: LoginFormProps) {
-  const [emailSent, setEmailSent] = useState<string | null>(null);
-  const [cooldown, setCooldown] = useState(0);
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: '' },
+    defaultValues: { email: '', password: '' },
   });
-
-  /**
-   * Story 7.1 — countdown de reenvio.
-   *
-   * Quando email é enviado, dispara contagem regressiva de
-   * `RESEND_COOLDOWN_SECONDS`. Botão "Reenviar" só fica clicável quando
-   * cooldown chega a zero. Protege:
-   *   • Rate limit do Supabase (~30s entre OTPs)
-   *   • Custo desnecessário no Resend
-   *   • UX de impaciência (usuária clica 5x sem ler que email já chegou)
-   */
-  useEffect(() => {
-    if (cooldown <= 0) {
-      if (cooldownRef.current) {
-        clearInterval(cooldownRef.current);
-        cooldownRef.current = null;
-      }
-      return;
-    }
-    cooldownRef.current = setInterval(() => {
-      setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => {
-      if (cooldownRef.current) {
-        clearInterval(cooldownRef.current);
-        cooldownRef.current = null;
-      }
-    };
-  }, [cooldown]);
 
   function onSubmit(values: FormValues) {
     startTransition(async () => {
-      const result = await signInWithOtpAction({ ...values, next: next ?? undefined });
-      if (result.success) {
-        setEmailSent(values.email);
-        setCooldown(RESEND_COOLDOWN_SECONDS);
-        toast.success('Link enviado!', {
-          description: 'Verifique sua caixa de entrada (e o spam).',
-        });
-      } else {
-        toast.error('Não foi possível enviar', { description: result.error });
-      }
-    });
-  }
-
-  function onResend() {
-    if (!emailSent || cooldown > 0 || pending) return;
-    startTransition(async () => {
-      const result = await signInWithOtpAction({
-        email: emailSent,
+      const result = await signInWithPasswordAction({
+        ...values,
         next: next ?? undefined,
+        turnstileToken: turnstileToken || undefined,
       });
       if (result.success) {
-        setCooldown(RESEND_COOLDOWN_SECONDS);
-        toast.success('Link reenviado', {
-          description: 'Confira novamente sua caixa de entrada.',
-        });
+        toast.success('Bem-vinda de volta');
+        router.push(next ?? '/dashboard');
+        router.refresh();
       } else {
-        toast.error('Não foi possível reenviar', { description: result.error });
+        toast.error('Não foi possível entrar', { description: result.error });
       }
     });
-  }
-
-  if (emailSent) {
-    const canResend = cooldown <= 0 && !pending;
-    return (
-      <div
-        className="flex flex-col items-center gap-4 text-center"
-        role="status"
-        aria-live="polite"
-      >
-        <CheckCircle2 className="h-10 w-10 text-secondary-500" aria-hidden="true" />
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-foreground">Confira seu e-mail</h2>
-          <p className="text-sm text-muted-foreground">
-            Enviamos um link mágico para{' '}
-            <span className="font-medium text-foreground">{emailSent}</span>. Abra-o no
-            mesmo dispositivo para entrar.
-          </p>
-        </div>
-
-        <Button
-          type="button"
-          variant="default"
-          className="w-full"
-          disabled={!canResend}
-          onClick={onResend}
-        >
-          {pending ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              Reenviando...
-            </>
-          ) : cooldown > 0 ? (
-            `Reenviar em ${cooldown}s`
-          ) : (
-            <>
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              Reenviar link
-            </>
-          )}
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={() => {
-            setEmailSent(null);
-            setCooldown(0);
-            reset({ email: '' });
-          }}
-        >
-          Usar outro e-mail
-        </Button>
-
-        <p className="text-xs text-muted-foreground">
-          Não chegou? Verifique a pasta de spam ou tente reenviar.
-        </p>
-      </div>
-    );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-      <div className="flex flex-col gap-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      <div className="grid gap-1.5">
         <Label htmlFor="email">E-mail</Label>
         <Input
           id="email"
           type="email"
-          inputMode="email"
           autoComplete="email"
-          autoFocus
           placeholder="voce@clinica.com.br"
-          aria-invalid={errors.email ? 'true' : 'false'}
-          aria-describedby={errors.email ? 'email-error' : undefined}
-          disabled={pending}
+          autoFocus
           {...register('email')}
+          aria-invalid={Boolean(errors.email)}
         />
-        {errors.email ? (
-          <p id="email-error" className="text-xs text-destructive" role="alert">
+        {errors.email && (
+          <p role="alert" className="text-xs text-destructive">
             {errors.email.message}
           </p>
-        ) : null}
+        )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={pending}>
+      <div className="grid gap-1.5">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">Senha</Label>
+          <Link
+            href="/esqueci-senha"
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete="current-password"
+            {...register('password')}
+            aria-invalid={Boolean(errors.password)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+        {errors.password && (
+          <p role="alert" className="text-xs text-destructive">
+            {errors.password.message}
+          </p>
+        )}
+      </div>
+
+      <TurnstileWidget onToken={setTurnstileToken} />
+
+      <Button type="submit" disabled={pending} className="w-full">
         {pending ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            Enviando...
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Entrando...
           </>
         ) : (
-          'Enviar link mágico'
+          'Entrar'
         )}
       </Button>
 
-      <p className="text-center text-xs text-muted-foreground">
-        Sem senha. Você recebe um link único no e-mail e entra com um clique.
+      <p className="text-center text-sm text-muted-foreground">
+        Ainda não tem conta?{' '}
+        <Link href="/cadastro" className="font-medium text-foreground hover:underline">
+          Crie sua conta
+        </Link>
       </p>
     </form>
   );

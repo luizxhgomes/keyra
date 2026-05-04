@@ -37,7 +37,14 @@ export function LegalDocument({
   altLinks = [],
 }: LegalDocumentProps) {
   // Remove o primeiro `# Título` do markdown (já exibido no <header>).
-  const body = contentMd.replace(/^\s*#\s+.+\n+/, '');
+  // Em seguida, limpa travessões (en-dash U+2013 e em-dash U+2014): o estilo
+  // editorial KEYRA evita travessões em corpo de texto. Substitui por
+  // espaço único e colapsa whitespace residual para preservar fluxo de leitura.
+  const body = contentMd
+    .replace(/^\s*#\s+.+\n+/, '')
+    .replace(/[–—]/g, ' ')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/^[ \t]+/gm, '');
 
   const formattedDate = publishedAt
     ? new Date(publishedAt).toLocaleDateString('pt-BR', {

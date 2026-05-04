@@ -5,7 +5,7 @@ import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'Termos de Uso · KEYRA',
-  description: 'Termos de uso da plataforma KEYRA — vigente versão 1.0.0',
+  description: 'Termos de uso da plataforma KEYRA, versão 1.0.0 vigente.',
 };
 
 /**

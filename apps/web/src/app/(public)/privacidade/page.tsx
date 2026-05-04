@@ -5,7 +5,7 @@ import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'Política de Privacidade · KEYRA',
-  description: 'Política de privacidade da plataforma KEYRA — vigente versão 1.0.0',
+  description: 'Política de privacidade da plataforma KEYRA, versão 1.0.0 vigente.',
 };
 
 export default async function PrivacidadePage() {

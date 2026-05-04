@@ -27,7 +27,7 @@ export default function RootNotFound() {
           <CardTitle>Esta página não existe.</CardTitle>
           <CardDescription>
             O endereço pode ter mudado, o link estar desatualizado, ou você ter
-            chegado aqui por engano. Sem drama — é só voltar.
+            chegado aqui por engano. Sem drama, é só voltar.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row">

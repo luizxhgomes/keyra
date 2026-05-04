@@ -18,13 +18,17 @@ import { cn } from '@/lib/utils';
 /**
  * Header user menu.
  *
- * Receives the user email from the Server Component parent so we avoid a
- * client-side Supabase round-trip just to render an avatar initial.
+ * Recebe email + displayName do Server Component pai (Story auth.7).
+ * displayName vem do JWT custom claim `full_name` (Auth Hook estendido na
+ * Story auth.1) com fallback no email — sem round-trip cliente.
+ *
+ * Avatar mostra initial do displayName (que é o full_name quando preenchido,
+ * ou primeira letra do email quando não).
  */
-export function UserMenu({ email }: { email: string }) {
+export function UserMenu({ email, displayName }: { email: string; displayName: string }) {
   const [pending, startTransition] = useTransition();
 
-  const initial = email.trim().charAt(0).toUpperCase() || '?';
+  const initial = displayName.trim().charAt(0).toUpperCase() || '?';
 
   function handleSignOut() {
     startTransition(async () => {

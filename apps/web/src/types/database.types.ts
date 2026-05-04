@@ -1795,6 +1795,20 @@ export type Database = {
         Args: { p_org_id: string }
         Returns: undefined
       }
+      signup_create_account_atomic: {
+        Args: {
+          p_clinic_name: string
+          p_cnpj: string
+          p_encryption_key: string
+          p_full_name: string
+          p_ip_address?: unknown
+          p_phone_e164: string
+          p_privacy_doc_id: string
+          p_terms_doc_id: string
+          p_user_agent?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

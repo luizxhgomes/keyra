@@ -9,6 +9,7 @@ export {
 } from './Skeleton';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { ErrorMessage, type ErrorMessageProps } from './ErrorMessage';
+export { LegalDocument, type LegalDocumentProps } from './LegalDocument';
 export {
   StatusBadge,
   appointmentStatusToBadge,

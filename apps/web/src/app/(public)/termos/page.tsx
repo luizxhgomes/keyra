@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { LegalDocument } from '@/components/keyra';
 import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata = {
@@ -11,13 +11,14 @@ export const metadata = {
 /**
  * Página pública /termos — exibe a versão vigente (não-deprecated) do tipo
  * 'terms' lendo da view `legal_documents_current` (security_invoker=true,
- * RLS permite SELECT pra `authenticated`).
+ * RLS permite SELECT pra `anon` e `authenticated`).
  *
  * Story auth.2 do EPIC-AUTH-V2.
  *
- * Renderização: content_md em <article> com `whitespace-pre-wrap` + tipografia
- * Tailwind `prose`. Sem react-markdown nesta versão — texto puro com tipografia
- * é suficiente para v1.0.0; rich rendering pode evoluir em sprint futura.
+ * Renderização: o conteúdo Markdown é parseado via `react-markdown` +
+ * `remark-gfm` (suporte a tabelas) dentro de `<LegalDocument>`, que aplica
+ * a tipografia editorial KEYRA — Inter Variable, weights extremos, paleta
+ * terracota+sálvia, espaçamento roomy.
  */
 export default async function TermosPage() {
   const supabase = await createServerClient();
@@ -27,40 +28,17 @@ export default async function TermosPage() {
     .eq('type', 'terms')
     .maybeSingle();
 
-  if (error || !data) {
+  if (error || !data || !data.version || !data.content_md) {
     notFound();
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <header className="mb-8 border-b border-border pb-6">
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">KEYRA</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Termos de Uso</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Versão {data.version} · vigente desde{' '}
-          {data.published_at
-            ? new Date(data.published_at).toLocaleDateString('pt-BR', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric',
-              })
-            : '—'}
-        </p>
-      </header>
-
-      <article className="prose prose-sm max-w-none whitespace-pre-wrap font-sans text-foreground">
-        {data.content_md}
-      </article>
-
-      <footer className="mt-12 border-t border-border pt-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground">
-          ← Voltar à página inicial
-        </Link>
-        {' · '}
-        <Link href="/privacidade" className="hover:text-foreground">
-          Política de Privacidade
-        </Link>
-      </footer>
-    </main>
+    <LegalDocument
+      title="Termos de Uso"
+      version={data.version}
+      publishedAt={data.published_at}
+      contentMd={data.content_md}
+      altLinks={[{ href: '/privacidade', label: 'Política de Privacidade' }]}
+    />
   );
 }

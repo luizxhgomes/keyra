@@ -80,3 +80,4 @@ __pycache__/
 # Diretórios de outras branches/squads — não devem ser comitados aqui
 .firecrawl/
 design-system/
+.vercel

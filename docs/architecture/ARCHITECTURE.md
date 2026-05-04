@@ -307,17 +307,19 @@ export function createAdminClient() // service_role key, BYPASS RLS — uso rest
 
 ### ADR-010 — Supabase Auth (email/senha + magic link)
 
-**Status:** ACCEPTED
+**Status:** SUPERSEDED por **ADR-022** em 2026-05-04 — ver §11.2.
 
-**Decisão:** Supabase Auth, Email + senha (primário) + Magic Link (recuperação).
+**Decisão original (histórica):** Supabase Auth, Email + senha (primário) + Magic Link (recuperação).
 
-**MVP (Fase 1):**
+**Por que foi superseded:** Story auth.4 (Fase B do EPIC-AUTH-V2) implementou login email+senha como único método sem fallback magic link, e Story auth.5 vai usar `resetPasswordForEmail` (fluxo de reset, NÃO magic link de login) para recovery. Magic link foi **removido inteiro da plataforma** por decisão estratégica da idealizadora em 2026-05-04. Detalhes da nova decisão e suas migrations/stories em ADR-022 §11.2.
+
+**MVP (Fase 1) — texto histórico, não vigente:**
 - Sign up: email + senha + nome
 - Login: email + senha
 - Reset: magic link
 - **NÃO no MVP:** Social login (Google/Apple), MFA, SSO
 
-**Pós-MVP (Phase 5+):** MFA via TOTP (compliance LGPD para clínicas com dados sensíveis), Google OAuth (esteticistas usam muito).
+**Pós-MVP (Phase 5+) — texto histórico:** MFA via TOTP (compliance LGPD para clínicas com dados sensíveis), Google OAuth (esteticistas usam muito) — Google OAuth virou Story auth.6 do EPIC-AUTH-V2.
 
 ---
 

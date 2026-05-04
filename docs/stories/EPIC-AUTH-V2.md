@@ -1,7 +1,8 @@
 # EPIC AUTH V2 — Auth UX completa + Cadastro estruturado + LGPD foundation
 
-**Status:** 🟢 Em execução
+**Status:** 🟡 Em execução — **6/10 stories Done** (60%)
 **Criado em:** 2026-05-03
+**Última atualização:** 2026-05-04 — encerramento de sessão com Fase B + visual revamp em prod
 **Origem:** Mapeamento da idealizadora (Luiz) em sessão 2026-05-03 — login considerado "muito feio", único método (magic link) inadequado para uso comercial, ausência de cadastro estruturado, ausência de Google OAuth, bug de duas abas obsoletas no fluxo magic link.
 **Auditoria preventiva de segurança:** [`docs/audit/auth-v2-security-audit.md`](../audit/auth-v2-security-audit.md) — 22 riscos identificados com fonte exata + 12 decisões de arquitetura travadas.
 **Pré-condição para abrir:** nenhuma (independente).
@@ -32,19 +33,26 @@ A auth atual do KEYRA é passwordless puro (magic link) — decisão tomada na A
 
 ## Composição do epic
 
-| Story | T-shirt | Pontos | Foco | Gates Phase 3.5 |
-|-------|---------|--------|------|------------------|
-| `auth.0` | S | 3 | Configuração Supabase Auth de produção (R1, R2, R3, R11, R12, R16, R20, R22) — habilitar email confirmation, senha forte, Turnstile, scrubbing Sentry, OTP 30min, secure password change | `@compliance-br`, `@devops` |
-| `auth.1` | M+ | 6 | Schema `profiles` + `user_consent_records` + `legal_documents` + Auth Hook estendido + UNIQUE CNPJ + hook `before_user_created` (R5, R6, R7, R9, R10, R13, R19) | `@data-engineer`, `@compliance-br` |
-| `auth.2` | S+ | 4 | Termos + Privacidade v1.0.0 versionados + páginas públicas + endpoint de current-version | `@compliance-br` |
-| `auth.3` | L | 8 | Cadastro signup atômico (RPC `signup_create_account_atomic` + Turnstile + libphonenumber + compensating delete) — campos: nome, celular, email, senha+conf, nome clínica, CNPJ, aceite | `@compliance-br`, `@growth-product` |
-| `auth.4` | S+ | 4 | Login email+senha (mensagem genérica anti-enumeration, Turnstile após 3 falhas, lockout após 10) | — |
-| `auth.5` | M | 5 | Esqueci senha (Turnstile, cooldown por email, signOut global pós-troca) — magic link migra integralmente para esta tela | — |
-| `auth.6` | M+ | 6 | Google OAuth (escopo mínimo, fluxo `/cadastro/completar` se faltar dados) | `@compliance-br` |
-| `auth.7` | XS | 2 | Custom claim `full_name` no JWT (sem `phone`) | — |
-| `auth.8` | XS | 1 | Bug 2 abas via `BroadcastChannel` | — |
-| `auth.9` | M | 5 | Visual revamp completo das 5 telas de auth aplicando direção visual KEYRA | `@ux-design-expert` |
-| **TOTAL** | — | **44** | — | — |
+| Story | Status | T-shirt | Pontos | Foco | Gates | Mergeada em |
+|-------|--------|---------|--------|------|-------|-------------|
+| `auth.0` | ✅ Done | S | 3 | Config Supabase Auth prod, Sentry scrubbing, Turnstile envs, ADR-022 | `@compliance-br` ✅ | PR #3 (`dbc753e`) |
+| `auth.1` | ✅ Done | M+ | 6 | Schema profiles + consent + legal_documents + UNIQUE CNPJ + Auth Hook estendido com full_name + before_user_created hook | `@data-engineer` ✅ + `@compliance-br` ✅ | PR #4 (`eaa3520`) |
+| `auth.2` | ✅ Done | S+ | 4 | Termos + Privacidade v1.0.0 versionados + páginas públicas /termos /privacidade | `@compliance-br` ✅ | PR #5 (`5cd4900`) |
+| `auth.3` | ✅ Done | L | 8 | Cadastro signup atômico (RPC + Turnstile + libphonenumber + compensating delete) | `@compliance-br` ✅ + `@growth-product` ✅ | PR #5 (`5cd4900`) |
+| `auth.4` | ✅ Done | S+ | 4 | Login email+senha (sem magic link, mensagem genérica anti-enumeration) | — | PR #5 (`5cd4900`) |
+| `auth.5` | ⏸️ Pendente | M | 5 | Esqueci senha via `resetPasswordForEmail` (NÃO magic link de login — só fluxo de reset) | — | — |
+| `auth.6` | ⏸️ Pendente | M+ | 6 | Google OAuth (botão hoje desabilitado com badge "em breve" até esta story) | `@compliance-br` | — |
+| `auth.7` | ✅ Done | XS | 2 | Custom claim `full_name` no JWT + AppShell mostra "Olá, {full_name}" | — | PR #5 (`5cd4900`) |
+| `auth.8` | ⏸️ Pendente | XS | 1 | Bug 2 abas via `BroadcastChannel` | — | — |
+| `auth.9` | ⏸️ Pendente | M | 5 | Visual revamp do AppShell autenticado pra coerência com tela auth (light KEYRA já aplicado nas telas de auth via PR #6+#7) | `@ux-design-expert` | — |
+| **TOTAL** | **6/10 Done** | — | **27/44 pts** (61%) | — | — | — |
+
+### PRs adicionais desta sessão (não eram stories formais)
+
+| PR | SHA | O quê |
+|----|-----|-------|
+| #6 | `79794cb` | Visual dark glassmorphism (HextaUI puro) — REVERTIDA pelo PR #7 |
+| #7 | `14ec8e3` + `5ad5805` | Reverter cores pra light KEYRA mantendo estrutura HextaUI (cores cream/bege + primary marrom) |
 
 ---
 

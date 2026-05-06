@@ -1,8 +1,8 @@
 # EPIC AUTH V2 — Auth UX completa + Cadastro estruturado + LGPD foundation
 
-**Status:** 🟡 Em execução — **6/10 stories Done** (60%)
+**Status:** 🟡 Em execução — **7/10 stories Done** (70%)
 **Criado em:** 2026-05-03
-**Última atualização:** 2026-05-04 — encerramento de sessão com Fase B + visual revamp em prod
+**Última atualização:** 2026-05-06 — Story `auth.5` (esqueci senha) Done em prod, abrindo Fase C
 **Origem:** Mapeamento da idealizadora (Luiz) em sessão 2026-05-03 — login considerado "muito feio", único método (magic link) inadequado para uso comercial, ausência de cadastro estruturado, ausência de Google OAuth, bug de duas abas obsoletas no fluxo magic link.
 **Auditoria preventiva de segurança:** [`docs/audit/auth-v2-security-audit.md`](../audit/auth-v2-security-audit.md) — 22 riscos identificados com fonte exata + 12 decisões de arquitetura travadas.
 **Pré-condição para abrir:** nenhuma (independente).
@@ -40,12 +40,12 @@ A auth atual do KEYRA é passwordless puro (magic link) — decisão tomada na A
 | `auth.2` | ✅ Done | S+ | 4 | Termos + Privacidade v1.0.0 versionados + páginas públicas /termos /privacidade | `@compliance-br` ✅ | PR #5 (`5cd4900`) |
 | `auth.3` | ✅ Done | L | 8 | Cadastro signup atômico (RPC + Turnstile + libphonenumber + compensating delete) | `@compliance-br` ✅ + `@growth-product` ✅ | PR #5 (`5cd4900`) |
 | `auth.4` | ✅ Done | S+ | 4 | Login email+senha (sem magic link, mensagem genérica anti-enumeration) | — | PR #5 (`5cd4900`) |
-| `auth.5` | ⏸️ Pendente | M | 5 | Esqueci senha via `resetPasswordForEmail` (NÃO magic link de login — só fluxo de reset) | — | — |
+| `auth.5` | ✅ Done | M | 5 | Esqueci senha via `resetPasswordForEmail` + cooldown 60s server-side + signOut global + template recovery pt-BR aplicado em prod | — | (PR pendente push) |
 | `auth.6` | ⏸️ Pendente | M+ | 6 | Google OAuth (botão hoje desabilitado com badge "em breve" até esta story) | `@compliance-br` | — |
 | `auth.7` | ✅ Done | XS | 2 | Custom claim `full_name` no JWT + AppShell mostra "Olá, {full_name}" | — | PR #5 (`5cd4900`) |
 | `auth.8` | ⏸️ Pendente | XS | 1 | Bug 2 abas via `BroadcastChannel` | — | — |
 | `auth.9` | ⏸️ Pendente | M | 5 | Visual revamp do AppShell autenticado pra coerência com tela auth (light KEYRA já aplicado nas telas de auth via PR #6+#7) | `@ux-design-expert` | — |
-| **TOTAL** | **6/10 Done** | — | **27/44 pts** (61%) | — | — | — |
+| **TOTAL** | **7/10 Done** | — | **32/44 pts** (73%) | — | — | — |
 
 ### PRs adicionais desta sessão (não eram stories formais)
 
@@ -167,3 +167,4 @@ Originada do gate `@compliance-br` em `auth.0` (2026-05-03):
 |------|--------|---------|-------|
 | 2026-05-03 | 1.0 | Epic criado a partir de mapeamento da idealizadora + auditoria preventiva. Branch `feat/auth-v2` criada a partir de `main`. | `@aiox-master` (Orion) |
 | 2026-05-03 | 1.1 | Story `auth.0` Ready for Review com gate `@compliance-br` APPROVE + 2 CONCERNS (Sentry e Cloudflare como subprocessors). CONCERNS propagados para escopo de `auth.2` como dependências cruzadas. | `@aiox-master` (Orion) atuando como `@compliance-br` |
+| 2026-05-06 | 1.2 | Story `auth.5` (Esqueci senha) Done em prod. Abertura da Fase C. Migration 20260506000100 (password_reset_attempts + RPC cooldown SECURITY DEFINER + 4 deny-all policies) aplicada via `supabase db push` com smoke transacional verde via psql. Template recovery pt-BR aplicado via Management API (`mailer_subjects_recovery="Redefinir sua senha do KEYRA"` + 6925 chars HTML identidade KEYRA) com snapshot defensivo + validação GET. 13 arquivos novos/modificados (migration, RPC, runbook, email template, script, 3 backend, 4 frontend, env.ts, types, banners). 6 riscos da auditoria mitigados (R3 Turnstile · R8 anti-enumeration · R11 signOut global · R12 otp 30min · R14 cooldown 60s · R16 Sentry sem PII). QA self-gate 7/7 PASS. Total: 7/10 stories Done (73%). | `@aiox-master` (Orion) atuando como SDC completo |

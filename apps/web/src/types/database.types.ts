@@ -1787,6 +1787,10 @@ export type Database = {
         Args: { min_role?: string; target_org_id: string }
         Returns: boolean
       }
+      request_password_reset_check_cooldown: {
+        Args: { p_email: string }
+        Returns: boolean
+      }
       round_half_even: {
         Args: { digits?: number; value: number }
         Returns: number

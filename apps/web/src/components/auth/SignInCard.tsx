@@ -20,14 +20,21 @@ type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
   next: string | null;
+  passwordChanged?: boolean;
+  errorCode?: string | null;
 };
 
 /**
  * Tela de login — estrutura HextaUI (card centralizado, animações hover)
  * com cores KEYRA (light, cream/bege + primary marrom). Story auth.4
  * visual revamp incrementado em 2026-05-04.
+ *
+ * Banners contextuais (Story auth.5):
+ *   - `passwordChanged` exibe banner verde após reset bem-sucedido.
+ *   - `errorCode` exibe banner vermelho com CTA pra recuperação se for um
+ *     erro de fluxo de recovery (link_expired, no_recovery_session).
  */
-export function SignInCard({ next }: Props) {
+export function SignInCard({ next, passwordChanged = false, errorCode = null }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
@@ -78,6 +85,47 @@ export function SignInCard({ next }: Props) {
         <p className="mb-6 text-center text-xs text-muted-foreground">
           Entre no seu financeiro operacional
         </p>
+
+        {passwordChanged && (
+          <div
+            className="mb-4 w-full rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm text-emerald-900"
+            role="status"
+          >
+            Senha redefinida com sucesso. Faça login com a nova senha.
+          </div>
+        )}
+
+        {errorCode === 'link_expired' && (
+          <div
+            className="mb-4 w-full rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-900"
+            role="alert"
+          >
+            Seu link de redefinição expirou.{' '}
+            <Link
+              href="/esqueci-senha"
+              className="font-semibold underline underline-offset-2 transition-colors hover:text-amber-950"
+            >
+              Solicitar um novo
+            </Link>
+            .
+          </div>
+        )}
+
+        {errorCode === 'no_recovery_session' && (
+          <div
+            className="mb-4 w-full rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-900"
+            role="alert"
+          >
+            Sua sessão de recuperação expirou.{' '}
+            <Link
+              href="/esqueci-senha"
+              className="font-semibold underline underline-offset-2 transition-colors hover:text-amber-950"
+            >
+              Solicitar um novo link
+            </Link>
+            .
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-3" noValidate>
           <div>

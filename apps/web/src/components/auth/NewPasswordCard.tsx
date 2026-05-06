@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,6 +9,7 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { postKeyraAuthEvent } from '@/lib/auth/broadcast';
 import { setNewPasswordAction } from '@/app/(auth)/redefinir-senha/actions';
 
 const formSchema = z
@@ -36,6 +38,7 @@ type FormValues = z.infer<typeof formSchema>;
  * Estilo visual idêntico ao SignInCard / SignUpCard.
  */
 export function NewPasswordCard() {
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -52,9 +55,13 @@ export function NewPasswordCard() {
   function onSubmit(values: FormValues) {
     startTransition(async () => {
       const result = await setNewPasswordAction(values);
-      // Caso a action redirect com sucesso, este código não executa.
-      // Só executa em caminho de erro (sessão expirada, senha fraca, etc.).
-      if (!result.success) {
+      if (result.success) {
+        // Story auth.8 — sinaliza para outras abas em /esqueci-senha que
+        // o reset acabou de ser concluído ANTES de navegar. Fire-and-forget;
+        // se BroadcastChannel não existir (browser muito antigo), no-op.
+        postKeyraAuthEvent({ type: 'password_reset_completed' });
+        router.push('/login?password_changed=1');
+      } else {
         toast.error('Não foi possível atualizar', { description: result.error });
       }
     });

@@ -1,6 +1,7 @@
 'use server';
 
 import { headers } from 'next/headers';
+import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
 import { env } from '@/lib/env';
@@ -8,6 +9,26 @@ import { verifyTurnstileToken } from '@/lib/security/verify-turnstile';
 import { createServerClient } from '@/lib/supabase/server';
 
 export type ActionResult = { success: true } | { success: false; error: string };
+
+type ResetOutcome = 'success' | 'turnstile_fail' | 'cooldown' | 'supabase_error' | 'invalid_input';
+
+/**
+ * Story auth.5 AC2 (cumprida via fiscalização 2026-05-06) — observabilidade
+ * do fluxo de recovery. Breadcrumb com APENAS o outcome (sem email, IP ou
+ * UA — minimização LGPD + defesa em profundidade contra vazamento de PII via
+ * Sentry, alinhado ao scrubbing R16).
+ *
+ * Em prod, Sentry agrega esses breadcrumbs e permite alarme se cooldown ou
+ * turnstile_fail dispararem em volume anormal (sinal de ataque).
+ */
+function recordResetOutcome(outcome: ResetOutcome): void {
+  Sentry.addBreadcrumb({
+    category: 'auth.recovery',
+    message: 'request_password_reset',
+    level: outcome === 'success' ? 'info' : 'warning',
+    data: { outcome },
+  });
+}
 
 const requestResetSchema = z.object({
   email: z.string().trim().toLowerCase().email('E-mail inválido'),
@@ -34,6 +55,7 @@ export async function requestPasswordResetAction(
 ): Promise<ActionResult> {
   const parsed = requestResetSchema.safeParse(input);
   if (!parsed.success) {
+    recordResetOutcome('invalid_input');
     const firstIssue = parsed.error.issues[0];
     return { success: false, error: firstIssue?.message ?? 'Dados inválidos' };
   }
@@ -45,6 +67,7 @@ export async function requestPasswordResetAction(
     const ip = xForwardedFor.split(',')[0]?.trim() || undefined;
     const captcha = await verifyTurnstileToken(parsed.data.turnstileToken, ip);
     if (!captcha.success) {
+      recordResetOutcome('turnstile_fail');
       return { success: false, error: 'Verificação de segurança falhou. Tente novamente.' };
     }
   }
@@ -62,11 +85,13 @@ export async function requestPasswordResetAction(
 
   if (cooldownError) {
     // Falha de RPC — registra mas NÃO expõe ao usuário (continua mensagem genérica).
+    recordResetOutcome('supabase_error');
     return { success: true };
   }
 
   if (canProceed !== true) {
     // Cooldown ativo — não disparar email, retornar sucesso genérico.
+    recordResetOutcome('cooldown');
     return { success: true };
   }
 
@@ -78,5 +103,6 @@ export async function requestPasswordResetAction(
     redirectTo: `${siteUrl}/auth/callback?type=recovery`,
   });
 
+  recordResetOutcome('success');
   return { success: true };
 }

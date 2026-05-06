@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typegen": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_REF\" --schema public > src/types/database.types.ts"
+    "typegen": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_REF\" --schema public > src/types/database.types.ts.tmp && mv src/types/database.types.ts.tmp src/types/database.types.ts"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",

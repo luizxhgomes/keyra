@@ -537,6 +537,100 @@ BEGIN
   RESET ROLE;
 END $$;
 
+-- =============================================================================
+-- Block H — Auth V2 cooldown (Story auth.5): password_reset_attempts
+-- =============================================================================
+-- Cobertura:
+--   H-1  authenticated NÃO consegue SELECT em password_reset_attempts (deny-all)
+--   H-2  authenticated NÃO consegue INSERT direto (deny-all)
+--   H-3  authenticated NÃO consegue UPDATE direto (deny-all)
+--   H-4  authenticated NÃO consegue DELETE direto (deny-all)
+--   H-5  RPC request_password_reset_check_cooldown retorna true na 1ª chamada
+--   H-6  RPC retorna false na 2ª chamada para o mesmo email dentro de 60s
+--   H-7  RPC retorna true para email distinto (cooldown é por-email)
+--   H-8  authenticated chama RPC mas continua sem ler a tabela diretamente
+
+DO $$
+DECLARE
+  v_user_a    uuid := current_setting('tests.user_a')::uuid;
+  v_count     int;
+  v_result    boolean;
+  v_email_x   text := 'rls-test-x@example.com';
+  v_email_y   text := 'rls-test-y@example.com';
+BEGIN
+  -- Setup como postgres (bypass RLS): garantir tabela vazia para emails de teste
+  DELETE FROM public.password_reset_attempts WHERE email_lower IN (v_email_x, v_email_y);
+
+  -- Assumir identidade de user A (authenticated)
+  PERFORM set_config('request.jwt.claim.sub',    v_user_a::text, true);
+  PERFORM set_config('request.jwt.claim.org_id', current_setting('tests.org_a'), true);
+  PERFORM set_config('request.jwt.claims',
+                     jsonb_build_object('sub', v_user_a::text,
+                                        'org_id', current_setting('tests.org_a'),
+                                        'role', 'authenticated')::text, true);
+  SET LOCAL role TO authenticated;
+
+  -- H-1
+  SELECT count(*) INTO v_count FROM public.password_reset_attempts;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [H-1 SELECT deny-all]: expected 0, got %', v_count;
+  END IF;
+
+  -- H-2
+  BEGIN
+    INSERT INTO public.password_reset_attempts (email_lower) VALUES (v_email_x);
+    SELECT count(*) INTO v_count FROM public.password_reset_attempts WHERE email_lower = v_email_x;
+    IF v_count <> 0 THEN
+      RAISE EXCEPTION 'RLS FAIL [H-2 INSERT deny-all]: linha inserida silenciosamente';
+    END IF;
+  EXCEPTION
+    WHEN insufficient_privilege OR check_violation THEN
+      NULL; -- esperado
+  END;
+
+  -- H-3 (UPDATE deny-all — afeta 0 rows mesmo se hipotética linha existisse)
+  UPDATE public.password_reset_attempts SET last_attempt_at = now() WHERE email_lower = v_email_x;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [H-3 UPDATE deny-all]: expected 0, got %', v_count;
+  END IF;
+
+  -- H-4 (DELETE deny-all)
+  DELETE FROM public.password_reset_attempts WHERE email_lower = v_email_x;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [H-4 DELETE deny-all]: expected 0, got %', v_count;
+  END IF;
+
+  -- H-5 — RPC primeira chamada permite
+  v_result := public.request_password_reset_check_cooldown(v_email_x);
+  IF v_result IS NOT TRUE THEN
+    RAISE EXCEPTION 'RLS FAIL [H-5 RPC primeira]: expected true, got %', v_result;
+  END IF;
+
+  -- H-6 — RPC segunda chamada bloqueia (cooldown ativo, <60s)
+  v_result := public.request_password_reset_check_cooldown(v_email_x);
+  IF v_result IS NOT FALSE THEN
+    RAISE EXCEPTION 'RLS FAIL [H-6 RPC segunda]: expected false (cooldown ativo), got %', v_result;
+  END IF;
+
+  -- H-7 — RPC com email distinto permite (cooldown é por-email)
+  v_result := public.request_password_reset_check_cooldown(v_email_y);
+  IF v_result IS NOT TRUE THEN
+    RAISE EXCEPTION 'RLS FAIL [H-7 RPC outro email]: expected true, got %', v_result;
+  END IF;
+
+  -- H-8 — mesmo após 3 chamadas RPC, usuário authenticated não enxerga a tabela
+  SELECT count(*) INTO v_count FROM public.password_reset_attempts;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [H-8 SELECT após RPC]: expected 0 (deny-all persiste), got %', v_count;
+  END IF;
+
+  RAISE NOTICE 'RLS test block H (auth.5 — password_reset_attempts cooldown): PASSED';
+
+  RESET ROLE;
+END $$;
+
 ROLLBACK;
 
 -- Final message (ROLLBACK above keeps DB clean; NOTICES still surface)

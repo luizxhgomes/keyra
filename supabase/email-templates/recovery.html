@@ -1,0 +1,207 @@
+<!--
+  KEYRA · template de recovery (esqueci minha senha) em pt-BR.
+  Versão: 1.0 (2026-05-06) — Story auth.5 do EPIC-AUTH-V2.
+  Estrutura, paleta e tipografia idênticas ao magic-link.html v2.0 — única
+  diferença é a copy (recovery vs login passwordless) e o copy do disclaimer
+  alinhado com o cooldown de 30min do mailer_otp_exp em prod.
+
+  Variáveis Supabase disponíveis (recovery flow):
+    {{ .ConfirmationURL }}  — URL pronta de redefinição (já contém ?type=recovery)
+    {{ .Email }}            — destinatário
+    {{ .SiteURL }}          — URL canônica do app (https://usekeyra.com)
+    {{ .Token }}            — token cru (não usar — preferimos URL pronto)
+    {{ .TokenHash }}        — hash do token (debug)
+
+  Aplicação:
+    Via Management API → scripts/configure-supabase-recovery-template.sh
+    OU
+    Supabase Dashboard → keyra-br → Authentication → Email Templates →
+    "Reset Password" → cola tudo abaixo deste comentário (a partir de <!doctype html>).
+    Subject sugerido: "Redefinir sua senha do KEYRA"
+
+  Princípios visuais (alinhados ao magic-link.html v2.0):
+    - Background creme #FAF8F5 (neutral-50 KEYRA).
+    - Card branco sem border — contraste por luminosidade.
+    - Wordmark KEYRA 18px weight 700 letter-spacing 0.22em.
+    - Botão terracota #C66A38 (primary KEYRA) — Von Restorff puro.
+    - bgcolor fallback no <a> e <td> do botão para Outlook 2007-2019.
+    - <meta color-scheme light only> impede dark-mode invert que destruiria o creme.
+-->
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light only" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>Redefinir sua senha do KEYRA</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #faf8f5;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #2e2a25;
+      line-height: 1.55;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      bgcolor="#faf8f5"
+      style="background-color: #faf8f5; padding: 40px 16px;"
+    >
+      <tr>
+        <td align="center">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            bgcolor="#ffffff"
+            style="
+              max-width: 480px;
+              background-color: #ffffff;
+              border-radius: 14px;
+              padding: 48px 40px;
+            "
+          >
+            <tr>
+              <td style="padding-bottom: 36px;">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 700;
+                    letter-spacing: 0.22em;
+                    text-transform: uppercase;
+                    color: #2e2a25;
+                  "
+                >
+                  KEYRA
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <h1
+                  style="
+                    margin: 0 0 16px;
+                    font-size: 26px;
+                    font-weight: 700;
+                    color: #2e2a25;
+                    line-height: 1.25;
+                    letter-spacing: -0.01em;
+                  "
+                >
+                  Vamos redefinir sua senha.
+                </h1>
+                <p
+                  style="
+                    margin: 0 0 28px;
+                    font-size: 16px;
+                    color: #5a5249;
+                    line-height: 1.55;
+                  "
+                >
+                  Toque no botão abaixo para escolher uma senha nova. Este link
+                  é válido por 30 minutos e funciona apenas uma vez.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" style="padding: 4px 0 28px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td
+                      align="center"
+                      bgcolor="#c66a38"
+                      style="border-radius: 8px;"
+                    >
+                      <a
+                        href="{{ .ConfirmationURL }}"
+                        target="_blank"
+                        rel="noopener"
+                        style="
+                          display: inline-block;
+                          padding: 16px 32px;
+                          background-color: #c66a38;
+                          color: #ffffff;
+                          text-decoration: none;
+                          border-radius: 8px;
+                          font-size: 16px;
+                          font-weight: 600;
+                          line-height: 1;
+                        "
+                      >
+                        Redefinir minha senha
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <p
+                  style="
+                    margin: 0 0 8px;
+                    font-size: 12px;
+                    color: #5a5249;
+                  "
+                >
+                  Ou copie este link no seu navegador:
+                </p>
+                <p
+                  style="
+                    margin: 0 0 28px;
+                    font-size: 12px;
+                    color: #8b8276;
+                    word-break: break-all;
+                    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+                    line-height: 1.5;
+                  "
+                >
+                  {{ .ConfirmationURL }}
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="border-top: 1px solid #e8dfd0; padding-top: 24px;">
+                <p
+                  style="
+                    margin: 0 0 16px;
+                    font-size: 12px;
+                    color: #5a5249;
+                    line-height: 1.55;
+                  "
+                >
+                  Se você não pediu para redefinir sua senha, ignore este email
+                  com segurança — sua senha continua a mesma e ninguém entra na
+                  sua conta sem clicar no botão acima.
+                </p>
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    color: #8b8276;
+                    letter-spacing: 0.02em;
+                  "
+                >
+                  KEYRA · financeiro operacional para clínicas de estética
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

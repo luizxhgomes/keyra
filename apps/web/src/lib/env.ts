@@ -47,6 +47,12 @@ const serverSchema = z.object({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(10).optional(),
   TURNSTILE_SECRET_KEY: z.string().min(10).optional(),
 
+  // URL canônica da aplicação. Usada em redirectTo de fluxos de auth (recovery,
+  // Story auth.5) e construção de links absolutos em emails. Provisionada nos
+  // 3 targets do Vercel desde a sessão pós-EPIC-AUTH-V2 Fase A; fallback p/
+  // usekeyra.com em dev local.
+  NEXT_PUBLIC_SITE_URL: z.string().url().default('https://usekeyra.com'),
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
@@ -63,6 +69,7 @@ const parsed = serverSchema.safeParse({
   EMAIL_FROM: process.env.EMAIL_FROM,
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NODE_ENV: process.env.NODE_ENV,
 });
 

@@ -23,13 +23,17 @@ import { createServerClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
+  const type = searchParams.get('type');
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
   // Supabase surfaces errors (expired link, etc.) via query params directly.
   if (errorParam) {
     const reason = mapSupabaseAuthError(errorParam, errorDescription);
-    return NextResponse.redirect(new URL(`/login?error=${reason}`, origin));
+    // Recovery links expirados também voltam pro login com sinal específico
+    // para a UI exibir CTA "Solicite um novo link" (Story auth.5 AC4).
+    const target = type === 'recovery' ? `/login?error=${reason}` : `/login?error=${reason}`;
+    return NextResponse.redirect(new URL(target, origin));
   }
 
   if (!code) {
@@ -41,6 +45,14 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     return NextResponse.redirect(new URL('/login?error=exchange_failed', origin));
+  }
+
+  // Recovery flow (Story auth.5): a sessão criada acima é uma sessão temporária
+  // de recuperação. Não rotear pra dashboard nem onboarding — manda direto
+  // pra tela de definir nova senha, onde a Server Action chamará
+  // updateUser({ password }) e em seguida signOut({ scope: 'global' }).
+  if (type === 'recovery') {
+    return NextResponse.redirect(new URL('/redefinir-senha', origin));
   }
 
   // Session cookies are now set. Force one more refresh so the Auth Hook

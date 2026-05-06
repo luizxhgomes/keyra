@@ -1,6 +1,5 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 import { createServerClient } from '@/lib/supabase/server';
@@ -34,9 +33,16 @@ const setNewPasswordSchema = z
  *   - signOut({ scope: 'global' }) invalida todas as sessões refresh-token-ativas
  *     (mitiga R11 — boa prática anti-account-takeover quando reset é resultado
  *     de comprometimento)
- *   - Redirect para /login?password_changed=1 (banner verde de confirmação)
+ *   - Retorna `{ success: true }` para o client navegar via `router.push`.
  *
- * Traceability: ADR-022 §11.2; auditoria R11; story auth.5 AC6.
+ * Por que NÃO `redirect()` server-side aqui (mudança da Story auth.8):
+ *   server-side redirect interrompe o fluxo antes do client emitir o
+ *   BroadcastChannel `password_reset_completed`, que sincroniza outras abas
+ *   abertas em `/esqueci-senha`. O client é responsável por:
+ *   1. postar o broadcast e
+ *   2. fazer `router.push('/login?password_changed=1')`.
+ *
+ * Traceability: ADR-022 §11.2; auditoria R11; story auth.5 AC6 + auth.8 AC2.
  */
 export async function setNewPasswordAction(
   input: z.input<typeof setNewPasswordSchema>,
@@ -82,5 +88,5 @@ export async function setNewPasswordAction(
   // em todos os dispositivos com a senha nova — incluindo a aba/sessão atual.
   await supabase.auth.signOut({ scope: 'global' });
 
-  redirect('/login?password_changed=1');
+  return { success: true };
 }

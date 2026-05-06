@@ -1,8 +1,8 @@
 # EPIC AUTH V2 — Auth UX completa + Cadastro estruturado + LGPD foundation
 
-**Status:** 🟡 Em execução — **7/10 stories Done** (70%)
+**Status:** 🟡 Em execução — **8/10 stories Done** (80%)
 **Criado em:** 2026-05-03
-**Última atualização:** 2026-05-06 — Story `auth.5` (esqueci senha) Done em prod, abrindo Fase C
+**Última atualização:** 2026-05-06 — `auth.5` mergeada em PR #8 (prod READY) + `auth.8` (BroadcastChannel) Done na sequência. Fase C praticamente completa (só `auth.6` Google OAuth restante)
 **Origem:** Mapeamento da idealizadora (Luiz) em sessão 2026-05-03 — login considerado "muito feio", único método (magic link) inadequado para uso comercial, ausência de cadastro estruturado, ausência de Google OAuth, bug de duas abas obsoletas no fluxo magic link.
 **Auditoria preventiva de segurança:** [`docs/audit/auth-v2-security-audit.md`](../audit/auth-v2-security-audit.md) — 22 riscos identificados com fonte exata + 12 decisões de arquitetura travadas.
 **Pré-condição para abrir:** nenhuma (independente).
@@ -40,12 +40,12 @@ A auth atual do KEYRA é passwordless puro (magic link) — decisão tomada na A
 | `auth.2` | ✅ Done | S+ | 4 | Termos + Privacidade v1.0.0 versionados + páginas públicas /termos /privacidade | `@compliance-br` ✅ | PR #5 (`5cd4900`) |
 | `auth.3` | ✅ Done | L | 8 | Cadastro signup atômico (RPC + Turnstile + libphonenumber + compensating delete) | `@compliance-br` ✅ + `@growth-product` ✅ | PR #5 (`5cd4900`) |
 | `auth.4` | ✅ Done | S+ | 4 | Login email+senha (sem magic link, mensagem genérica anti-enumeration) | — | PR #5 (`5cd4900`) |
-| `auth.5` | ✅ Done | M | 5 | Esqueci senha via `resetPasswordForEmail` + cooldown 60s server-side + signOut global + template recovery pt-BR aplicado em prod | — | (PR pendente push) |
+| `auth.5` | ✅ Done | M | 5 | Esqueci senha via `resetPasswordForEmail` + cooldown 60s server-side + signOut global + template recovery pt-BR aplicado em prod | — | PR #8 (`5d9e71d`) |
 | `auth.6` | ⏸️ Pendente | M+ | 6 | Google OAuth (botão hoje desabilitado com badge "em breve" até esta story) | `@compliance-br` | — |
 | `auth.7` | ✅ Done | XS | 2 | Custom claim `full_name` no JWT + AppShell mostra "Olá, {full_name}" | — | PR #5 (`5cd4900`) |
-| `auth.8` | ⏸️ Pendente | XS | 1 | Bug 2 abas via `BroadcastChannel` | — | — |
+| `auth.8` | ✅ Done | XS | 1 | Bug 2 abas via `BroadcastChannel` — helper centralizado + listener com cleanup + estado `completedElsewhere` com precedência | — | (PR pendente push) |
 | `auth.9` | ⏸️ Pendente | M | 5 | Visual revamp do AppShell autenticado pra coerência com tela auth (light KEYRA já aplicado nas telas de auth via PR #6+#7) | `@ux-design-expert` | — |
-| **TOTAL** | **7/10 Done** | — | **32/44 pts** (73%) | — | — | — |
+| **TOTAL** | **8/10 Done** | — | **33/44 pts** (75%) | — | — | — |
 
 ### PRs adicionais desta sessão (não eram stories formais)
 

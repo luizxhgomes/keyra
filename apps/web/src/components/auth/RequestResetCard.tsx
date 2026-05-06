@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { TurnstileWidget } from '@/components/auth/TurnstileWidget';
+import { subscribeKeyraAuthEvents } from '@/lib/auth/broadcast';
 import { requestPasswordResetAction } from '@/app/(auth)/esqueci-senha/actions';
 
 const formSchema = z.object({
@@ -30,6 +31,19 @@ export function RequestResetCard() {
   const [pending, startTransition] = useTransition();
   const [turnstileToken, setTurnstileToken] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [completedElsewhere, setCompletedElsewhere] = useState(false);
+
+  // Story auth.8 — escuta outras abas (NewPasswordCard) sinalizando que o
+  // reset foi concluído. Cleanup no return previne handlers stale em
+  // hot-reload. Em SSR/browsers antigos, subscribe é no-op.
+  useEffect(() => {
+    const unsubscribe = subscribeKeyraAuthEvents((event) => {
+      if (event.type === 'password_reset_completed') {
+        setCompletedElsewhere(true);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   const {
     register,
@@ -76,7 +90,23 @@ export function RequestResetCard() {
         <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-primary">KEYRA</h2>
         <p className="mb-6 text-center text-xs text-muted-foreground">Recuperação de senha</p>
 
-        {submitted ? (
+        {completedElsewhere ? (
+          <div className="flex w-full flex-col items-center text-center">
+            <p className="mb-2 text-sm font-semibold text-foreground">
+              Senha redefinida em outra aba
+            </p>
+            <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+              Você acabou de definir sua nova senha em outra janela. Pode fechar esta tela e
+              fazer login com a nova senha.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
+            >
+              Ir para o login
+            </Link>
+          </div>
+        ) : submitted ? (
           <div className="flex w-full flex-col items-center text-center">
             <p className="mb-2 text-sm font-semibold text-foreground">Pedido recebido</p>
             <p className="mb-6 text-sm leading-relaxed text-muted-foreground">

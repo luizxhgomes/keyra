@@ -3,69 +3,159 @@
 @tailwind utilities;
 
 /**
- * KEYRA design tokens (HSL, Tailwind CSS-vars friendly).
- * Source of truth: docs/ux/wireframes/00-design-principles.md §2.
+ * KEYRA Brand Identity — Design Tokens canônicos.
+ *
+ * Source of truth visual: docs/brand/03-identity/preview.html
+ * Mapa canônico: docs/brand/03-identity/PREVIEW-REFERENCE.md
+ * Tokens DTCG: docs/brand/03-identity/tokens.json
+ *
+ * Direção: Editorial Beauty Luxury · warm always, cool never.
+ * Substitui paleta anterior (terracota #C66A38 + sálvia #457A50) pela
+ * palette canônica completa (ivory/sand/mocha/bronze/cocoa + terracotta
+ * + gold + champagne + status quentes).
+ *
+ * Compatibilidade: tokens HSL antigos (--primary, --secondary, etc.)
+ * permanecem mapeados para os equivalentes KEYRA durante a migração
+ * progressiva (Epic BRAND-INTEGRATION). Stories brand.2-7 sweepam
+ * usos legados → tokens canônicos.
  */
 
 @layer base {
   :root {
-    /* Base surfaces — cinzas quentes, sem branco puro. */
-    --background: 36 33% 97%; /* #FAF8F5 neutral-50 */
-    --foreground: 36 10% 16%; /* #2E2A25 neutral-700 */
+    /* ──────────────────────────────────────────────────────────────
+       KEYRA Palette Canônica · HEX direto (compatível com tokens.json)
+       ────────────────────────────────────────────────────────────── */
+
+    /* Ivory & Sand — backgrounds, surfaces, divisores */
+    --keyra-ivory-50:  #FAF6EE;
+    --keyra-ivory-100: #F4EDE2;
+    --keyra-sand-200:  #EAE0CF;
+    --keyra-mocha-300: #C8B49A;
+
+    /* Bronze & Cocoa — texto, foreground, fundo brand premium */
+    --keyra-bronze-400: #946640;
+    --keyra-bronze-500: #7E5A40;
+    --keyra-cocoa-700:  #5A3E26;
+    --keyra-cocoa-800:  #3F2A1B;
+    --keyra-cocoa-900:  #2B1810;
+    --keyra-ink-950:    #181210;
+
+    /* Terracota & Âmbar — calor expressivo, CTAs */
+    --keyra-amber-300:      #E5B473;
+    --keyra-amber-400:      #D89A4D;
+    --keyra-amber-500:      #C8843A;
+    --keyra-terracotta-500: #C26832;
+    --keyra-terracotta-600: #B8612B;
+    --keyra-terracotta-700: #A05525;
+    --keyra-rust-800:       #843E1A;
+
+    /* Gold & Champagne — acento precioso (uso raríssimo) */
+    --keyra-champagne-200: #F0D8A8;
+    --keyra-gold-300:      #E5C690;
+    --keyra-gold-400:      #D4A752;
+    --keyra-gold-500:      #B8923A;
+    --keyra-gold-600:      #9A7A2C;
+
+    /* Status (Product layer) */
+    --keyra-success-leaf: #6E8C5A;
+    --keyra-success-deep: #4F6840;
+    --keyra-info:         #5A6C7E;
+
+    /* ──────────────────────────────────────────────────────────────
+       Motion Tokens (Brand motion-system)
+       ────────────────────────────────────────────────────────────── */
+    --motion-duration-instant:   100ms;
+    --motion-duration-fast:      200ms;
+    --motion-duration-base:      320ms;
+    --motion-duration-slow:      480ms;
+    --motion-duration-cinematic: 720ms;
+
+    --motion-easing-out-soft:         cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-easing-in-out-editorial: cubic-bezier(0.65, 0, 0.35, 1);
+    --motion-easing-in-quiet:         cubic-bezier(0.7, 0, 0.84, 0);
+    --motion-easing-out-bounce-subtle: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    --motion-distance-whisper:   4px;
+    --motion-distance-small:     8px;
+    --motion-distance-medium:    16px;
+    --motion-distance-large:     32px;
+
+    --motion-stagger-tight:  40ms;
+    --motion-stagger-small:  80ms;
+    --motion-stagger-medium: 120ms;
+    --motion-stagger-large:  160ms;
+
+    /* ──────────────────────────────────────────────────────────────
+       Warm Shadows (cocoa-based, não slate)
+       ────────────────────────────────────────────────────────────── */
+    --shadow-warm-xs: 0 1px 2px rgba(43, 24, 16, 0.04);
+    --shadow-warm-sm: 0 2px 4px rgba(43, 24, 16, 0.06);
+    --shadow-warm-md: 0 4px 8px rgba(43, 24, 16, 0.08);
+    --shadow-warm-lg: 0 8px 16px rgba(43, 24, 16, 0.12);
+    --shadow-warm-xl: 0 16px 32px rgba(43, 24, 16, 0.16);
+    --shadow-premium-glow: 0 0 24px rgba(184, 146, 58, 0.18);
+
+    /* ──────────────────────────────────────────────────────────────
+       Mapping legacy tokens → KEYRA canônicos (HSL para Tailwind)
+       Mantém compatibilidade durante migração progressiva.
+       ────────────────────────────────────────────────────────────── */
+
+    /* Backgrounds & surfaces */
+    --background: 36 47% 96%;        /* ivory-50  #FAF6EE */
+    --foreground: 21 47% 12%;        /* cocoa-900 #2B1810 */
 
     --card: 0 0% 100%;
-    --card-foreground: 36 10% 16%;
+    --card-foreground: 21 47% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 36 10% 16%;
+    --popover-foreground: 21 47% 12%;
 
-    /* Primary — terracota queimada (pele/argila, anti-azul-corporativo). */
-    --primary: 21 56% 50%; /* #C66A38 primary-500 */
-    --primary-foreground: 0 0% 100%;
+    /* Primary CTA — terracotta-600 #B8612B (substitui terracota antiga) */
+    --primary: 23 62% 44%;
+    --primary-foreground: 36 47% 96%;
 
-    /* Secondary — verde sálvia (saúde/calma). */
-    --secondary: 132 27% 37%; /* #457A50 secondary-500 */
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary — bronze-500 #7E5A40 (substitui sálvia) */
+    --secondary: 27 32% 32%;
+    --secondary-foreground: 36 47% 96%;
 
-    --muted: 34 20% 93%; /* #F3EFE9 neutral-100 */
-    --muted-foreground: 30 8% 32%; /* #5A5249 — Story 5.4: subido de 40% para 32% para passar WCAG AA em text-xs (≥4.5:1) */
+    --muted: 36 32% 92%;             /* ivory-100 #F4EDE2 */
+    --muted-foreground: 27 39% 45%;  /* bronze-500 — passa WCAG AA */
 
-    --accent: 34 20% 93%;
-    --accent-foreground: 36 10% 16%;
+    --accent: 36 32% 92%;
+    --accent-foreground: 21 47% 12%;
 
-    /* Destructive — vermelho terra, não "semaforo vermelho". */
-    --destructive: 0 51% 46%; /* #B23A3A */
-    --destructive-foreground: 0 0% 100%;
+    /* Destructive — rust-800 #843E1A */
+    --destructive: 18 67% 31%;
+    --destructive-foreground: 36 47% 96%;
 
-    --border: 36 22% 84%; /* #D0C6B8 neutral-300 */
-    --input: 36 22% 84%;
-    --ring: 21 56% 50%;
+    --border: 33 51% 86%;            /* sand-200 #EAE0CF */
+    --input: 33 51% 86%;
+    --ring: 23 62% 44%;              /* terracotta-600 */
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark mode placeholder — design-principles não especifica ainda,
-       mantemos mapeamento neutro para não crashear se `class="dark"` aparecer. */
-    --background: 36 6% 10%;
-    --foreground: 36 10% 92%;
-    --card: 36 6% 12%;
-    --card-foreground: 36 10% 92%;
-    --popover: 36 6% 12%;
-    --popover-foreground: 36 10% 92%;
-    --primary: 21 56% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 132 27% 45%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 36 6% 18%;
-    --muted-foreground: 36 10% 65%;
-    --accent: 36 6% 18%;
-    --accent-foreground: 36 10% 92%;
-    --destructive: 0 51% 55%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 36 6% 22%;
-    --input: 36 6% 22%;
-    --ring: 21 56% 55%;
+    /* Dark mode editorial premium · cocoa-900 + champagne-200 + gold-500 detail */
+    --background: 21 47% 12%;        /* cocoa-900 */
+    --foreground: 38 73% 80%;        /* champagne-200 #F0D8A8 */
+    --card: 21 47% 12%;
+    --card-foreground: 38 73% 80%;
+    --popover: 21 47% 12%;
+    --popover-foreground: 38 73% 80%;
+    --primary: 23 62% 44%;
+    --primary-foreground: 36 47% 96%;
+    --secondary: 38 49% 71%;         /* gold-300 */
+    --secondary-foreground: 21 47% 12%;
+    --muted: 21 35% 18%;
+    --muted-foreground: 38 39% 65%;
+    --accent: 21 35% 18%;
+    --accent-foreground: 38 73% 80%;
+    --destructive: 18 67% 31%;
+    --destructive-foreground: 36 47% 96%;
+    --border: 21 30% 22%;
+    --input: 21 30% 22%;
+    --ring: 41 53% 47%;              /* gold-500 */
   }
 }
 

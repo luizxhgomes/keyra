@@ -83,12 +83,12 @@ export function RequestResetCard() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500">
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-warm-xl animate-in fade-in zoom-in-95 duration-500">
         <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
           <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
-        <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-primary">KEYRA</h2>
+        <h2 className="mb-1 text-center font-serif text-3xl font-bold tracking-tight text-cocoa-900">KEYRA<span className="text-gold-500">.</span></h2>
         <p className="mb-6 text-center text-xs text-muted-foreground">Recuperação de senha</p>
 
         {completedElsewhere ? (

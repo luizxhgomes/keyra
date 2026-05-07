@@ -1,0 +1,253 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Squad: Copy
+# Domain: Copywriting — Direct Response & Launch Strategy
+# Created: 2026-03-14
+# Version: 1.0.0
+# ═══════════════════════════════════════════════════════════════════════════════
+
+squad:
+  name: copy
+  display_name: "Copy Squad"
+  version: "1.0.0"
+  domain: "Copywriting — Direct Response & Launch Strategy"
+  description: |
+    Squad especialista em copywriting de resposta direta, liderado pelo Copy Chief
+    que orquestra 24 copywriters lendarios usando sistema de Tiers.
+    Diagnostico Tier 0 -> Execucao Tier 1-3 -> Auditoria Hopkins -> 30 Triggers.
+
+  philosophy: |
+    "Copy is the salesman in print."
+    Cada copywriter do squad e baseado em uma mente lendaria real com frameworks
+    documentados. O sistema garante qualidade via diagnostico obrigatorio (Tier 0),
+    selecao inteligente de copywriter, e dupla auditoria (Hopkins + Sugarman).
+
+  keywords:
+    - copywriting
+    - direct-response
+    - sales-page
+    - email-sequence
+    - vsl
+    - headlines
+    - ads
+    - launch
+    - plf
+    - product-launch-formula
+    - conversion
+    - persuasion
+
+  entry_agent: copy-chief
+  created_by: "manual"
+  created_at: "2026-03-14"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TIER ARCHITECTURE
+# ─────────────────────────────────────────────────────────────────────────────
+
+tiers:
+  tier_0:
+    name: "Diagnosis & Audit"
+    agents:
+      - copy-chief
+      - eugene-schwartz
+      - claude-hopkins
+    purpose: "Triage: awareness level, market sophistication, scientific audit"
+
+  tier_1:
+    name: "Master Copywriters"
+    agents:
+      - gary-halbert
+      - gary-bencivenga
+      - david-ogilvy
+    purpose: "Top-tier execution for high-stakes copy"
+
+  tier_2:
+    name: "Specialist Copywriters"
+    agents:
+      - dan-kennedy
+      - todd-brown
+      - jeff-walker
+    purpose: "Domain specialists: urgency, unique mechanism, launches"
+
+  tier_3:
+    name: "Format Specialists"
+    agents:
+      - jon-benson
+      - ry-schwartz
+      - robert-collier
+    purpose: "Format-specific: VSL, enrollment copy, mental conversation"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AGENT REGISTRY
+# ─────────────────────────────────────────────────────────────────────────────
+
+agents:
+  copy-chief:
+    file: agents/copy-chief.md
+    tier: 0
+    based_on: "Orchestrator (Copy Chief)"
+    icon: "📋"
+    focus: "Triage, routing, orchestration, quality gates"
+
+  eugene-schwartz:
+    file: agents/eugene-schwartz.md
+    tier: 0
+    based_on: "Eugene Schwartz"
+    icon: "🔬"
+    focus: "5 awareness levels, market sophistication diagnosis"
+
+  claude-hopkins:
+    file: agents/claude-hopkins.md
+    tier: 0
+    based_on: "Claude Hopkins"
+    icon: "📊"
+    focus: "Scientific advertising audit, 85/100 quality gate"
+
+  gary-halbert:
+    file: agents/gary-halbert.md
+    tier: 1
+    based_on: "Gary Halbert"
+    icon: "🔥"
+    focus: "Visceral storytelling, emotional sales pages, direct mail"
+
+  gary-bencivenga:
+    file: agents/gary-bencivenga.md
+    tier: 1
+    based_on: "Gary Bencivenga"
+    icon: "🎯"
+    focus: "Bullets, fascinations, proof-heavy copy"
+
+  david-ogilvy:
+    file: agents/david-ogilvy.md
+    tier: 1
+    based_on: "David Ogilvy"
+    icon: "👔"
+    focus: "Premium branding, elegant long-form, research-driven"
+
+  dan-kennedy:
+    file: agents/dan-kennedy.md
+    tier: 2
+    based_on: "Dan Kennedy"
+    icon: "⚡"
+    focus: "NO B.S., urgency, scarcity, upsells, email sequences"
+
+  todd-brown:
+    file: agents/todd-brown.md
+    tier: 2
+    based_on: "Todd Brown"
+    icon: "🧩"
+    focus: "Unique mechanism, saturated markets, E5 method"
+
+  jeff-walker:
+    file: agents/jeff-walker.md
+    tier: 2
+    based_on: "Jeff Walker"
+    icon: "🚀"
+    focus: "Product Launch Formula, PLC sequences, seed launches"
+
+  jon-benson:
+    file: agents/jon-benson.md
+    tier: 3
+    based_on: "Jon Benson"
+    icon: "🎬"
+    focus: "VSL (Video Sales Letter), sellerator format"
+
+  ry-schwartz:
+    file: agents/ry-schwartz.md
+    tier: 3
+    based_on: "Ry Schwartz"
+    icon: "🎓"
+    focus: "Enrollment copy, cohort courses, transformation narratives"
+
+  robert-collier:
+    file: agents/robert-collier.md
+    tier: 3
+    based_on: "Robert Collier"
+    icon: "💭"
+    focus: "Mental conversation mapping, entering the dialogue"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HANDOFF MATRIX
+# ─────────────────────────────────────────────────────────────────────────────
+
+handoffs:
+  copy-chief:
+    routes_to: [eugene-schwartz, claude-hopkins, gary-halbert, gary-bencivenga, david-ogilvy, dan-kennedy, todd-brown, jeff-walker, jon-benson, ry-schwartz, robert-collier]
+
+  eugene-schwartz:
+    collaborates_with: [claude-hopkins, robert-collier]
+    escalates_to: [copy-chief]
+
+  claude-hopkins:
+    collaborates_with: [eugene-schwartz]
+    escalates_to: [copy-chief]
+
+  gary-halbert:
+    collaborates_with: [gary-bencivenga, dan-kennedy]
+    escalates_to: [copy-chief]
+
+  gary-bencivenga:
+    collaborates_with: [gary-halbert, david-ogilvy]
+    escalates_to: [copy-chief]
+
+  david-ogilvy:
+    collaborates_with: [gary-bencivenga]
+    escalates_to: [copy-chief]
+
+  dan-kennedy:
+    collaborates_with: [gary-halbert, todd-brown]
+    escalates_to: [copy-chief]
+
+  todd-brown:
+    collaborates_with: [dan-kennedy, eugene-schwartz]
+    escalates_to: [copy-chief]
+
+  jeff-walker:
+    collaborates_with: [dan-kennedy, ry-schwartz]
+    escalates_to: [copy-chief]
+
+  jon-benson:
+    collaborates_with: [gary-halbert]
+    escalates_to: [copy-chief]
+
+  ry-schwartz:
+    collaborates_with: [jeff-walker, todd-brown]
+    escalates_to: [copy-chief]
+
+  robert-collier:
+    collaborates_with: [eugene-schwartz]
+    escalates_to: [copy-chief]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# QUALITY STANDARDS
+# ─────────────────────────────────────────────────────────────────────────────
+
+quality_standards:
+  hopkins_audit:
+    min_score: 85
+    max_score: 100
+    required: true
+    description: "Scientific advertising audit by @claude-hopkins"
+
+  sugarman_triggers:
+    min_coverage: 80
+    total_triggers: 30
+    required: true
+    description: "Sugarman 30 psychological triggers check"
+
+  tier_0_diagnosis:
+    required: true
+    description: "NEVER skip Tier 0 diagnosis before execution"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SETTINGS
+# ─────────────────────────────────────────────────────────────────────────────
+
+settings:
+  greeting:
+    level: archetypal
+    show_project_status: true
+    show_aiox_context: true
+
+  activation:
+    prefix: "copy"
+    example: "@copy:copy-chief"

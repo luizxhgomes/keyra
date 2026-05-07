@@ -1,0 +1,2002 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KEYRA · Brand Identity · Documento de Apresentação Premium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200..900;1,9..144,200..900&family=Inter:wght@200..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Color tokens */
+  --ivory-50:#FAF6EE; --ivory-100:#F4EDE2; --sand-200:#EAE0CF; --mocha-300:#C8B49A;
+  --bronze-400:#946640; --bronze-500:#7E5A40;
+  --cocoa-700:#5A3E26; --cocoa-800:#3F2A1B; --cocoa-900:#2B1810; --ink-950:#181210;
+  --amber-300:#E5B473; --amber-400:#D89A4D; --amber-500:#C8843A;
+  --terracotta-500:#C26832; --terracotta-600:#B8612B; --terracotta-700:#A05525; --rust-800:#843E1A;
+  --champagne-200:#F0D8A8; --gold-300:#E5C690; --gold-400:#D4A752; --gold-500:#B8923A; --gold-600:#9A7A2C;
+  --success-leaf:#6E8C5A; --success-deep:#4F6840; --info:#5A6C7E;
+
+  /* Semantic — Product */
+  --background:var(--ivory-50);
+  --surface:#fff;
+  --surface-muted:var(--ivory-100);
+  --foreground:var(--cocoa-900);
+  --foreground-secondary:var(--bronze-500);
+  --foreground-muted:var(--bronze-400);
+  --border-subtle:var(--sand-200);
+  --border-default:var(--mocha-300);
+  --cta-primary:var(--terracotta-600);
+  --cta-primary-hover:var(--terracotta-700);
+  --cta-primary-fg:var(--ivory-50);
+  --premium-accent:var(--gold-500);
+
+  /* Typography */
+  --font-serif:'Fraunces',Times,serif;
+  --font-sans:'Inter',-apple-system,system-ui,sans-serif;
+
+  /* Motion */
+  --d-instant:100ms; --d-fast:200ms; --d-base:320ms; --d-slow:480ms; --d-cinematic:720ms;
+  --e-out-soft:cubic-bezier(0.22,1,0.36,1);
+  --e-in-out-editorial:cubic-bezier(0.65,0,0.35,1);
+  --e-in-quiet:cubic-bezier(0.7,0,0.84,0);
+  --e-out-bounce:cubic-bezier(0.34,1.56,0.64,1);
+
+  /* Shadows warm */
+  --sh-xs:0 1px 2px rgba(43,24,16,.04);
+  --sh-sm:0 2px 4px rgba(43,24,16,.06);
+  --sh-md:0 4px 8px rgba(43,24,16,.08);
+  --sh-lg:0 8px 16px rgba(43,24,16,.12);
+  --sh-xl:0 16px 32px rgba(43,24,16,.16);
+  --sh-glow:0 0 24px rgba(184,146,58,.18);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--background);
+  color:var(--foreground);
+  font-family:var(--font-sans);
+  font-feature-settings:"tnum";
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+
+@media (prefers-reduced-motion:reduce){
+  :root{--d-instant:0ms;--d-fast:0ms;--d-base:0ms;--d-slow:0ms;--d-cinematic:0ms}
+}
+
+.editorial{font-family:var(--font-serif);font-feature-settings:"ss01","liga"}
+
+/* ─── Layout ─── */
+.shell{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border-subtle)}
+section:first-of-type{border-top:none}
+.eyebrow{
+  font-family:var(--font-sans);
+  font-size:12px;font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--gold-500);margin-bottom:16px;
+}
+.title{
+  font-family:var(--font-serif);font-weight:300;
+  font-size:clamp(40px,5vw,72px);
+  line-height:1.05;letter-spacing:-0.02em;
+  color:var(--cocoa-900);margin-bottom:32px;
+}
+.title strong{font-weight:700}
+.title em{font-weight:200;font-style:italic}
+.subtitle{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:24px;color:var(--bronze-500);margin-bottom:48px;max-width:680px;
+}
+.lead{
+  font-size:17px;color:var(--cocoa-800);margin-bottom:24px;
+  max-width:980px;line-height:1.7;
+}
+
+/* Lead em duas colunas (newspaper editorial) — para textos longos em sections premium */
+.lead-columns{
+  max-width:none;
+  column-count:2;
+  column-gap:80px;
+  column-rule:1px solid var(--sand-200);
+  margin-bottom:32px;
+}
+@media (max-width:768px){
+  .lead-columns{column-count:1;column-gap:0;column-rule:none}
+}
+
+/* Loop indicator · barra fina dourada que pulsa no ritmo do reveal */
+.loop-indicator{
+  margin-top:24px;
+  height:2px;
+  background:var(--sand-200);
+  border-radius:1px;
+  position:relative;
+  overflow:hidden;
+}
+.loop-indicator::after{
+  content:"";
+  position:absolute;left:0;top:0;bottom:0;
+  width:100%;
+  background:linear-gradient(90deg,var(--gold-500),var(--gold-400));
+  transform-origin:left;
+  transform:scaleX(0);
+}
+.loop-indicator.running::after{
+  animation:loopProgress 4500ms linear infinite;
+}
+.loop-indicator.paused::after{
+  animation-play-state:paused;
+}
+@keyframes loopProgress{
+  0%{transform:scaleX(0)}
+  100%{transform:scaleX(1)}
+}
+
+/* Tokens table · legibilidade premium */
+.tokens-table{
+  display:flex;flex-direction:column;
+  gap:0;margin:8px 0 0;
+}
+.tokens-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:14px 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.tokens-row:last-child{border-bottom:none}
+.tokens-table dt{
+  font-family:var(--font-sans);
+  font-size:14px;font-weight:500;
+  color:var(--cocoa-700);
+  letter-spacing:0.01em;
+  flex-shrink:0;
+}
+.tokens-table dd{
+  font-family:var(--font-sans);
+  font-size:15px;font-weight:500;
+  color:var(--cocoa-900);
+  font-feature-settings:"tnum";
+  letter-spacing:0;
+  text-align:right;
+  margin:0;
+}
+.tokens-table dd b{
+  font-weight:700;
+  color:var(--cocoa-900);
+  background:var(--ivory-100);
+  padding:2px 6px;border-radius:4px;
+}
+.tokens-table dd .unit{
+  color:var(--bronze-500);font-weight:400;
+  margin-left:2px;
+}
+.tokens-table dd .bezier{
+  font-family:ui-monospace,Menlo,monospace;
+  font-size:13px;
+  color:var(--cocoa-800);
+  background:var(--ivory-100);
+  padding:4px 10px;border-radius:6px;
+}
+@media (max-width:640px){
+  .tokens-row{flex-direction:column;align-items:flex-start;gap:6px}
+  .tokens-table dd{text-align:left}
+}
+
+/* Manifesto · 2 colunas estruturadas (thesis | context) */
+.manifesto-body{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:64px;
+  margin-top:40px;
+  margin-bottom:24px;
+}
+.manifesto-col{display:flex;flex-direction:column;gap:16px}
+.manifesto-col .lead{max-width:none;margin-bottom:0}
+.manifesto-tag{
+  font-family:var(--font-sans);font-size:11px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--gold-500);
+  padding-bottom:12px;
+  border-bottom:1px solid var(--sand-200);
+}
+@media (max-width:768px){
+  .manifesto-body{grid-template-columns:1fr;gap:32px}
+}
+
+/* ─── Hero ─── */
+.hero{
+  padding:140px 0 120px;
+  border-top:none;
+  position:relative;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at top right,var(--ivory-100),transparent 60%);
+  pointer-events:none;
+}
+.hero-tag{
+  font-family:var(--font-sans);font-size:13px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--gold-500);margin-bottom:32px;
+  display:flex;align-items:center;gap:12px;
+}
+.hero-tag::before{content:"";width:32px;height:1px;background:var(--gold-500)}
+.hero h1{
+  font-family:var(--font-serif);
+  font-size:clamp(72px,10vw,144px);
+  line-height:0.95;letter-spacing:-0.03em;
+  color:var(--cocoa-900);margin-bottom:24px;
+  font-weight:700;
+}
+.hero h1 .thin{font-weight:200;font-style:italic;color:var(--bronze-500)}
+.hero p{
+  font-family:var(--font-serif);font-style:italic;font-weight:200;
+  font-size:28px;color:var(--cocoa-700);max-width:680px;line-height:1.4;
+  margin-bottom:48px;
+}
+.hero-meta{
+  display:flex;gap:48px;font-size:13px;color:var(--bronze-500);
+  letter-spacing:0.04em;text-transform:uppercase;font-weight:500;
+}
+.hero-meta b{color:var(--cocoa-900);font-weight:600}
+
+/* ─── TOC ─── */
+.toc{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,246,238,.92);
+  backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:1px solid var(--border-subtle);
+  padding:16px 32px;
+  display:flex;gap:32px;flex-wrap:wrap;align-items:center;
+  font-size:13px;font-weight:500;
+}
+.toc-brand{
+  font-family:var(--font-serif);font-weight:700;font-size:20px;
+  color:var(--cocoa-900);letter-spacing:-0.02em;margin-right:16px;
+  text-decoration:none;
+  display:inline-flex;align-items:baseline;
+  transition:opacity var(--d-fast,200ms) var(--e-out-soft,cubic-bezier(0.22,1,0.36,1));
+}
+.toc-brand:hover{opacity:0.7}
+.toc-brand .dot{
+  color:var(--gold-500);
+  font-weight:700;
+  margin-left:1px;
+}
+.toc a{
+  color:var(--bronze-500);text-decoration:none;
+  transition:color var(--d-fast) var(--e-out-soft);
+}
+.toc a:hover{color:var(--cocoa-900)}
+.toc-version{
+  margin-left:auto;font-size:11px;
+  color:var(--bronze-400);letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+
+/* ─── Logo Concepts ─── */
+.logo-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;margin-top:32px;
+}
+/* Lei da Densidade Proporcional · anti-órfão automático */
+.logo-grid > .logo-card:nth-last-child(1):nth-child(3n+1){grid-column:1 / -1}
+.logo-grid > .logo-card:nth-last-child(2):nth-child(3n+1){grid-column:span 2}
+.logo-grid > .logo-card:nth-last-child(2):nth-child(3n+1) ~ .logo-card{grid-column:span 1}
+.logo-card{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:12px;
+  padding:64px 32px 32px;
+  text-align:center;
+  display:flex;flex-direction:column;justify-content:space-between;
+  min-height:280px;
+  container-type:inline-size;
+  overflow:hidden;
+  transition:transform var(--d-base) var(--e-out-soft),box-shadow var(--d-base) var(--e-out-soft);
+}
+.logo-card:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+.logo-card.dark{background:var(--cocoa-900);color:var(--champagne-200);border-color:var(--cocoa-800)}
+.logo-card.gold-bg{background:var(--ink-950);color:var(--gold-500);border-color:var(--cocoa-800)}
+
+.logo-mark{
+  font-family:var(--font-serif);font-weight:600;
+  font-size:64px;line-height:1;letter-spacing:-0.03em;
+  color:inherit;margin-bottom:auto;
+}
+.logo-mark .dot{color:var(--gold-500)}
+.logo-mark .gold-line{
+  display:block;width:48px;height:2px;background:var(--gold-500);
+  margin:12px auto 0;
+}
+.logo-mark.mono{font-weight:700;font-size:96px}
+.logo-mark.outline{
+  -webkit-text-stroke:1px var(--gold-500);
+  color:transparent;font-weight:600;
+}
+.logo-caption{
+  font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--bronze-400);margin-top:24px;
+}
+.logo-card.dark .logo-caption{color:var(--bronze-400)}
+
+/* Subtítulo das galerias de logo */
+.logo-subtitle{
+  font-family:var(--font-serif);
+  font-weight:500;font-size:24px;
+  color:var(--cocoa-900);
+  letter-spacing:-0.01em;
+  margin-top:32px;margin-bottom:8px;
+}
+
+/* Lockup horizontal · Wordmark + tagline */
+.logo-lockup{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:auto;
+  flex-wrap:wrap;justify-content:center;
+}
+.lockup-divider{
+  width:1px;height:40px;
+  background:var(--mocha-300);
+  flex-shrink:0;
+}
+.lockup-tagline{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:14px;color:var(--bronze-500);
+  line-height:1.3;text-align:left;
+}
+
+/* Selo circular · wordmark centralizado dentro do círculo */
+.logo-stamp{
+  display:flex;align-items:center;justify-content:center;
+  width:200px;height:200px;
+  border:1.5px solid var(--gold-500);
+  border-radius:50%;
+  margin:auto;
+  position:relative;
+  flex-shrink:0;
+}
+.logo-stamp .logo-mark{
+  margin:0 !important;
+  line-height:1;
+  text-align:center;
+}
+.logo-stamp::before,
+.logo-stamp::after{
+  content:"";position:absolute;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold-500);
+}
+.logo-stamp::before{top:50%;left:-3px;transform:translateY(-50%)}
+.logo-stamp::after{top:50%;right:-3px;transform:translateY(-50%)}
+/* Card que contém o stamp precisa centralizar verticalmente */
+.logo-card:has(.logo-stamp){justify-content:center;padding:32px;gap:32px}
+
+/* Vertical stack · K acima de KEYRA */
+.logo-vertical{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  margin:auto;
+}
+.logo-vertical .logo-mark{margin:0 !important;line-height:1}
+.vertical-divider{
+  width:1px;height:32px;
+  background:var(--gold-500);opacity:0.6;
+}
+.vertical-wordmark{
+  font-family:var(--font-serif);font-weight:600;
+  font-size:18px;letter-spacing:0.32em;
+  color:var(--cocoa-900);
+}
+.logo-card:has(.logo-vertical){justify-content:center;gap:32px}
+
+/* ─── Color swatches ─── */
+.palette{display:grid;gap:16px;margin-top:32px}
+.palette-row{
+  display:grid;
+  grid-template-columns:200px 1fr;
+  gap:24px;align-items:start;
+}
+.palette-name{
+  font-family:var(--font-serif);font-weight:500;font-size:20px;
+  color:var(--cocoa-900);
+}
+.palette-name small{
+  display:block;font-family:var(--font-sans);font-weight:400;font-size:13px;
+  color:var(--bronze-500);margin-top:4px;line-height:1.4;
+}
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.swatch{
+  border-radius:8px;
+  padding:80px 16px 16px;
+  position:relative;
+  cursor:pointer;
+  transition:transform var(--d-fast) var(--e-out-soft);
+  border:1px solid rgba(43,24,16,.06);
+  font-size:11px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  min-height:120px;
+}
+.swatch:hover{transform:translateY(-1px)}
+.swatch-name{font-weight:600;letter-spacing:0.04em}
+.swatch-hex{font-family:ui-monospace,Menlo,monospace;font-size:10px;opacity:.75;margin-top:2px}
+.swatch-copied{
+  position:absolute;top:8px;right:8px;
+  background:var(--cocoa-900);color:var(--ivory-50);
+  font-size:10px;padding:2px 6px;border-radius:3px;
+  opacity:0;pointer-events:none;
+  transition:opacity var(--d-fast);
+}
+.swatch.copied .swatch-copied{opacity:1}
+.swatch.dark{color:var(--ivory-50)}
+.swatch.light{color:var(--cocoa-900)}
+
+/* ─── Typography demo ─── */
+.type-demo{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:12px;
+  padding:48px;margin-top:32px;
+}
+.type-row{
+  display:grid;
+  grid-template-columns:140px 1fr;
+  gap:32px;align-items:baseline;
+  padding:24px 0;
+  border-bottom:1px solid var(--border-subtle);
+}
+.type-row:last-child{border-bottom:none}
+.type-meta{
+  font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--bronze-500);
+}
+.type-meta small{display:block;font-weight:400;text-transform:none;letter-spacing:0;color:var(--bronze-400);margin-top:4px}
+.type-sample{color:var(--cocoa-900)}
+
+.t-hero{font-family:var(--font-serif);font-weight:200;font-size:clamp(56px,7vw,96px);line-height:0.95;letter-spacing:-0.02em;font-style:italic}
+.t-display1{font-family:var(--font-serif);font-weight:600;font-size:clamp(40px,5vw,72px);line-height:1;letter-spacing:-0.02em}
+.t-display2{font-family:var(--font-serif);font-weight:500;font-size:48px;line-height:1.05;letter-spacing:-0.01em}
+.t-headline{font-family:var(--font-serif);font-weight:600;font-size:32px;line-height:1.1}
+.t-subhead{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:24px;line-height:1.3;color:var(--bronze-500)}
+.t-body-large{font-family:var(--font-sans);font-weight:400;font-size:20px;line-height:1.55}
+.t-body{font-family:var(--font-sans);font-weight:400;font-size:17px;line-height:1.6}
+.t-caption{font-family:var(--font-sans);font-weight:500;font-size:14px;color:var(--bronze-500)}
+.t-overline{font-family:var(--font-sans);font-weight:600;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-500)}
+.t-kpi{font-family:var(--font-sans);font-weight:700;font-size:64px;line-height:1;font-feature-settings:"tnum";letter-spacing:-0.02em}
+
+/* ─── Components ─── */
+.component-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:24px;margin-top:32px;
+}
+.demo-card{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:12px;padding:32px;
+}
+.demo-title{
+  font-family:var(--font-sans);font-weight:600;font-size:14px;
+  letter-spacing:0.04em;text-transform:uppercase;
+  color:var(--bronze-500);margin-bottom:24px;
+}
+
+/* Buttons */
+.btn{
+  font-family:var(--font-sans);font-weight:500;font-size:15px;
+  padding:12px 24px;border-radius:8px;border:none;cursor:pointer;
+  transition:background-color var(--d-instant) var(--e-out-soft),
+             transform var(--d-instant) var(--e-out-soft),
+             box-shadow var(--d-instant) var(--e-out-soft);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--cta-primary);color:var(--cta-primary-fg)}
+.btn-primary:hover{background:var(--cta-primary-hover)}
+.btn-secondary{background:var(--ivory-50);color:var(--cocoa-900);border:1px solid var(--bronze-500)}
+.btn-secondary:hover{background:var(--ivory-100);border-color:var(--cocoa-700)}
+.btn-ghost{background:transparent;color:var(--bronze-500)}
+.btn-ghost:hover{background:var(--ivory-100);color:var(--cocoa-900)}
+.btn-destructive{background:var(--rust-800);color:var(--ivory-50)}
+.btn-destructive:hover{background:#6F3015}
+.btn-premium{background:var(--gold-500);color:var(--cocoa-900);font-weight:600}
+.btn-premium:hover{background:var(--gold-600);box-shadow:var(--sh-glow)}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap}
+
+/* Inputs */
+.input{
+  font-family:var(--font-sans);font-size:15px;
+  padding:12px 16px;border-radius:8px;
+  border:1px solid var(--mocha-300);
+  background:var(--ivory-50);width:100%;
+  transition:border-color var(--d-fast) var(--e-out-soft),
+             box-shadow var(--d-fast) var(--e-out-soft);
+}
+.input:focus{outline:none;border-color:var(--bronze-500);box-shadow:0 0 0 3px rgba(126,90,64,.12)}
+.label{font-size:14px;font-weight:500;color:var(--cocoa-800);margin-bottom:6px;display:block}
+
+/* KPI Card — container queries para escalar dentro de qualquer parent */
+.kpi{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:12px;padding:24px;
+  display:flex;flex-direction:column;gap:8px;
+  container-type:inline-size;
+  transition:box-shadow var(--d-base) var(--e-out-soft),
+             transform var(--d-base) var(--e-out-soft);
+  overflow:hidden;
+}
+.kpi:hover{box-shadow:var(--sh-lg);transform:translateY(-1px)}
+.kpi-label{
+  font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--bronze-500);
+}
+.kpi-value{
+  font-family:var(--font-sans);font-weight:700;
+  font-size:clamp(28px, 13cqi, 44px);
+  line-height:1;color:var(--cocoa-900);
+  font-feature-settings:"tnum";letter-spacing:-0.02em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.kpi-delta{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:15px;color:var(--success-leaf);
+  line-height:1.3;
+}
+.kpi-delta.negative{color:var(--rust-800)}
+
+/* Toast */
+.toast{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:16px;border-radius:8px;
+  background:var(--ivory-100);
+  border-left:4px solid var(--success-leaf);
+  font-size:14px;color:var(--cocoa-800);
+  margin-bottom:12px;
+}
+.toast.error{border-left-color:var(--rust-800)}
+.toast.warn{border-left-color:var(--amber-500)}
+.toast-icon{font-size:18px;flex-shrink:0}
+.toast b{display:block;color:var(--cocoa-900);font-weight:500;margin-bottom:2px}
+
+/* Empty state */
+.empty{
+  text-align:center;padding:48px 24px;
+}
+.empty-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--ivory-100);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;
+  color:var(--bronze-500);font-size:24px;
+}
+.empty h4{font-family:var(--font-serif);font-weight:500;font-size:24px;color:var(--cocoa-900);margin-bottom:8px}
+.empty p{color:var(--bronze-500);font-size:15px;margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto}
+
+/* Combinations */
+.combo{
+  border-radius:12px;
+  padding:48px 40px;
+  min-height:280px;
+  display:flex;flex-direction:column;justify-content:center;
+  container-type:inline-size;
+  overflow:hidden;
+}
+.combo-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  margin-top:32px;
+}
+.combo-grid > .combo:nth-child(4),
+.combo-grid > .combo:nth-child(5){
+  grid-column:span 1;
+}
+@media (min-width:1024px){
+  /* 5 cards em desktop: 3 + 2 centralizados (combos 4 e 5 ocupam mais largura cada) */
+  .combo-grid{grid-template-columns:repeat(6,1fr)}
+  .combo-grid > .combo:nth-child(1),
+  .combo-grid > .combo:nth-child(2),
+  .combo-grid > .combo:nth-child(3){grid-column:span 2}
+  .combo-grid > .combo:nth-child(4){grid-column:2 / span 2}
+  .combo-grid > .combo:nth-child(5){grid-column:span 2}
+}
+.combo-A{background:var(--ivory-50)}
+.combo-B{background:var(--cocoa-900);color:var(--champagne-200)}
+.combo-C{background:var(--terracotta-600);color:var(--ivory-50)}
+.combo-D{background:var(--ivory-50);border:1px solid var(--border-subtle)}
+.combo-E{background:var(--ivory-100)}
+.combo-tag{
+  font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--gold-500);margin-bottom:12px;
+}
+.combo-B .combo-tag,.combo-C .combo-tag{color:var(--gold-300)}
+.combo-headline{
+  font-family:var(--font-serif);font-weight:600;font-size:36px;line-height:1.05;letter-spacing:-0.01em;
+  margin-bottom:8px;
+}
+.combo-B .combo-headline{color:var(--champagne-200)}
+.combo-C .combo-headline{color:var(--ivory-50);font-weight:300}
+.combo-C .combo-headline strong{font-weight:700}
+.combo-sub{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:18px;color:var(--bronze-500);margin-bottom:24px}
+.combo-B .combo-sub{color:var(--gold-300)}
+.combo-C .combo-sub{color:var(--champagne-200)}
+.combo-cta{display:inline-block;margin-top:8px}
+
+/* Mockups Instagram — container queries para fonte escalar com o card */
+.mockup-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  margin-top:32px;
+}
+.mockup{
+  aspect-ratio:4/5;border-radius:12px;
+  padding:8% 8% 6%;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  position:relative;overflow:hidden;
+  container-type:inline-size;
+}
+.mockup-1{background:linear-gradient(135deg,var(--terracotta-600),var(--rust-800))}
+.mockup-2{background:#fff;border:1px solid var(--border-subtle)}
+.mockup-3{background:linear-gradient(180deg,var(--amber-400),var(--terracotta-700))}
+.mockup-4{background:linear-gradient(135deg,var(--amber-400) 0%,var(--gold-500) 70%,var(--cocoa-800) 100%)}
+.mockup-5{background:var(--cocoa-900)}
+.mockup-6{background:var(--ink-950)}
+
+/* Headline base — fonte em cqw (% da largura do card), não da viewport */
+.mock-headline{
+  font-family:var(--font-serif);
+  font-weight:300;line-height:0.92;letter-spacing:-0.02em;
+  hyphens:none;word-break:keep-all;
+  margin-bottom:auto;
+}
+.mock-line{display:block}
+.mock-line.thin{font-weight:200}
+.mock-line.bold{font-weight:700}
+.mock-line.italic{font-style:italic;font-weight:200}
+
+/* Tamanhos calibrados POR mockup (palavra mais longa define) */
+/* Card ~280-360px: fontes 13-18cqw funcionam */
+.mockup-1 .mock-headline{font-size:15cqw;color:var(--ivory-50)}     /* DICAS PARA / VOCÊ CUIDAR / DA SUA PELE */
+.mockup-2 .mock-headline{font-size:13.5cqw;color:var(--cocoa-900)}  /* BENEFÍCIOS / DO BOTOX */
+.mockup-3 .mock-headline{font-size:16cqw;color:var(--ivory-50)}     /* DEPILAÇÃO / A LASER */
+.mockup-4 .mock-headline{font-size:13cqw;color:var(--ivory-50)}     /* SEJA SUA / MELHOR / VERSÃO */
+.mockup-5 .mock-headline{font-size:14cqw;color:var(--ivory-50)}     /* SOCIAL / MEDIA / estética */
+.mockup-6 .mock-headline{
+  font-size:13cqw;color:var(--gold-500);font-weight:700;             /* A IMPORTÂNCIA / DO COLÁGENO */
+}
+
+/* Word-specific tweaks — palavras longas reduzem 1 escalão */
+.mock-line.shrink-sm{font-size:0.85em}
+.mock-line.shrink-md{font-size:0.75em}
+.mock-line.grow-sm{font-size:1.15em}
+
+.mock-handle{
+  display:flex;align-items:center;gap:10px;margin-top:6%;
+  font-size:3.2cqw;font-weight:500;letter-spacing:0.08em;
+  text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mock-avatar{
+  width:7cqw;height:7cqw;min-width:18px;min-height:18px;
+  max-width:28px;max-height:28px;
+  border-radius:50%;background:var(--bronze-400);flex-shrink:0;
+}
+.mockup-1 .mock-handle,.mockup-3 .mock-handle,.mockup-4 .mock-handle,.mockup-5 .mock-handle,.mockup-6 .mock-handle{color:var(--champagne-200)}
+.mockup-2 .mock-handle{color:var(--bronze-500)}
+
+/* Anti-padrões */
+.anti-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:32px;
+}
+.anti-card{
+  border-radius:8px;padding:24px;
+  background:var(--surface);border:1px dashed var(--rust-800);
+  position:relative;
+}
+.anti-card::before{
+  content:"✕ NÃO USAR";position:absolute;top:12px;right:12px;
+  font-size:10px;font-weight:600;letter-spacing:0.08em;
+  color:var(--rust-800);
+}
+.anti-bad{margin-bottom:8px;font-weight:500}
+.anti-why{font-size:13px;color:var(--bronze-500);line-height:1.5}
+
+/* Motion demos */
+.motion-demo{
+  background:var(--surface);border:1px solid var(--border-subtle);
+  border-radius:12px;padding:32px;
+}
+.demo-button-large{
+  font-family:var(--font-sans);font-weight:500;font-size:17px;
+  padding:14px 32px;border-radius:8px;border:none;cursor:pointer;
+  background:var(--cta-primary);color:var(--cta-primary-fg);
+  transition:background-color var(--d-instant) var(--e-out-soft),
+             transform var(--d-instant) var(--e-out-soft);
+}
+.demo-button-large:hover{background:var(--cta-primary-hover)}
+.demo-button-large:active{transform:scale(.98)}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes kpiCount{
+  from{opacity:0;transform:scale(.96)}
+  to{opacity:1;transform:scale(1)}
+}
+.reveal-stage{display:flex;gap:12px;flex-direction:column;align-items:flex-start}
+.reveal-stage > *{opacity:0}
+.reveal-stage.play .label{animation:fadeUp .32s var(--e-out-soft) forwards}
+.reveal-stage.play .value{animation:kpiCount .48s var(--e-out-soft) forwards;animation-delay:.08s}
+.reveal-stage.play .delta{animation:fadeUp .32s var(--e-out-soft) forwards;animation-delay:.32s}
+
+/* Footer */
+footer{
+  border-top:1px solid var(--border-subtle);
+  padding:48px 32px;text-align:center;
+  font-size:13px;color:var(--bronze-500);
+}
+footer a{color:var(--cocoa-900);text-decoration:none;font-weight:500}
+
+/* Helpers */
+.muted{color:var(--bronze-500)}
+.notice{
+  background:var(--ivory-100);
+  border-left:3px solid var(--gold-500);
+  padding:16px 20px;border-radius:6px;
+  font-size:14px;color:var(--cocoa-800);
+  margin:24px 0;
+}
+.grid-2{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   ANIMATIONS & PREMIUM INTERACTIONS
+   Tokens consumidos de motion-system/. Respeita prefers-reduced-motion.
+   Princípios: calor crescente, calmaria sem jerk, drama sob demanda.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Scroll progress (gold-500 thin bar no topo) ── */
+.scroll-progress{
+  position:fixed;top:0;left:0;
+  height:2px;width:0%;
+  background:linear-gradient(90deg,var(--gold-500),var(--gold-400));
+  z-index:101;
+  transition:width 80ms linear;
+  box-shadow:0 0 12px rgba(184,146,58,.4);
+}
+
+/* ── Reveal on scroll (fade-up consumindo motion-tokens) ── */
+[data-reveal]{
+  opacity:0;
+  transform:translateY(12px);
+  transition:opacity var(--d-slow) var(--e-out-soft),
+             transform var(--d-slow) var(--e-out-soft);
+  transition-delay:var(--reveal-delay,0ms);
+  will-change:opacity,transform;
+}
+[data-reveal].in{opacity:1;transform:translateY(0)}
+
+/* ── Stagger children (lista entrando em sequência) ── */
+.stagger-children > *{
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity var(--d-base) var(--e-out-soft),
+             transform var(--d-base) var(--e-out-soft);
+  transition-delay:calc(var(--stagger-i,0) * 60ms);
+}
+.stagger-children.in > *{opacity:1;transform:translateY(0)}
+
+/* ── Hover refinements (calor crescente, sombra warm) ── */
+.kpi,.demo-card,.motion-demo,.logo-card,.anti-card{
+  transition:transform var(--d-base) var(--e-out-soft),
+             box-shadow var(--d-base) var(--e-out-soft),
+             border-color var(--d-base) var(--e-out-soft);
+}
+.demo-card:hover,.motion-demo:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--sh-lg);
+  border-color:var(--mocha-300);
+}
+.kpi:hover{
+  transform:translateY(-1px);
+  box-shadow:var(--sh-lg);
+}
+.logo-card{
+  transition:transform var(--d-slow) var(--e-out-soft),
+             box-shadow var(--d-slow) var(--e-out-soft);
+}
+.logo-card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--sh-xl);
+}
+
+/* ── Mockup hover sutil (sem parallax — princípio respeitado) ── */
+.mockup{
+  transition:transform var(--d-slow) var(--e-out-soft),
+             box-shadow var(--d-slow) var(--e-out-soft),
+             filter var(--d-slow) var(--e-out-soft);
+  cursor:pointer;
+  box-shadow:var(--sh-md);
+}
+.mockup:hover{
+  transform:translateY(-6px) scale(1.01);
+  box-shadow:var(--sh-xl);
+  filter:saturate(1.05) brightness(1.02);
+}
+
+/* ── Combo cards: lift sutil ── */
+.combo{
+  transition:transform var(--d-base) var(--e-out-soft),
+             box-shadow var(--d-base) var(--e-out-soft);
+  box-shadow:var(--sh-sm);
+}
+.combo:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--sh-md);
+}
+
+/* ── Swatches: hover leve ── */
+.swatch{
+  transition:transform var(--d-fast) var(--e-out-soft),
+             box-shadow var(--d-fast) var(--e-out-soft);
+}
+.swatch:hover{
+  transform:translateY(-1px) scale(1.02);
+  box-shadow:var(--sh-md);
+  z-index:2;
+}
+
+/* ── TOC active highlight ── */
+.toc a.active{
+  color:var(--cocoa-900);
+  position:relative;
+}
+.toc a.active::after{
+  content:"";
+  position:absolute;left:0;right:0;bottom:-4px;
+  height:1px;
+  background:var(--gold-500);
+  animation:tocSlide var(--d-base) var(--e-out-soft);
+}
+@keyframes tocSlide{
+  from{transform:scaleX(0);transform-origin:left}
+  to{transform:scaleX(1);transform-origin:left}
+}
+
+/* ── Hero subtle breathing (gradient respira sutilmente — não parallax) ── */
+@keyframes heroBreath{
+  0%,100%{opacity:.55;transform:scale(1)}
+  50%{opacity:.85;transform:scale(1.04)}
+}
+.hero::before{
+  animation:heroBreath 12s ease-in-out infinite;
+}
+
+/* ── Hero entrance (load-time stagger) ── */
+@keyframes heroFadeUp{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero .hero-tag,.hero h1,.hero p,.hero-meta{
+  opacity:0;
+  animation:heroFadeUp var(--d-slow) var(--e-out-soft) forwards;
+}
+.hero .hero-tag{animation-delay:.1s}
+.hero h1{animation-delay:.2s}
+.hero p{animation-delay:.4s}
+.hero-meta{animation-delay:.55s}
+
+/* ── Premium button glow pulse (raro — respeita "drama sob demanda") ── */
+@keyframes premiumPulse{
+  0%,90%,100%{box-shadow:0 0 0 rgba(184,146,58,0)}
+  45%{box-shadow:var(--sh-glow)}
+}
+.btn-premium{animation:premiumPulse 6s ease-in-out infinite}
+.btn-premium:hover{animation:none;box-shadow:var(--sh-glow)}
+
+/* ── Logo card subtle breath (1ª visualização) ── */
+@keyframes logoBreath{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-2px)}
+}
+.logo-card[data-breath]{animation:logoBreath 5s ease-in-out infinite}
+.logo-card[data-breath]:hover{animation:none}
+
+/* ── Section transitions com border anim ── */
+section{
+  position:relative;
+}
+section::before{
+  content:"";position:absolute;top:-1px;left:50%;
+  width:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-500),transparent);
+  transform:translateX(-50%);
+  transition:width var(--d-cinematic) var(--e-out-soft);
+}
+section.in-view::before{width:120px}
+
+/* ── Kpi counter (transição imediata para JS atualizar texto) ── */
+[data-counter]{transition:none}
+
+/* ════════════════════════════════════════════════════════════════════
+   RESPONSIVIDADE — mobile-first ajustada cuidadosamente
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Tablet large (1024px) */
+@media (max-width:1024px){
+  section{padding:80px 0}
+  .shell{padding:0 24px}
+  .hero{padding:100px 0 80px}
+  .toc{gap:20px;padding:14px 24px;font-size:12px}
+  .toc-version{display:none}
+  .palette-row{grid-template-columns:1fr;gap:12px}
+  .palette-name{font-size:18px}
+  .type-demo{padding:32px}
+  /* Combo grid em tablet: 2 colunas com 5º card ocupando linha inteira */
+  .combo-grid{grid-template-columns:repeat(2,1fr) !important}
+  .combo-grid > .combo{grid-column:auto !important}
+  .combo-grid > .combo:nth-child(5){grid-column:1 / -1 !important}
+}
+
+/* Tablet (768px) */
+@media (max-width:768px){
+  section{padding:64px 0}
+  .shell{padding:0 20px}
+  .hero{padding:80px 0 60px}
+  .hero h1{font-size:clamp(56px,12vw,88px)}
+  .hero p{font-size:22px}
+  .hero-meta{flex-wrap:wrap;gap:24px}
+  .title{font-size:clamp(32px,6vw,56px)}
+  .lead{font-size:16px}
+  .subtitle{font-size:20px}
+  .swatches{grid-template-columns:repeat(2,1fr)}
+  .component-grid{grid-template-columns:1fr}
+  .combo-grid{grid-template-columns:1fr !important}
+  .combo-grid > .combo{grid-column:auto !important}
+  .mockup-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+  .anti-grid{grid-template-columns:repeat(2,1fr)}
+  .logo-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+  .grid-2{grid-template-columns:1fr}
+  .demo-card{padding:24px}
+  .combo{padding:32px 24px;min-height:240px}
+  .combo-headline{font-size:28px}
+  .t-kpi{font-size:clamp(36px,7vw,48px)}
+  .type-row{grid-template-columns:100px 1fr;gap:16px;padding:16px 0}
+  .type-meta{font-size:10px}
+  .toc{
+    overflow-x:auto;flex-wrap:nowrap;gap:18px;
+    padding:12px 20px;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .toc::-webkit-scrollbar{display:none}
+  .toc a{flex-shrink:0;white-space:nowrap}
+  .toc-brand{flex-shrink:0}
+}
+
+/* Mobile (640px) */
+@media (max-width:640px){
+  .hero{padding:64px 0 48px}
+  .hero h1{font-size:clamp(48px,14vw,72px)}
+  .hero-tag{font-size:11px}
+  .hero p{font-size:18px;margin-bottom:32px}
+  .hero-meta{flex-direction:column;gap:8px;font-size:12px}
+  .title{font-size:clamp(28px,8vw,44px);margin-bottom:24px}
+  .lead{font-size:15px}
+  .palette-name{font-size:16px}
+  .palette-name small{font-size:12px}
+  .swatch{padding:64px 12px 12px;min-height:96px;font-size:10px}
+  .type-demo{padding:20px}
+  .type-row{grid-template-columns:1fr;gap:6px;padding:14px 0}
+  .type-meta{font-size:10px;margin-bottom:4px}
+  .demo-card,.motion-demo{padding:20px}
+  .demo-title{font-size:12px;margin-bottom:16px}
+  .anti-grid{grid-template-columns:1fr;gap:12px}
+  .anti-card{padding:18px}
+  .combo-headline{font-size:24px}
+  .combo-sub{font-size:16px}
+  .combo{padding:28px 20px;min-height:220px}
+  .t-kpi{font-size:40px}
+  .empty{padding:32px 16px}
+  .empty-icon{width:56px;height:56px;font-size:20px}
+  .toc-brand{font-size:16px;margin-right:8px}
+  .toc{gap:14px;font-size:11px}
+}
+
+/* Mobile small (380px) */
+@media (max-width:380px){
+  .shell{padding:0 16px}
+  .mockup-grid,.logo-grid,.anti-grid{grid-template-columns:1fr;gap:12px}
+  .swatches{grid-template-columns:repeat(2,1fr)}
+  .hero h1{font-size:48px}
+  .btn-row{flex-direction:column}
+  .btn-row .btn{width:100%;justify-content:center}
+  .hero-meta{font-size:11px}
+  .palette-row{gap:8px}
+}
+
+/* Reduced motion: zera tudo (regra inegociável do motion-system) */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation:none !important;
+    transition:none !important;
+  }
+  [data-reveal]{opacity:1 !important;transform:none !important}
+  .stagger-children > *{opacity:1 !important;transform:none !important}
+  .scroll-progress{display:none}
+}
+
+/* High contrast: garante border visível em alto contraste */
+@media (prefers-contrast:more){
+  .demo-card,.motion-demo,.kpi,.logo-card,.combo,.input{
+    border-width:2px;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOC -->
+<nav class="toc" aria-label="Navegação do brandbook">
+  <a href="#" class="toc-brand editorial" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">KEYRA<span class="dot">.</span></a>
+  <a href="#concept">Conceito</a>
+  <a href="#vision">Visão</a>
+  <a href="#logo">Logo</a>
+  <a href="#colors">Cores</a>
+  <a href="#typography">Tipografia</a>
+  <a href="#components">Componentes</a>
+  <a href="#motion">Movimento</a>
+  <a href="#combos">Combinações</a>
+  <a href="#mockups">Aplicações</a>
+  <a href="#anti">Anti-padrões</a>
+  <span class="toc-version">7 de maio de 2026</span>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="shell">
+    <div class="hero-tag">Brand Identity · Documento de Apresentação</div>
+    <h1>Sua clínica<br/><span class="thin">rendendo</span> mais.</h1>
+    <p>Sem planilha. Sem domingo perdido. Sem achismo.</p>
+    <div class="hero-meta">
+      <div>Categoria visual · <b>Editorial Beauty Luxury</b></div>
+      <div>Cliente ideal · <b>Camila</b></div>
+      <div>Voz da marca · <b>Mentora confiável</b></div>
+    </div>
+  </div>
+</header>
+
+<!-- CONCEITO ESTRATÉGICO -->
+<section id="concept">
+  <div class="shell">
+    <div class="eyebrow">Manifesto · O conceito da marca</div>
+    <h2 class="title">Premium é <em>precisão</em>, não <strong>ostentação</strong>.</h2>
+    <div class="manifesto-body">
+      <div class="manifesto-col">
+        <div class="manifesto-tag">O ritual que termina aqui</div>
+        <p class="lead">Toda dona de clínica conhece o ritual. Atender. Lançar a comanda. Conferir a maquininha. Ligar para o contador. Esperar o relatório. Abrir a planilha no domingo. Decidir. Sete passos para descobrir um número que já existia desde o primeiro atendimento da semana.</p>
+        <p class="lead"><strong>A KEYRA termina esse ritual.</strong></p>
+        <p class="lead">Inauguramos uma categoria nova de software de gestão para clínicas de estética, batizada de <strong>Cadeia Viva</strong>: a operação da clínica passa a produzir o próprio financeiro, sem intervenção humana, em uma linha contínua que vai do horário marcado ao lucro real. Atendimento gera comanda. Comanda gera transação. Transação alimenta o DRE. DRE informa a próxima decisão.</p>
+        <p class="lead">Você abre o aplicativo entre dois atendimentos. O número está lá. O comparativo está lá. A decisão está pronta para ser tomada.</p>
+        <p class="lead"><em>Trinta segundos. Sem planilha. Sem domingo. Sem achismo.</em></p>
+      </div>
+      <div class="manifesto-col">
+        <div class="manifesto-tag">Por que esse ritual durou tanto</div>
+        <p class="lead muted">A categoria existente foi construída de fora para dentro, e por isso o ritual sobreviveu por anos sem disputa real.</p>
+        <p class="lead muted">Os ERPs tradicionais (Conta Azul, Omie) atendem qualquer empresa, e atendem mal cada uma: exigem lançamento manual e devolvem dashboard genérico que não fala a língua de quem cobra por procedimento. As agendas verticais (Trinks, Belle, Gestek) entendem a operação até a comanda e ali param: o financeiro real é empurrado para o contador, a decisão real volta para a planilha de domingo.</p>
+        <p class="lead muted">A KEYRA é a primeira plataforma construída de dentro para fora. Da operação para o número. Do número para a decisão. Da decisão para a próxima ação. <strong>Sua clínica deixa de explicar o financeiro e passa a falar com ele de igual para igual.</strong></p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:48px">
+      <div class="motion-demo">
+        <div class="demo-title">A categoria nova</div>
+        <p style="font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:22px;line-height:1.4;color:var(--cocoa-800)">Cadeia Viva: a primeira plataforma em que o financeiro nasce automaticamente da operação, sem lançamento manual, sem dupla entrada, sem maratona de domingo.</p>
+      </div>
+      <div class="motion-demo">
+        <div class="demo-title">A promessa central</div>
+        <p style="font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:22px;line-height:1.4;color:var(--cocoa-800)">A clínica vira financeiro sozinha. Você decide com clareza editorial, no tempo do atendimento, com o respeito de uma marca que entende quem você é.</p>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top:48px"><strong>Quatro pilares estratégicos sustentam a marca:</strong> mecanismo proprietário (Cadeia Viva), princípios UX inegociáveis (números absolutos, comparativos textuais, tela única), voz editorial luxury (mentora confiável em pt-BR culto e direto), tipografia única em pesos extremos (Fraunces e Inter, jamais um terceiro tipo).</div>
+  </div>
+</section>
+
+<!-- VISÃO -->
+<section id="vision">
+  <div class="shell">
+    <div class="eyebrow">01 · Visão da marca</div>
+    <h2 class="title">A clínica vira financeiro <em>sozinha</em>. Você decide com <strong>clareza</strong>.</h2>
+    <p class="lead">KEYRA é a primeira plataforma financeira de clínica de estética construída sobre um mecanismo proprietário chamado <strong>Cadeia Viva</strong>: cada atendimento concluído gera comanda, cada pagamento gera transação, cada transação alimenta o DRE, cada DRE informa a próxima decisão. <em>Serviço → Agenda → Comanda → Pagamento → Transação → DRE → Decisão.</em> Tudo conectado, tudo em movimento, tudo verdade.</p>
+    <p class="lead muted">Construída para mulheres empreendedoras que cansaram da maratona de domingo com planilha. Onde o ERP genérico exige lançamento manual e a agenda de mercado para na comanda, KEYRA fecha a cadeia inteira: do horário marcado ao lucro real, em uma linha contínua que não pede esforço humano para existir.</p>
+
+    <div class="notice"><strong>Princípios visuais inegociáveis:</strong> calor sempre, frio nunca · tipografia é a estrela · ouro raro, ouro precioso · drama sob demanda · zero parallax · números absolutos protagonistas.</div>
+  </div>
+</section>
+
+<!-- LOGO -->
+<section id="logo">
+  <div class="shell">
+    <div class="eyebrow">02 · Logo · sistema signature</div>
+    <h2 class="title">Conceitos para o <em>letterform</em></h2>
+    <p class="lead lead-columns">Doze explorações tipográficas em CSS puro, modeladas a partir de Fraunces 600 e 700 com detalhe em ouro foil. O <strong>ponto dourado é a assinatura proprietária</strong> da marca: aparece como pingo do letterform, como pontuação editorial, como selo de fechamento. Cada concepção respeita o brief estratégico: letterform feminino, gesto orgânico discreto, ouro como detalhe precioso, zero elementos botânicos.</p>
+
+    <h3 class="logo-subtitle">Concepts primários</h3>
+    <p class="muted" style="font-size:14px;margin-bottom:24px;max-width:760px">Seis explorações fundadoras do letterform. Servem para validar a direção visual antes do refinamento profissional final.</p>
+
+    <div class="logo-grid">
+      <div class="logo-card">
+        <div class="logo-mark editorial">KEYRA<span class="dot">.</span></div>
+        <div class="logo-caption">Concept A · Wordmark + ponto gold</div>
+      </div>
+      <div class="logo-card">
+        <div class="logo-mark editorial">KEYRA
+          <span class="gold-line"></span>
+        </div>
+        <div class="logo-caption">Concept B · Wordmark + sublinha gold</div>
+      </div>
+      <div class="logo-card dark">
+        <div class="logo-mark editorial" style="color:var(--champagne-200)">KEYRA<span class="dot">.</span></div>
+        <div class="logo-caption">Concept A · Sobre cocoa-900</div>
+      </div>
+      <div class="logo-card gold-bg">
+        <div class="logo-mark mono editorial">K<span class="dot" style="font-size:.5em">.</span></div>
+        <div class="logo-caption">Monograma · Favicon, app icon, avatar</div>
+      </div>
+      <div class="logo-card">
+        <div class="logo-mark mono editorial" style="color:var(--cocoa-900)">K<span class="dot" style="font-size:.4em">.</span></div>
+        <div class="logo-caption">Monograma + dot gold</div>
+      </div>
+      <div class="logo-card dark">
+        <div class="logo-mark mono outline">K<span class="dot" style="font-size:.4em;-webkit-text-stroke:0;color:var(--gold-500)">.</span></div>
+        <div class="logo-caption">Monoline outline · uso premium foil</div>
+      </div>
+    </div>
+
+    <h3 class="logo-subtitle" style="margin-top:64px">Sistema do ponto · O signature em outros formatos</h3>
+    <p class="muted" style="font-size:14px;margin-bottom:24px;max-width:760px">O ponto dourado funciona como um sistema completo, não como um detalhe isolado. Estas seis aplicações estendem a assinatura para lockups, selos, letterspacing editorial e variações lowercase, sempre preservando a proporcionalidade do <em>letterform</em> original.</p>
+
+    <div class="logo-grid">
+
+      <div class="logo-card">
+        <div class="logo-lockup">
+          <span class="logo-mark editorial" style="font-size:40px">KEYRA<span class="dot">.</span></span>
+          <span class="lockup-divider"></span>
+          <span class="lockup-tagline">sua clínica<br/>rendendo mais</span>
+        </div>
+        <div class="logo-caption">Lockup horizontal · Wordmark + tagline</div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-stamp">
+          <div class="logo-mark editorial" style="font-size:36px">KEYRA<span class="dot">.</span></div>
+        </div>
+        <div class="logo-caption">Selo circular · Badges, stickers, avatares</div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-mark editorial" style="font-size:clamp(22px,10cqi,32px);letter-spacing:0.24em;white-space:nowrap">KEYRA<span class="dot" style="letter-spacing:0">.</span></div>
+        <div class="logo-caption">Letterspacing editorial · Capas, hero premium</div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-mark editorial" style="font-size:64px;text-transform:lowercase;font-weight:300;letter-spacing:-0.03em">keyra<span class="dot">.</span></div>
+        <div class="logo-caption">Variação lowercase · Tom contemporâneo soft</div>
+      </div>
+
+      <div class="logo-card dark">
+        <div class="logo-vertical">
+          <div class="logo-mark mono editorial" style="font-size:64px;color:var(--champagne-200)">K<span class="dot" style="font-size:.4em">.</span></div>
+          <div class="vertical-divider"></div>
+          <div class="vertical-wordmark editorial" style="color:var(--champagne-200)">KEYRA</div>
+        </div>
+        <div class="logo-caption">Stack vertical · Cabeçalhos editoriais</div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-mark editorial" style="font-size:clamp(18px,8cqi,26px);white-space:nowrap">KEYRA<span class="dot" style="margin:0 0.18em 0 0.14em">·</span><span style="font-style:italic;font-weight:300">estética</span><span class="dot">.</span></div>
+        <div class="logo-caption">Pontuação editorial · Sub-brand e categorias</div>
+      </div>
+
+    </div>
+
+    <div class="notice" style="margin-top:48px"><strong>O ponto como sistema:</strong> a assinatura dourada permanece consistente em escala, posição e proporção em todas as aplicações. A regra é simples e não negociável: o ponto ocupa entre 18 e 28 por cento da altura da letra à esquerda dele, e a cor é sempre <code>gold-500</code> em fundo claro ou <code>champagne-200</code> em fundo escuro premium.</div>
+  </div>
+</section>
+
+<!-- COLORS -->
+<section id="colors">
+  <div class="shell">
+    <div class="eyebrow">03 · Sistema cromático</div>
+    <h2 class="title">Palette canônica: <em>warm always, cool never</em></h2>
+    <p class="lead lead-columns">Toda cor da KEYRA passa por filtro quente, sem exceção. Pretos são cocoa profundos. Brancos são cremes têxteis. Cinzas existem apenas como mocha e bronze. <strong>Zero azul corporativo, zero rosa infantilizado, zero turquesa de spa.</strong> Cada matiz foi escolhido para construir gravitas editorial sem cair em ostentação. A palette inteira é composta por neutros quentes, terracotas, âmbares e ouro precioso, organizados em famílias semânticas que conversam entre si com hierarquia clara. Clique em qualquer amostra para copiar o código hexadecimal correspondente.</p>
+
+    <div class="palette">
+      <div class="palette-row">
+        <div class="palette-name">Ivory & Sand <small>Backgrounds, surfaces, divisores</small></div>
+        <div class="swatches">
+          <div class="swatch light" style="background:#FAF6EE"><span class="swatch-name">ivory-50</span><span class="swatch-hex">#FAF6EE</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch light" style="background:#F4EDE2"><span class="swatch-name">ivory-100</span><span class="swatch-hex">#F4EDE2</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch light" style="background:#EAE0CF"><span class="swatch-name">sand-200</span><span class="swatch-hex">#EAE0CF</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch light" style="background:#C8B49A"><span class="swatch-name">mocha-300</span><span class="swatch-hex">#C8B49A</span><span class="swatch-copied">copiado</span></div>
+        </div>
+      </div>
+      <div class="palette-row">
+        <div class="palette-name">Bronze & Cocoa <small>Texto, foreground, fundo brand premium</small></div>
+        <div class="swatches">
+          <div class="swatch dark" style="background:#946640"><span class="swatch-name">bronze-400</span><span class="swatch-hex">#946640</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#7E5A40"><span class="swatch-name">bronze-500</span><span class="swatch-hex">#7E5A40</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#5A3E26"><span class="swatch-name">cocoa-700</span><span class="swatch-hex">#5A3E26</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#3F2A1B"><span class="swatch-name">cocoa-800</span><span class="swatch-hex">#3F2A1B</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#2B1810"><span class="swatch-name">cocoa-900</span><span class="swatch-hex">#2B1810</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#181210"><span class="swatch-name">ink-950</span><span class="swatch-hex">#181210</span><span class="swatch-copied">copiado</span></div>
+        </div>
+      </div>
+      <div class="palette-row">
+        <div class="palette-name">Terracota & Âmbar <small>Acentos, CTAs, calor expressivo</small></div>
+        <div class="swatches">
+          <div class="swatch dark" style="background:#E5B473;color:var(--cocoa-900)"><span class="swatch-name">amber-300</span><span class="swatch-hex">#E5B473</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#D89A4D;color:var(--cocoa-900)"><span class="swatch-name">amber-400</span><span class="swatch-hex">#D89A4D</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#C8843A"><span class="swatch-name">amber-500</span><span class="swatch-hex">#C8843A</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#B8612B"><span class="swatch-name">terracotta-600</span><span class="swatch-hex">#B8612B</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#A05525"><span class="swatch-name">terracotta-700</span><span class="swatch-hex">#A05525</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#843E1A"><span class="swatch-name">rust-800</span><span class="swatch-hex">#843E1A</span><span class="swatch-copied">copiado</span></div>
+        </div>
+      </div>
+      <div class="palette-row">
+        <div class="palette-name">Gold & Champagne <small>Acento precioso · uso raríssimo (até 1 elemento por tela)</small></div>
+        <div class="swatches">
+          <div class="swatch light" style="background:#F0D8A8"><span class="swatch-name">champagne-200</span><span class="swatch-hex">#F0D8A8</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch light" style="background:#E5C690"><span class="swatch-name">gold-300</span><span class="swatch-hex">#E5C690</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#D4A752;color:var(--cocoa-900)"><span class="swatch-name">gold-400</span><span class="swatch-hex">#D4A752</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#B8923A"><span class="swatch-name">gold-500</span><span class="swatch-hex">#B8923A</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#9A7A2C"><span class="swatch-name">gold-600</span><span class="swatch-hex">#9A7A2C</span><span class="swatch-copied">copiado</span></div>
+        </div>
+      </div>
+      <div class="palette-row">
+        <div class="palette-name">Status (Product layer) <small>Sucesso oliva (não verde-neon), warning, destrutivo, info raro</small></div>
+        <div class="swatches">
+          <div class="swatch dark" style="background:#6E8C5A"><span class="swatch-name">success-leaf</span><span class="swatch-hex">#6E8C5A</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#4F6840"><span class="swatch-name">success-deep</span><span class="swatch-hex">#4F6840</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#C8843A"><span class="swatch-name">warning</span><span class="swatch-hex">#C8843A</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#843E1A"><span class="swatch-name">destructive</span><span class="swatch-hex">#843E1A</span><span class="swatch-copied">copiado</span></div>
+          <div class="swatch dark" style="background:#5A6C7E"><span class="swatch-name">info</span><span class="swatch-hex">#5A6C7E</span><span class="swatch-copied">copiado</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPOGRAPHY -->
+<section id="typography">
+  <div class="shell">
+    <div class="eyebrow">04 · Sistema tipográfico</div>
+    <h2 class="title">Fraunces <em>encontra</em> Inter</h2>
+    <p class="lead lead-columns">Duas famílias tipográficas, jamais três. <strong>Fraunces</strong> entrega a voz editorial premium em display, headlines, hero e títulos de página. <strong>Inter</strong> oferece clareza funcional em corpo de texto, interface e números financeiros com numerais tabulares. A mistura é o personagem da marca: a camada de comunicação trabalha com aproximadamente 70 por cento serifa, a camada de produto opera com 85 por cento sem serifa. A mesma marca em dois ritmos, sempre coerentes.</p>
+
+    <div class="type-demo">
+      <div class="type-row">
+        <div class="type-meta">brand-hero<small>Fraunces 200 italic · clamp(64,10vw,144)</small></div>
+        <div class="type-sample t-hero">Sua clínica</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">brand-display-1<small>Fraunces 600 · clamp(48,6vw,96)</small></div>
+        <div class="type-sample t-display1">rendendo mais.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">brand-display-2<small>Fraunces 500 · 48px</small></div>
+        <div class="type-sample t-display2">A clínica vira financeiro sozinha.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">brand-headline<small>Fraunces 600 · 32px</small></div>
+        <div class="type-sample t-headline">Decisão com clareza, não achismo.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">brand-subhead<small>Fraunces 300 italic · 24px</small></div>
+        <div class="type-sample t-subhead">para donas de clínica de estética que cansaram da planilha</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">body-large<small>Inter 400 · 20px · 1.55</small></div>
+        <div class="type-sample t-body-large">Atendimento concluído gera comanda. Pagamento gera transação. Transação alimenta o DRE. Você decide.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">body<small>Inter 400 · 17px · 1.6</small></div>
+        <div class="type-sample t-body">Em uma linha contínua, do serviço à decisão. Sem lançamento manual, sem dupla entrada, sem domingo perdido com planilha.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">caption<small>Inter 500 · 14px</small></div>
+        <div class="type-sample t-caption">Mockup ilustrativo · dados reais variam por clínica</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">overline<small>Inter 600 · 12px · tracking 0.12em</small></div>
+        <div class="type-sample t-overline">RECEITA DO MÊS · COMPARATIVO ABRIL</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">ui-kpi-value<small>Inter 700 · 64px · tnum</small></div>
+        <div class="type-sample t-kpi" data-counter="12847.30" data-format="brl" data-duration="1400">R$ 12.847,30</div>
+      </div>
+    </div>
+
+    <div class="notice"><strong>Drama tipográfico em pesos extremos:</strong> a palavra estrutural fica fina (peso 200 ou 300), a palavra-foco recebe peso bold (600 ou 700) na mesma frase. Hierarquia construída por contraste, jamais por tamanho gritante.</div>
+
+    <div class="grid-2">
+      <div class="motion-demo">
+        <div class="demo-title">Drama tipográfico · exemplo aplicado</div>
+        <div style="font-family:var(--font-serif);font-size:64px;line-height:0.95;letter-spacing:-0.02em">
+          <span style="font-weight:200">BENEFÍCIOS</span><br/>
+          <span style="font-weight:700">DO BOTOX</span>
+        </div>
+      </div>
+      <div class="motion-demo">
+        <div class="demo-title">Itálico como sussurro</div>
+        <div style="font-family:var(--font-serif);font-size:36px;line-height:1.2;font-weight:400">
+          <em style="font-weight:200">Sua</em> clínica.<br/>
+          <em style="font-weight:200">Esse</em> mês.<br/>
+          <em style="font-weight:200">O</em> seu lucro real.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPONENTS -->
+<section id="components">
+  <div class="shell">
+    <div class="eyebrow">05 · Componentes (camada de produto)</div>
+    <h2 class="title">Como o app <em>se sente</em></h2>
+    <p class="lead">Componentes vivos do design system, calibrados para a operação diária da clínica. Hover, focus, press: cada estado respeita o sistema de movimento. Modo claro por princípio inegociável de UX, porque o público usuário abre o aplicativo entre atendimentos e precisa enxergar tudo no primeiro segundo.</p>
+
+    <div class="component-grid">
+
+      <div class="demo-card">
+        <div class="demo-title">Buttons</div>
+        <div class="btn-row">
+          <button class="btn btn-primary">Quero conhecer</button>
+          <button class="btn btn-secondary">Saber mais</button>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-ghost">Voltar</button>
+          <button class="btn btn-destructive">Excluir cliente</button>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-premium">⭐ Upgrade premium</button>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-title">Inputs</div>
+        <label class="label">Nome da paciente</label>
+        <input class="input" placeholder="Beatriz Aquino"/>
+        <label class="label" style="margin-top:16px">CPF</label>
+        <input class="input" placeholder="000.000.000-00"/>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-title">KPI Card</div>
+        <div class="kpi">
+          <span class="kpi-label">Receita do mês</span>
+          <span class="kpi-value" data-counter="12847.30" data-format="brl">R$ 12.847,30</span>
+          <span class="kpi-delta">R$ 2.300 a mais que abril</span>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-title">KPI Card · estado negativo</div>
+        <div class="kpi">
+          <span class="kpi-label">Margem do mês</span>
+          <span class="kpi-value" data-counter="28.4" data-format="percent">28,4%</span>
+          <span class="kpi-delta negative">8 pontos a menos que abril</span>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-title">Notificações nos quatro estados de voz</div>
+        <div class="toast">
+          <span class="toast-icon">✓</span>
+          <div><b>Comanda fechada.</b> R$ 850 entraram agora.</div>
+        </div>
+        <div class="toast warn">
+          <span class="toast-icon">!</span>
+          <div><b>3 contas venceram.</b> Total: R$ 1.245. Ver detalhes.</div>
+        </div>
+        <div class="toast error">
+          <span class="toast-icon">✕</span>
+          <div><b>Algo travou aqui.</b> Pode tentar de novo? Se persistir, código <code style="font-family:ui-monospace;font-size:11px">E_TIMEOUT_4471</code>.</div>
+        </div>
+      </div>
+
+      <div class="demo-card">
+        <div class="demo-title">Empty state</div>
+        <div class="empty">
+          <div class="empty-icon">＋</div>
+          <h4>Você ainda não tem pacientes.</h4>
+          <p>Cadastre quem atende você para ver histórico, ticket médio e LTV de cada cliente.</p>
+          <button class="btn btn-primary">Cadastrar primeira paciente</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MOTION -->
+<section id="motion">
+  <div class="shell">
+    <div class="eyebrow">06 · Sistema de movimento</div>
+    <h2 class="title">Calmaria com <em>gravitas</em></h2>
+    <p class="lead lead-columns">Duração padrão de 320 milissegundos com curva ease-out-soft. Hover sempre aquece a cor, nunca esfria. KPI revela em três atos sucessivos: número primeiro, rótulo em seguida, comparativo no fechamento. Drama em apenas 10 por cento das interações, e somente quando ganho pela ação. Zero parallax. Zero scroll forçado. Movimento construído para respeitar o tempo do público usuário, não para impressionar plateia.</p>
+
+    <div class="grid-2">
+
+      <div class="motion-demo">
+        <div class="demo-title">Hover · o CTA aquece</div>
+        <p class="muted" style="font-size:14px;margin-bottom:24px">Passe o mouse e observe: o tom terracota 600 aquece para terracota 700, sem brilho artificial, sem sombra agressiva.</p>
+        <button class="demo-button-large">Quero conhecer</button>
+      </div>
+
+      <div class="motion-demo" id="kpi-demo-card">
+        <div class="demo-title">KPI Reveal · narrativa em três atos</div>
+        <p class="muted" style="font-size:14px;margin-bottom:24px">A sequência se reproduz em loop sutil enquanto está em viewport: o número entra primeiro, o rótulo se acomoda em seguida, o comparativo fecha o sentido. Stagger de 80 milissegundos entre atos. Passe o mouse para pausar a demonstração.</p>
+        <div class="reveal-stage" id="kpi-stage">
+          <span class="value t-kpi" style="font-size:48px">R$ 12.847,30</span>
+          <span class="label kpi-label">RECEITA DO MÊS</span>
+          <span class="delta kpi-delta">R$ 2.300 a mais que abril</span>
+        </div>
+        <div class="loop-indicator" id="kpi-loop-indicator" aria-hidden="true"></div>
+      </div>
+
+      <div class="motion-demo">
+        <div class="demo-title">Card hover · a sombra respira</div>
+        <p class="muted" style="font-size:14px;margin-bottom:24px">Passe o mouse sobre o cartão. A sombra cresce com calor, a peça sobe um pixel, a sensação é tátil. Sem floreio, sem 3D, sem espetáculo.</p>
+        <div class="kpi" style="cursor:pointer">
+          <span class="kpi-label">Comandas em aberto</span>
+          <span class="kpi-value" data-counter="7" data-format="int">7</span>
+          <span class="kpi-delta">Total: R$ 4.230 a receber</span>
+        </div>
+      </div>
+
+      <div class="motion-demo">
+        <div class="demo-title">Tokens canônicos</div>
+        <dl class="tokens-table">
+          <div class="tokens-row">
+            <dt>Duração</dt>
+            <dd>100 / 200 / <b>320</b> / 480 / 720 <span class="unit">ms</span></dd>
+          </div>
+          <div class="tokens-row">
+            <dt>Easing padrão</dt>
+            <dd><span class="bezier">cubic-bezier(0.22, 1, 0.36, 1)</span></dd>
+          </div>
+          <div class="tokens-row">
+            <dt>Distância</dt>
+            <dd>4 / <b>8</b> / 16 / 32 <span class="unit">px</span></dd>
+          </div>
+          <div class="tokens-row">
+            <dt>Stagger</dt>
+            <dd>40 / <b>80</b> / 120 / 160 <span class="unit">ms</span></dd>
+          </div>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- COMBINATIONS -->
+<section id="combos">
+  <div class="shell">
+    <div class="eyebrow">07 · Combinações canônicas</div>
+    <h2 class="title">Cinco modos de <em>aplicar</em> a marca</h2>
+    <p class="lead lead-columns">Cada combinação cromática tem ocasião própria, escolhida com intenção. Misturar sem propósito polui a hierarquia e dilui o conceito premium. Estas cinco aplicações cobrem 100 por cento dos cenários previstos: comunicação institucional, vendas, produto operacional, drama editorial e administração interna. Cada combinação tem o seu papel definido e não compete com as outras pela atenção do leitor.</p>
+
+    <div class="combo-grid">
+
+      <div class="combo combo-A">
+        <div class="combo-tag">Combinação A · Editorial light</div>
+        <div class="combo-headline editorial" style="color:var(--cocoa-900)">Sua clínica<br/>rendendo mais.</div>
+        <div class="combo-sub">para empresárias que cansaram da maratona de planilha</div>
+        <div class="combo-cta"><button class="btn btn-primary">Quero conhecer</button></div>
+        <div class="muted" style="margin-top:32px;font-size:12px">Hero institucional, capa de proposta clara, landing page de captura.</div>
+      </div>
+
+      <div class="combo combo-B">
+        <div class="combo-tag">Combinação B · Editorial dark premium</div>
+        <div class="combo-headline editorial">A importância<br/>do <em style="font-weight:300">colágeno.</em></div>
+        <div class="combo-sub">drama editorial · ouro como pingo precioso</div>
+        <div style="margin-top:32px;display:inline-block;padding:8px 16px;border:1px solid var(--gold-500);color:var(--gold-500);border-radius:4px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600">@KEYRA · BLOG</div>
+      </div>
+
+      <div class="combo combo-C">
+        <div class="combo-tag">Combinação C · Calor saturado</div>
+        <div class="combo-headline editorial">DICAS PARA<br/>VOCÊ <strong>CUIDAR</strong><br/>DA SUA PELE</div>
+        <div class="combo-sub">post de campanha pronto para o feed Instagram</div>
+      </div>
+
+      <div class="combo combo-D">
+        <div class="combo-tag">Combinação D · Produto UI light</div>
+        <div class="kpi" style="margin-bottom:16px">
+          <span class="kpi-label">Receita do mês</span>
+          <span class="kpi-value" data-counter="12847.30" data-format="brl">R$ 12.847,30</span>
+          <span class="kpi-delta">R$ 2.300 a mais que abril</span>
+        </div>
+        <div class="muted" style="font-size:12px">Estado padrão do app: ivory 50, cocoa 900, número como protagonista absoluto.</div>
+      </div>
+
+      <div class="combo combo-E">
+        <div class="combo-tag">Combinação E · Mocha quiet</div>
+        <div class="combo-headline editorial" style="font-size:24px;color:var(--cocoa-800)">Configurações da clínica</div>
+        <div class="combo-sub" style="font-size:15px">áreas administrativas, perfil, ajustes finos</div>
+        <div style="margin-top:24px">
+          <label class="label">CNPJ da clínica</label>
+          <input class="input" value="12.345.678/0001-90" readonly/>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MOCKUPS -->
+<section id="mockups">
+  <div class="shell">
+    <div class="eyebrow">08 · Aplicações de campanha</div>
+    <h2 class="title">Posts <em>no espírito</em> das suas referências</h2>
+    <p class="lead lead-columns">Seis aplicações de campanha construídas inteiramente em CSS, modeladas a partir das peças que inspiraram a direção visual: Botox, Depilação, Versão, Pele, Colágeno, Social Media. Cada peça obedece à mesma gramática editorial: display serifado em escala dramática, cor saturada quente como protagonista, assinatura social discreta no rodapé. A marca trabalha em uma única chave, jamais improvisa, jamais foge à coerência estrutural definida.</p>
+
+    <div class="mockup-grid">
+
+      <!-- Mockup 1 — terracotta · "Dicas para você cuidar da sua pele" -->
+      <div class="mockup mockup-1">
+        <div class="mock-headline">
+          <span class="mock-line thin shrink-md">DICAS PARA</span>
+          <span class="mock-line thin">VOCÊ <strong style="font-weight:700">CUIDAR</strong></span>
+          <span class="mock-line thin shrink-sm">DA SUA PELE</span>
+        </div>
+        <div class="mock-handle"><div class="mock-avatar"></div><div>@SUACLINICA</div></div>
+      </div>
+
+      <!-- Mockup 2 — branco · "Benefícios do Botox" (drama editorial) -->
+      <div class="mockup mockup-2">
+        <div class="mock-headline">
+          <span class="mock-line thin shrink-sm">BENEFÍCIOS</span>
+          <span class="mock-line bold">DO BOTOX</span>
+        </div>
+        <div class="mock-handle"><div class="mock-avatar"></div><div>@SUACLINICA</div></div>
+      </div>
+
+      <!-- Mockup 3 — gradient âmbar · "Depilação a Laser" -->
+      <div class="mockup mockup-3">
+        <div class="mock-headline">
+          <span class="mock-line thin shrink-sm">DEPILAÇÃO</span>
+          <span class="mock-line bold grow-sm">A LASER</span>
+        </div>
+        <div class="mock-handle"><div class="mock-avatar"></div><div>@SUACLINICA</div></div>
+      </div>
+
+      <!-- Mockup 4 — gradient gold · "Seja sua melhor versão" -->
+      <div class="mockup mockup-4">
+        <div class="mock-headline">
+          <span class="mock-line thin shrink-md">SEJA SUA MELHOR</span>
+          <span class="mock-line bold grow-sm">VERSÃO</span>
+        </div>
+        <div class="mock-handle"><div class="mock-avatar"></div><div>@SUACLINICA</div></div>
+      </div>
+
+      <!-- Mockup 5 — cocoa · "Social Media estética" -->
+      <div class="mockup mockup-5">
+        <div class="mock-headline">
+          <span class="mock-line thin shrink-md" style="color:var(--champagne-200)">SOCIAL</span>
+          <span class="mock-line bold">MEDIA</span>
+          <span class="mock-line italic shrink-sm" style="color:var(--gold-400);text-transform:lowercase">estética</span>
+        </div>
+        <div class="mock-handle" style="color:var(--gold-300)"><div class="mock-avatar" style="background:var(--gold-500)"></div><div>@KEYRA</div></div>
+      </div>
+
+      <!-- Mockup 6 — ink-950 · "A importância do colágeno" -->
+      <div class="mockup mockup-6">
+        <div class="mock-headline">
+          <span class="mock-line shrink-sm">A IMPORTÂNCIA</span>
+          <span class="mock-line">DO COLÁGENO</span>
+        </div>
+        <div class="mock-handle" style="color:var(--bronze-400)"><div class="mock-avatar" style="background:var(--bronze-500)"></div><div>@SUACLINICA</div></div>
+      </div>
+
+    </div>
+
+    <div class="notice" style="margin-top:48px"><strong>Estas peças são exemplos visuais ilustrativos.</strong> A produção real de cada campanha utiliza fotografia editorial autêntica e animação programática, partindo dos quatro templates canônicos do sistema de movimento e respeitando integralmente as proporções, tokens e voz aqui definidos.</div>
+  </div>
+</section>
+
+<!-- ANTI -->
+<section id="anti">
+  <div class="shell">
+    <div class="eyebrow">09 · Anti-padrões estratégicos</div>
+    <h2 class="title">O que <em>não</em> é KEYRA</h2>
+    <p class="lead lead-columns">Tão decisivo quanto declarar o que a marca é, é declarar o que ela recusa ser. Cada bloco abaixo representa uma direção visual que destrói o conceito premium se aplicada por engano. Estes seis anti-padrões precisam estar em vigilância permanente em qualquer execução, briefing externo ou colaboração com agências, fotógrafos, agências de mídia ou parceiros editoriais.</p>
+
+    <div class="anti-grid">
+      <div class="anti-card" style="background:#0F62FE;color:#fff;border-color:#0F62FE">
+        <div class="anti-bad">Tech corporativo (azul saturado)</div>
+        <div class="anti-why" style="color:#cce">Frio, masculino, padronizado. Estética errada para o público de clínicas femininas premium.</div>
+      </div>
+      <div class="anti-card" style="background:#FFE4EC;color:#993355;border-color:#993355">
+        <div class="anti-bad">Spa infantilizado (rosa-bebê e lavanda)</div>
+        <div class="anti-why">Diminutivo. KEYRA é negócio sério construído por empresárias adultas, não centro de relaxamento.</div>
+      </div>
+      <div class="anti-card" style="background:#FF1493;color:#fff;border-color:#FF1493">
+        <div class="anti-bad">Beauty hiperfeminino (rosa choque)</div>
+        <div class="anti-why" style="color:#fce">Geração errada. O público alvo são profissionais entre 30 e 45 anos, com poder de decisão e gosto refinado.</div>
+      </div>
+      <div class="anti-card" style="background:#1E3A5F;color:#94A3B8;border-color:#1E3A5F">
+        <div class="anti-bad">ERP institucional (azul e cinza)</div>
+        <div class="anti-why" style="color:#94A3B8">Anti-classe. Sai como banco. O premium da KEYRA é editorial, não institucional.</div>
+      </div>
+      <div class="anti-card" style="background:#A8B89C;color:#3F4F30;border-color:#3F4F30">
+        <div class="anti-bad">Skincare millennial (verde sálvia)</div>
+        <div class="anti-why">Tendência em fim de ciclo, sem distintividade. A KEYRA constrói atemporalidade, não captura modas.</div>
+      </div>
+      <div class="anti-card" style="background:#000;color:#FFD700;border-color:#FFD700">
+        <div class="anti-bad">Luxo ostentação (preto e ouro tridimensional)</div>
+        <div class="anti-why" style="color:#FFD700">Vulgar. A marca opera em quiet luxury, jamais em estética de torre dourada.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALIDATION -->
+<section id="validation">
+  <div class="shell">
+    <div class="eyebrow">10 · Validação estratégica</div>
+    <h2 class="title">Antes de você dizer <em>sim</em></h2>
+    <p class="lead lead-columns">A identidade só é considerada aprovada quando cada bloco abaixo passar no seu olhar crítico. Marque mentalmente, anote ressalvas, peça refinamentos onde sentir necessidade. Esta página existe para que a aprovação seja consciente, deliberada, não automática. Premium não é o que parece, é o que resiste à inspeção próxima.</p>
+
+    <div class="grid-2">
+      <div class="motion-demo">
+        <div class="demo-title">Direção visual</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px">
+          <li>☐ A sensação geral entrega editorial luxury, sem cair em estética tech ou spa.</li>
+          <li>☐ A palette quente convence à primeira vista, zero azul, zero rosa, zero turquesa.</li>
+          <li>☐ O ouro aparece como acento precioso, jamais como cor de fundo.</li>
+          <li>☐ Os pretos são cocoa profundos, jamais slate frio.</li>
+          <li>☐ Os brancos são creme têxtil, jamais branco gelo de hospital.</li>
+        </ul>
+      </div>
+      <div class="motion-demo">
+        <div class="demo-title">Tipografia</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px">
+          <li>☐ Fraunces transmite o editorial luxury pretendido.</li>
+          <li>☐ Inter cumpre clareza funcional no app financeiro.</li>
+          <li>☐ O drama tipográfico (peso 200 com peso 700 na mesma frase) ressoa.</li>
+          <li>☐ O itálico como sussurro carrega o sentido pretendido.</li>
+        </ul>
+      </div>
+      <div class="motion-demo">
+        <div class="demo-title">Componentes e voz</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px">
+          <li>☐ O KPI Card respeita o princípio "número absoluto como protagonista".</li>
+          <li>☐ O comparativo textual ("R$ 2.300 a mais que abril") soa como mentora.</li>
+          <li>☐ A notificação cúmplice ("Comanda fechada. R$ 850 entraram") tem o tom certo.</li>
+          <li>☐ Os botões CTA em terracota convencem por elegância, sem precisar de azul.</li>
+        </ul>
+      </div>
+      <div class="motion-demo">
+        <div class="demo-title">Concepts de logo</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14px">
+          <li>☐ O concept com pingo dourado tem direção que vale aprofundar.</li>
+          <li>☐ O wordmark com sublinha dourada é alternativa estrategicamente válida.</li>
+          <li>☐ O monograma "K" funciona em favicon e ícone de aplicativo.</li>
+          <li>☐ A versão escura com champagne ressoa para uso premium.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong class="editorial">KEYRA</strong> · Brand Identity destilada em 7 de maio de 2026 a partir de 12 referências visuais entregues pela idealizadora.</p>
+  <p style="margin-top:8px">Documentação completa em <a href="../00-INDEX.md">docs/brand/</a> · Tokens canônicos em <a href="tokens.json">tokens.json</a> · Apresentação narrativa em <a href="BRANDBOOK.md">BRANDBOOK.md</a> · Sistema técnico em <a href="DESIGN.md">DESIGN.md</a>.</p>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ─────────────────────────────────────────────────────────
+     1. Scroll progress bar (gold-500 thin no topo)
+     ───────────────────────────────────────────────────────── */
+  const progress = document.createElement('div');
+  progress.className = 'scroll-progress';
+  document.body.appendChild(progress);
+
+  let raf = null;
+  const updateProgress = () => {
+    const scrolled = window.scrollY;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (scrolled / max) * 100 : 0;
+    progress.style.width = pct + '%';
+    raf = null;
+  };
+  window.addEventListener('scroll', () => {
+    if (!raf) raf = requestAnimationFrame(updateProgress);
+  }, { passive: true });
+  updateProgress();
+
+  /* ─────────────────────────────────────────────────────────
+     2. Reveal-on-scroll (IntersectionObserver)
+        Aplica fade-up automaticamente em pontos-chave de cada section.
+        Princípio: calmaria sem jerk, threshold 0.15.
+     ───────────────────────────────────────────────────────── */
+  if (!reduced) {
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+    // Auto-aplica reveal a elementos-chave (sem editar HTML)
+    const revealSelectors = [
+      '.eyebrow', '.title', '.lead', '.subtitle',
+      '.notice', '.type-demo',
+      '.hero-tag' /* hero já tem animação própria */
+    ];
+    document.querySelectorAll(revealSelectors.join(',')).forEach(el => {
+      // Pula elementos do hero (já animados via CSS)
+      if (el.closest('.hero')) return;
+      el.setAttribute('data-reveal', '');
+      revealObs.observe(el);
+    });
+
+    /* ─── Stagger automático em grids ───
+       Cada filho recebe --stagger-i para escalonar o transition-delay. */
+    const staggerSelectors = [
+      { sel: '.swatches', delay: 60 },
+      { sel: '.logo-grid', delay: 90 },
+      { sel: '.component-grid', delay: 100 },
+      { sel: '.combo-grid', delay: 120 },
+      { sel: '.mockup-grid', delay: 100 },
+      { sel: '.anti-grid', delay: 80 },
+      { sel: '.btn-row', delay: 40 },
+    ];
+    staggerSelectors.forEach(({ sel, delay }) => {
+      document.querySelectorAll(sel).forEach(grid => {
+        grid.classList.add('stagger-children');
+        Array.from(grid.children).forEach((child, i) => {
+          child.style.setProperty('--stagger-i', i);
+          child.style.transitionDelay = (i * delay) + 'ms';
+        });
+        revealObs.observe(grid);
+      });
+    });
+
+    /* ─── Linha gold sob title da section ao entrar viewport ─── */
+    document.querySelectorAll('section').forEach(s => {
+      revealObs.observe(s);
+    });
+  } else {
+    // Reduced motion: revela tudo imediatamente
+    document.querySelectorAll('[data-reveal],.stagger-children').forEach(el => el.classList.add('in'));
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     3. TOC active highlight conforme rolagem
+     ───────────────────────────────────────────────────────── */
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = Array.from(document.querySelectorAll('.toc a[href^="#"]'));
+  const linkById = new Map(tocLinks.map(a => [a.getAttribute('href').slice(1), a]));
+
+  const tocObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const active = linkById.get(id);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0, rootMargin: '-25% 0px -65% 0px' });
+  sections.forEach(s => tocObs.observe(s));
+
+  /* ─────────────────────────────────────────────────────────
+     4. Smooth scroll com offset do TOC
+     ───────────────────────────────────────────────────────── */
+  tocLinks.forEach(a => {
+    a.addEventListener('click', (ev) => {
+      const id = a.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if (!target) return;
+      ev.preventDefault();
+      const tocHeight = document.querySelector('.toc').offsetHeight;
+      const top = target.getBoundingClientRect().top + window.scrollY - tocHeight - 16;
+      window.scrollTo({
+        top,
+        behavior: reduced ? 'auto' : 'smooth'
+      });
+    });
+  });
+
+  /* ─────────────────────────────────────────────────────────
+     5. KPI Counter (anima de 0 ao valor real ao entrar viewport)
+     ───────────────────────────────────────────────────────── */
+  const formatBRL = (v) => new Intl.NumberFormat('pt-BR', {
+    style: 'currency', currency: 'BRL'
+  }).format(v);
+  const formatPercent = (v) => v.toFixed(1).replace('.', ',') + '%';
+  const formatInt = (v) => Math.round(v).toString();
+
+  const counterObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = parseFloat(el.dataset.counter);
+      const fmt = el.dataset.format || 'int';
+      const formatter = fmt === 'brl' ? formatBRL : fmt === 'percent' ? formatPercent : formatInt;
+      const duration = parseInt(el.dataset.duration) || 1200;
+
+      if (reduced) {
+        el.textContent = formatter(target);
+        counterObs.unobserve(el);
+        return;
+      }
+
+      let start = null;
+      const animate = (ts) => {
+        if (!start) start = ts;
+        const t = Math.min((ts - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 4); // out-quart ≈ out-soft do motion-system
+        el.textContent = formatter(target * eased);
+        if (t < 1) requestAnimationFrame(animate);
+        else el.textContent = formatter(target);
+      };
+      requestAnimationFrame(animate);
+      counterObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-counter]').forEach(el => counterObs.observe(el));
+
+  /* ─────────────────────────────────────────────────────────
+     6. Copy hex no swatch click + microfeedback haptic-like
+     ───────────────────────────────────────────────────────── */
+  document.querySelectorAll('.swatch').forEach(s => {
+    s.addEventListener('click', () => {
+      const hex = s.querySelector('.swatch-hex').textContent;
+      navigator.clipboard?.writeText(hex);
+      s.classList.add('copied');
+      setTimeout(() => s.classList.remove('copied'), 900);
+    });
+    s.setAttribute('title', 'Clique para copiar');
+    s.setAttribute('role', 'button');
+    s.setAttribute('tabindex', '0');
+    s.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); s.click(); }
+    });
+  });
+
+  /* ─────────────────────────────────────────────────────────
+     7. KPI reveal · auto-loop animado com pause on hover
+        Toca a sequência a cada 4.5s enquanto o card está visível.
+        Pausa quando o mouse entra no card (princípio: respeito ao foco).
+     ───────────────────────────────────────────────────────── */
+  const stage = document.getElementById('kpi-stage');
+  const loopIndicator = document.getElementById('kpi-loop-indicator');
+  const demoCard = document.getElementById('kpi-demo-card');
+
+  if (stage && demoCard) {
+    let loopId = null;
+    let isVisible = false;
+    let isPaused = false;
+
+    const playOnce = () => {
+      stage.classList.remove('play');
+      void stage.offsetWidth;
+      stage.classList.add('play');
+    };
+
+    const startLoop = () => {
+      if (reduced || loopId || isPaused || !isVisible) return;
+      playOnce();
+      loopIndicator?.classList.add('running');
+      loopIndicator?.classList.remove('paused');
+      loopId = setInterval(() => {
+        if (!isPaused) playOnce();
+      }, 4500);
+    };
+
+    const stopLoop = () => {
+      if (loopId) {
+        clearInterval(loopId);
+        loopId = null;
+      }
+      loopIndicator?.classList.remove('running');
+    };
+
+    const pauseLoop = () => {
+      isPaused = true;
+      stopLoop();
+      loopIndicator?.classList.add('paused');
+    };
+
+    const resumeLoop = () => {
+      isPaused = false;
+      loopIndicator?.classList.remove('paused');
+      if (isVisible) startLoop();
+    };
+
+    // Pause on hover, resume on leave
+    demoCard.addEventListener('mouseenter', pauseLoop);
+    demoCard.addEventListener('mouseleave', resumeLoop);
+
+    // Start when entering viewport, stop when leaving
+    const stageObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        isVisible = e.isIntersecting;
+        if (isVisible) {
+          setTimeout(() => {
+            if (!isPaused) startLoop();
+          }, 300);
+        } else {
+          stopLoop();
+        }
+      });
+    }, { threshold: 0.5 });
+    stageObs.observe(stage);
+
+    // Reduced motion fallback: mostra estado final permanentemente
+    if (reduced) stage.classList.add('play');
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     8. Logo cards: ativa breath nos primeiros 2 (1ª impressão)
+     ───────────────────────────────────────────────────────── */
+  const logoCards = document.querySelectorAll('.logo-card');
+  logoCards.forEach((card, i) => {
+    if (i < 2 && !reduced) card.setAttribute('data-breath', '');
+  });
+
+  /* ─────────────────────────────────────────────────────────
+     9. Section in-view (linha gold cresce do topo da section)
+     ───────────────────────────────────────────────────────── */
+  if (!reduced) {
+    const sectionObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('section').forEach(s => sectionObs.observe(s));
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     10. Smooth fontes: aguarda Fraunces+Inter carregarem antes
+         de animar (evita FOUT visualmente quebrado)
+     ───────────────────────────────────────────────────────── */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      document.documentElement.classList.add('fonts-ready');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

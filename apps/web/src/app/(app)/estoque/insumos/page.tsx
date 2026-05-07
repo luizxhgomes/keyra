@@ -154,7 +154,7 @@ export default async function InsumosPage({ searchParams }: PageProps) {
                       {lowStock ? (
                         <Badge
                           variant="outline"
-                          className="border-amber-500 text-amber-700"
+                          className="border-amber-500 text-cocoa-800"
                         >
                           <AlertTriangle className="mr-1 h-3 w-3" /> Recompra
                         </Badge>

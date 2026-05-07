@@ -51,7 +51,7 @@ export default async function MaisPage() {
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="text-display-hero text-foreground">Mais</h1>
+        <h1 className="font-serif text-display-hero text-foreground">Mais</h1>
         <p className="text-sm text-muted-foreground">
           Tudo que existe no KEYRA, num só lugar.
         </p>

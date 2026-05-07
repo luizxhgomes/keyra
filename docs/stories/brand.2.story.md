@@ -1,8 +1,24 @@
-# Story brand.2: Components/keyra migrados (KPI, AlertCard, EmptyState, Skeleton, ComparativoTexto, StatusBadge, ErrorMessage)
+# Story brand.2: Components/keyra migrados (KPI, AlertCard, EmptyState, ComparativoTexto, StatusBadge)
 
 ## Status
 
-Draft
+Done · PR #13 squash mergeado em main (`d16f77b`) em 2026-05-07.
+
+## Implementação executada (resumo)
+
+5 componentes migrados para tokens canônicos KEYRA + container queries + Fraunces editorial:
+
+- **KPICard:** container queries `clamp(28px, 13cqi, 44px)` + warm shadow + motion tokens (`duration-base`, `ease-out-soft`)
+- **ComparativoTexto:** direção em Fraunces font-light italic (sussurro voz mentora)
+- **EmptyState:** título em Fraunces text-xl medium (editorial)
+- **AlertCard:** padrão brandbook border-left 4px semântica + bg-ivory-100 (substitui bg-amber-50/red-50 Tailwind defaults frios)
+- **StatusBadge:** 24 cores hardcoded migradas (`bg-blue-100/text-blue-900` → `bg-amber-300/30 + text-cocoa-800`; `bg-secondary-100/text-secondary-700` → `bg-success-leaf/20 + text-success-deep`)
+
+**Regression fix incluído:** escalas `primary.{50..900}` e `secondary.{50..900}` re-adicionadas no Tailwind config mapeadas para palette KEYRA (preserva backward compat com 24 referências em button.tsx, LegalDocument, page.tsx).
+
+**Validação técnica:** typecheck verde · lint zero warnings · build verde (38 rotas) · RSC Boundary Audit PASS · Cross-tenant isolation PASS · Vercel deploy SUCCESS.
+
+---
 
 ## Story
 

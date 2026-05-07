@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { PasswordStrengthMeter } from '@/components/auth/PasswordStrengthMeter';
 import { TurnstileWidget } from '@/components/auth/TurnstileWidget';
 import { signUpAction } from '@/app/(auth)/cadastro/actions';
 
@@ -81,6 +82,7 @@ export function SignUpCard() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -95,6 +97,9 @@ export function SignUpCard() {
       acceptedTerms: false as never,
     },
   });
+
+  // Story auth.9 — sincroniza PasswordStrengthMeter em tempo real
+  const watchedPassword = useWatch({ control, name: 'password' }) ?? '';
 
   function onSubmit(values: FormValues) {
     if (!turnstileToken) {
@@ -237,6 +242,7 @@ export function SignUpCard() {
                 {errors.password.message}
               </p>
             )}
+            <PasswordStrengthMeter password={watchedPassword} />
           </div>
 
           <div>

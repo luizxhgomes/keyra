@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { JourneyProgress } from '@/components/auth/JourneyProgress';
+import { PasswordStrengthMeter } from '@/components/auth/PasswordStrengthMeter';
 import { postKeyraAuthEvent } from '@/lib/auth/broadcast';
 import { setNewPasswordAction } from '@/app/(auth)/redefinir-senha/actions';
 
@@ -46,11 +48,15 @@ export function NewPasswordCard() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { password: '', confirmPassword: '' },
   });
+
+  // Story auth.9 — sincroniza PasswordStrengthMeter em tempo real
+  const watchedPassword = useWatch({ control, name: 'password' }) ?? '';
 
   function onSubmit(values: FormValues) {
     startTransition(async () => {
@@ -60,7 +66,9 @@ export function NewPasswordCard() {
         // o reset acabou de ser concluído ANTES de navegar. Fire-and-forget;
         // se BroadcastChannel não existir (browser muito antigo), no-op.
         postKeyraAuthEvent({ type: 'password_reset_completed' });
-        router.push('/login?password_changed=1');
+        // Story auth.9 — fechamento da jornada com tela dedicada de sucesso
+        // antes de cair no login. Mais clarity emocional pro usuário.
+        router.push('/redefinir-senha/sucesso');
       } else {
         toast.error('Não foi possível atualizar', { description: result.error });
       }
@@ -88,6 +96,7 @@ export function NewPasswordCard() {
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-3" noValidate>
+          <JourneyProgress step={3} />
           <p className="mb-2 text-center text-sm leading-relaxed text-muted-foreground">
             Use no mínimo 10 caracteres com letras maiúsculas, minúsculas e números.
           </p>
@@ -117,6 +126,7 @@ export function NewPasswordCard() {
                 {errors.password.message}
               </p>
             )}
+            <PasswordStrengthMeter password={watchedPassword} />
           </div>
 
           <div>

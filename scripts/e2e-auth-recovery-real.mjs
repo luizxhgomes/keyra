@@ -271,12 +271,22 @@ try {
     `expected ${userId}, got ${updateBody.id}`,
   );
 
-  // 7) Admin signOut(scope=global) — exerce o R11
+  // 7) signOut(scope=global) — equivalente ao que setNewPasswordAction faz em prod.
+  // Em prod a action chama `supabase.auth.signOut({scope:'global'})` no cliente que
+  // tem a sessão recovery atual — não usa Admin signOut.
   console.log('');
-  console.log('🚪 ETAPA 5: Admin signOut(scope=global) — R11');
+  console.log('🚪 ETAPA 5: signOut(scope=global) no cliente com sessão recovery — R11');
 
-  const { error: signOutError } = await adminClient.auth.admin.signOut(userId, 'global');
-  assert('signOut admin sem erro', !signOutError, signOutError?.message);
+  // Cria cliente com a sessão recovery que extraímos do callback
+  const sessionClient = createClient(supabaseUrl, anonKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  // Seta a sessão manualmente (equivalente ao que createServerClient faz via cookies)
+  const refreshToken = sessionData.refresh_token || '';
+  await sessionClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+
+  const { error: signOutError } = await sessionClient.auth.signOut({ scope: 'global' });
+  assert('signOut(scope=global) sem erro', !signOutError, signOutError?.message);
 
   // Aguarda propagação interna
   await new Promise((r) => setTimeout(r, 1500));

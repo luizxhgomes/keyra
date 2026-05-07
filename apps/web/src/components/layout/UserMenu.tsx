@@ -47,9 +47,11 @@ export function UserMenu({ email, displayName }: { email: string; displayName: s
 
   return (
     <DropdownMenu>
+      {/* Story auth.9 — avatar usa primary (mesma cor da bolha "K" auth) em
+          vez de tonalidade clara: identidade visual coesa entre login e app. */}
       <DropdownMenuTrigger
         className={cn(
-          'inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold uppercase text-primary-700 hover:bg-primary-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase text-primary-foreground shadow-sm transition-all duration-200 hover:scale-110 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         )}
         aria-label={`Menu de ${email}`}
         disabled={pending}

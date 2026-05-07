@@ -117,18 +117,27 @@ export function Sidebar() {
         collapsed ? 'w-16' : 'w-60',
       )}
     >
+      {/* Story auth.9 — bolha "K" coerente com tela auth (light KEYRA) */}
       <div
         className={cn(
           'flex h-16 items-center border-b border-border',
-          collapsed ? 'justify-center px-2' : 'px-6',
+          collapsed ? 'justify-center px-2' : 'gap-3 px-5',
         )}
       >
         <Link
           href="/dashboard"
-          className="text-xl font-bold tracking-tight text-primary"
+          className="flex items-center gap-3"
           title={collapsed ? 'KEYRA' : undefined}
+          aria-label="KEYRA — ir para Dashboard"
         >
-          {collapsed ? 'K' : 'KEYRA'}
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-200 hover:scale-110">
+            <span className="text-sm font-bold tracking-tight">K</span>
+          </span>
+          {!collapsed && (
+            <span className="text-base font-bold uppercase tracking-[0.18em] text-foreground">
+              KEYRA
+            </span>
+          )}
         </Link>
       </div>
 

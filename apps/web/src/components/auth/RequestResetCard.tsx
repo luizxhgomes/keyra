@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { JourneyProgress } from '@/components/auth/JourneyProgress';
 import { TurnstileWidget } from '@/components/auth/TurnstileWidget';
 import { subscribeKeyraAuthEvents } from '@/lib/auth/broadcast';
 import { requestPasswordResetAction } from '@/app/(auth)/esqueci-senha/actions';
@@ -92,6 +93,7 @@ export function RequestResetCard() {
 
         {completedElsewhere ? (
           <div className="flex w-full flex-col items-center text-center">
+            <JourneyProgress step={4} />
             <p className="mb-2 text-sm font-semibold text-foreground">
               Senha redefinida em outra aba
             </p>
@@ -108,6 +110,7 @@ export function RequestResetCard() {
           </div>
         ) : submitted ? (
           <div className="flex w-full flex-col items-center text-center">
+            <JourneyProgress step={2} />
             <p className="mb-2 text-sm font-semibold text-foreground">Pedido recebido</p>
             <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
               Se este e-mail estiver cadastrado, enviamos um link de redefinição. Verifique sua
@@ -122,6 +125,7 @@ export function RequestResetCard() {
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="flex w-full flex-col gap-3" noValidate>
+            <JourneyProgress step={1} />
             <p className="mb-2 text-center text-sm leading-relaxed text-muted-foreground">
               Digite seu e-mail e enviaremos um link para você escolher uma senha nova.
             </p>

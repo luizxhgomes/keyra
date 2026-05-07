@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Fraunces, Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 import { cn } from '@/lib/utils';
@@ -7,13 +7,22 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 
 /**
- * Inter Variable (Story 6.1) — sem `weight` explícito, o Next carrega a versão
- * variable que cobre 100–900 num único arquivo (axis `wght`). Avaliado adicionar
- * `axes: ['opsz']` para optical sizing, mas o tradeoff de bundle (+124KB de
- * subsets) não compensou o ganho perceptual em escalas KEYRA (display-hero
- * 56px → label 12px). Inter wght variable cobre toda a hierarquia 200–600
- * sem custo extra.
+ * Tipografia dupla KEYRA (Brand Identity, Epic BRAND-INTEGRATION story brand.1).
+ *
+ * - Fraunces: serifa editorial (Display, headlines, hero, títulos de página).
+ *   Carregada com axis opsz e SOFT para optical sizing premium.
+ * - Inter: sans funcional (body, UI, KPIs com numerais tabulares).
+ *   Variable cobre 200–700 num único arquivo.
+ *
+ * Referência canônica: docs/brand/03-identity/typography-system.md
  */
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+  axes: ['opsz', 'SOFT'],
+});
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
@@ -48,8 +57,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FAF8F5' },
-    { media: '(prefers-color-scheme: dark)', color: '#1C1A17' },
+    { media: '(prefers-color-scheme: light)', color: '#FAF6EE' },
+    { media: '(prefers-color-scheme: dark)', color: '#181210' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -62,7 +71,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={cn(inter.variable, 'min-h-screen bg-background font-sans text-foreground')}>
+      <body className={cn(fraunces.variable, inter.variable, 'min-h-screen bg-background font-sans text-foreground')}>
         {children}
         <Toaster richColors position="bottom-right" />
       </body>

@@ -76,19 +76,19 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-warm-xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm-md transition-transform duration-300 ease-out hover:scale-110">
           <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
-        <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-primary">KEYRA</h2>
+        <h2 className="mb-1 text-center font-serif text-3xl font-bold tracking-tight text-cocoa-900">KEYRA<span className="text-gold-500">.</span></h2>
         <p className="mb-6 text-center text-xs text-muted-foreground">
           Entre no seu financeiro operacional
         </p>
 
         {passwordChanged && (
           <div
-            className="mb-4 w-full rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm text-emerald-900"
+            className="mb-4 w-full rounded-2xl border border-success-leaf/30 bg-success-leaf/10 px-4 py-3 text-center text-sm text-success-deep"
             role="status"
           >
             Senha redefinida com sucesso. Faça login com a nova senha.
@@ -97,7 +97,7 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
 
         {errorCode === 'link_expired' && (
           <div
-            className="mb-4 w-full rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-900"
+            className="mb-4 w-full rounded-2xl border border-amber-500/30 bg-amber-300/15 px-4 py-3 text-center text-sm text-cocoa-800"
             role="alert"
           >
             Seu link de redefinição expirou.{' '}
@@ -113,7 +113,7 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
 
         {errorCode === 'no_recovery_session' && (
           <div
-            className="mb-4 w-full rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-900"
+            className="mb-4 w-full rounded-2xl border border-amber-500/30 bg-amber-300/15 px-4 py-3 text-center text-sm text-cocoa-800"
             role="alert"
           >
             Sua sessão de recuperação expirou.{' '}

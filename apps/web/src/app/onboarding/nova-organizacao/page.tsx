@@ -38,22 +38,28 @@ export default async function OnboardingPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center gap-2 text-center">
-          <Link href="/" className="text-3xl font-bold tracking-tight text-primary">
-            KEYRA
+          <Link
+            href="/"
+            className="font-serif text-4xl font-bold tracking-tight text-cocoa-900"
+          >
+            KEYRA<span className="text-gold-500">.</span>
           </Link>
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
             Onboarding · passo 1 de 1
           </p>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-6 shadow-sm sm:p-8">
+        <div className="rounded-lg border border-border bg-card p-6 shadow-warm-md sm:p-8">
           <div className="mb-6 flex flex-col gap-2">
-            <h1 className="text-2xl font-semibold text-foreground">
+            {/* Story brand.6 — título em Fraunces editorial. Subtitle reforça
+                conceito Cadeia Viva (mecanismo proprietário documentado em
+                docs/brand/03-identity/BRANDBOOK.md §1). */}
+            <h1 className="font-serif text-3xl font-semibold tracking-tight text-foreground">
               Vamos criar sua clínica
             </h1>
             <p className="text-sm text-muted-foreground">
-              Em 30 segundos você começa. Depois você completa endereço, logo e equipe
-              quando quiser.
+              Em 30 segundos você começa. A partir do primeiro atendimento, a operação
+              vira financeiro sozinha — sem planilha, sem domingo perdido, sem achismo.
             </p>
           </div>
 

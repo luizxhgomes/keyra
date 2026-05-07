@@ -11,26 +11,26 @@ const STRENGTH_CONFIG: Record<
   fraca: {
     label: 'Fraca',
     bars: 1,
-    barColor: 'bg-red-500',
+    barColor: 'bg-rust-800',
     textColor: 'text-red-600',
   },
   regular: {
     label: 'Regular',
     bars: 2,
     barColor: 'bg-amber-500',
-    textColor: 'text-amber-700',
+    textColor: 'text-cocoa-800',
   },
   boa: {
     label: 'Boa',
     bars: 3,
-    barColor: 'bg-emerald-500',
-    textColor: 'text-emerald-700',
+    barColor: 'bg-success-leaf',
+    textColor: 'text-success-deep',
   },
   forte: {
     label: 'Forte',
     bars: 4,
-    barColor: 'bg-emerald-600',
-    textColor: 'text-emerald-900',
+    barColor: 'bg-success-deep',
+    textColor: 'text-success-deep',
   },
 };
 

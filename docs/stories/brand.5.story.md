@@ -1,8 +1,22 @@
-# Story brand.5: Motion system: View Transitions + Framer Motion + page-fade + kpi-reveal
+# Story brand.5: Motion system canônico KEYRA · KPI reveal narrativo + StaggerList
 
 ## Status
 
-Draft
+Done · PR #16 squash mergeado em main (`f71fa06`) em 2026-05-07.
+
+## Implementação executada (resumo)
+
+- **`lib/motion/tokens.ts` estendido** com presets canônicos brandbook:
+  - 2 easings novos: `outSoft` `cubic-bezier(0.22,1,0.36,1)` (DEFAULT do brandbook) + `inQuiet` (saída/dismiss)
+  - 5 variants novos: `kpiRevealItem`, `kpiRevealContainer` (orquestra 3 atos com staggerChildren 80ms), `staggerList` (80ms padrão), `staggerListTight` (40ms para listas densas), `pageEnter` (fade-up 320ms)
+- **`KPICard.tsx` com KPI reveal narrativo em 3 atos**: wrapper `m.div` com `kpiRevealContainer` orquestra entrada do label → value → comparativo com stagger 80ms; AnimatePresence interno preservado (P5 pattern para mudanças dinâmicas de valor)
+- **`lib/motion/stagger-list.tsx` (NOVO)**: helper `<StaggerList>` para listagens com `cadence: 'default' | 'tight'` e `as: 'div' | 'ul' | 'ol' | 'section'`; cada filho ganha `kpiRevealItem` automaticamente via `Children.map`
+
+**Decisão arquitetural honesta:** View Transitions API (Next 16) skip — `unstable_ViewTransition` ainda tem inconsistências com RSC boundaries (mesmo tipo de bug que quebrou Sprints 5/6/7). Decisão conservadora: Framer Motion via LazyMotion (RSC-safe + bundle ~21KB preservado).
+
+**Validação técnica:** typecheck verde · lint zero warnings · build verde (38 rotas) · RSC Boundary Audit PASS · Cross-tenant PASS · Vercel SUCCESS.
+
+---
 
 ## Story
 

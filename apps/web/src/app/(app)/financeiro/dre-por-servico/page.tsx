@@ -43,7 +43,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-h2">DRE por serviço — {periodLabel}</h2>
+        <h2 className="font-serif text-h2">DRE por serviço — {periodLabel}</h2>
         <p className="text-sm text-muted-foreground">
           Lucro de cada procedimento individualmente. <strong>Diferencial KEYRA:</strong>{' '}
           Conta Azul/Omie não entregam isso.

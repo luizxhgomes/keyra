@@ -85,7 +85,7 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-h2">Custos fixos</h2>
+          <h2 className="font-serif text-h2">Custos fixos</h2>
           <p className="text-sm text-muted-foreground">
             Despesas marcadas como fixas (categoria `fixed_cost` ou flag manual no
             lançamento). Recorrência manual via botão de clone.
@@ -166,7 +166,7 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
               action={{ label: 'Cadastrar custo fixo', href: '/financeiro/despesas/nova' }}
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="stagger-list divide-y divide-border">
               {fixedThisPeriod.map((r) => (
                 <li
                   key={r.id}

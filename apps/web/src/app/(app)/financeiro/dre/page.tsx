@@ -54,7 +54,7 @@ export default async function DrePage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-h2">DRE — {periodLabel}</h2>
+        <h2 className="font-serif text-h2">DRE — {periodLabel}</h2>
         <p className="text-sm text-muted-foreground">
           Demonstrativo do Resultado do Exercício. Compare absoluto com o mês anterior
           para enxergar tendências.

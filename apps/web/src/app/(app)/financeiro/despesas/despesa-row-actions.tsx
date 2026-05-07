@@ -24,7 +24,7 @@ export function DespesaRowActions({ id, archived }: { id: string; archived: bool
     startTransition(async () => {
       const result = await archiveExpense(id);
       if (!result.ok) toast.error(result.error);
-      else toast.success('Despesa arquivada.');
+      else toast.success('Despesa arquivada. Não conta mais no DRE deste mês.');
     });
   }
 
@@ -32,7 +32,7 @@ export function DespesaRowActions({ id, archived }: { id: string; archived: bool
     startTransition(async () => {
       const result = await unarchiveExpense(id);
       if (!result.ok) toast.error(result.error);
-      else toast.success('Despesa reativada.');
+      else toast.success('Despesa reativada. Voltou para o fluxo de caixa.');
     });
   }
 

@@ -28,7 +28,7 @@ export function PacienteRowActions({ id, archived }: { id: string; archived: boo
         toast.error(result.error);
         return;
       }
-      toast.success('Paciente arquivado.');
+      toast.success('Paciente arquivado. Não aparece mais nas listagens ativas.');
     });
   }
 
@@ -39,7 +39,7 @@ export function PacienteRowActions({ id, archived }: { id: string; archived: boo
         toast.error(result.error);
         return;
       }
-      toast.success('Paciente reativado.');
+      toast.success('Paciente reativado. Volta para as listagens ativas.');
     });
   }
 

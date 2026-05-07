@@ -64,7 +64,7 @@ export default async function DespesasPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-h2">Despesas</h2>
+          <h2 className="font-serif text-h2">Despesas</h2>
           <p className="text-sm text-muted-foreground">
             {total} {total === 1 ? 'lançamento' : 'lançamentos'} no período · Total{' '}
             <span className="font-semibold tabular-nums">{formatBRL(totalNet)}</span>
@@ -156,7 +156,7 @@ export default async function DespesasPage({ searchParams }: PageProps) {
               action={{ label: 'Cadastrar despesa', href: '/financeiro/despesas/nova' }}
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="stagger-list divide-y divide-border">
               {rows.map((r) => {
                 const isArchived = !!r.deleted_at;
                 return (

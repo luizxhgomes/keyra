@@ -162,7 +162,7 @@ export function ComandaEditForm({
         toast.error(result.error);
         return;
       }
-      toast.success('Comanda finalizada.');
+      toast.success('Comanda finalizada. Pronta para receber pagamento.');
     });
   }
 

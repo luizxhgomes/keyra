@@ -66,7 +66,7 @@ export function ProfissionalForm() {
         toast.error(result.error);
         return;
       }
-      toast.success('Profissional cadastrado.');
+      toast.success('Profissional cadastrado. Já pode receber agendamentos.');
       form.reset({
         displayName: '',
         email: '',

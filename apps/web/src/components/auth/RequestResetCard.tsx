@@ -84,7 +84,7 @@ export function RequestResetCard() {
       />
 
       <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-warm-xl animate-in fade-in zoom-in-95 duration-500">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm-lg transition-transform duration-300 ease-out hover:scale-110">
           <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
@@ -103,7 +103,7 @@ export function RequestResetCard() {
             </p>
             <Link
               href="/login"
-              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md"
             >
               Ir para o login
             </Link>
@@ -118,7 +118,7 @@ export function RequestResetCard() {
             </p>
             <Link
               href="/login"
-              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md"
             >
               Voltar ao login
             </Link>
@@ -154,7 +154,7 @@ export function RequestResetCard() {
             <button
               type="submit"
               disabled={pending || !turnstileToken}
-              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md disabled:opacity-50 disabled:hover:bg-primary"
+              className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md disabled:opacity-50 disabled:hover:bg-primary"
             >
               {pending ? (
                 <span className="inline-flex items-center justify-center gap-2">

@@ -201,7 +201,7 @@ export default async function TransacoesPage({ searchParams }: PageProps) {
               description="Pagamentos de comandas, despesas manuais e ajustes aparecem aqui. Tente ampliar o período ou limpar os filtros."
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="stagger-list divide-y divide-border">
               {rows.map((r) => (
                 <li key={r.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="min-w-0 space-y-0.5">

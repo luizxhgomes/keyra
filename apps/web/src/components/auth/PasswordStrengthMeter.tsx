@@ -12,7 +12,7 @@ const STRENGTH_CONFIG: Record<
     label: 'Fraca',
     bars: 1,
     barColor: 'bg-rust-800',
-    textColor: 'text-red-600',
+    textColor: 'text-rust-800',
   },
   regular: {
     label: 'Regular',

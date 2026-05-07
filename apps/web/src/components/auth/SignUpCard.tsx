@@ -136,7 +136,7 @@ export function SignUpCard() {
       <div className={wrapper}>
         {radial}
         <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 text-center shadow-warm-xl animate-in fade-in zoom-in-95 duration-500">
-          <CheckCircle2 className="h-10 w-10 text-emerald-600" aria-hidden="true" />
+          <CheckCircle2 className="h-10 w-10 text-success-leaf" aria-hidden="true" />
           <h2 className="mt-4 text-xl font-semibold text-foreground">Confira seu e-mail</h2>
           <p className="mt-3 text-sm text-muted-foreground">
             Enviamos um link de confirmação para <strong className="text-foreground">{emailSent}</strong>.
@@ -144,7 +144,7 @@ export function SignUpCard() {
           </p>
           <button
             onClick={() => router.push('/login')}
-            className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
+            className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md"
           >
             Ir para o login
           </button>
@@ -158,7 +158,7 @@ export function SignUpCard() {
       {radial}
 
       <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-warm-xl animate-in fade-in zoom-in-95 duration-500">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform duration-300 ease-out hover:scale-110">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm-lg transition-transform duration-300 ease-out hover:scale-110">
           <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
@@ -345,7 +345,7 @@ export function SignUpCard() {
           <button
             type="submit"
             disabled={pending}
-            className="mt-1 w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md disabled:opacity-50 disabled:hover:bg-primary"
+            className="mt-1 w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md disabled:opacity-50 disabled:hover:bg-primary"
           >
             {pending ? (
               <span className="inline-flex items-center justify-center gap-2">

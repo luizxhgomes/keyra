@@ -58,7 +58,7 @@ export default async function CategoriasPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-h2">Plano de contas</h2>
+        <h2 className="font-serif text-h2">Plano de contas</h2>
         <p className="text-sm text-muted-foreground">
           Categorias para classificar receitas e despesas (FR-FI-05). O seed inicial
           vem do `seed_default_chart_of_accounts`; edição via UI entra na Phase 5.

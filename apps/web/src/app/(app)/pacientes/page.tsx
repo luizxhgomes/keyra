@@ -133,7 +133,7 @@ export default async function PacientesPage({ searchParams }: PageProps) {
               />
             )
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="stagger-list divide-y divide-border">
               {patients.map((p) => {
                 const isArchived = !!p.deleted_at;
                 return (

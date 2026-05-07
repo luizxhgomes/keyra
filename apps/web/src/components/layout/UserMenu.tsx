@@ -51,7 +51,7 @@ export function UserMenu({ email, displayName }: { email: string; displayName: s
           vez de tonalidade clara: identidade visual coesa entre login e app. */}
       <DropdownMenuTrigger
         className={cn(
-          'inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase text-primary-foreground shadow-sm transition-all duration-200 hover:scale-110 hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase text-primary-foreground shadow-warm-sm transition-all duration-200 hover:scale-110 hover:shadow-warm-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         )}
         aria-label={`Menu de ${email}`}
         disabled={pending}

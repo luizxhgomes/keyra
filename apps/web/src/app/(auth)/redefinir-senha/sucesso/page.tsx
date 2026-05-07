@@ -30,8 +30,8 @@ export default function RedefinirSenhaSucessoPage() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-xl animate-in fade-in zoom-in-95 duration-500">
-        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
+      <div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-3xl border border-border bg-card p-8 shadow-warm-xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm-lg">
           <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
@@ -40,8 +40,8 @@ export default function RedefinirSenhaSucessoPage() {
 
         <JourneyProgress step={4} />
 
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-          <CheckCircle2 className="h-10 w-10 text-emerald-600" aria-hidden="true" />
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-success-leaf/20">
+          <CheckCircle2 className="h-10 w-10 text-success-leaf" aria-hidden="true" />
         </div>
 
         <h3 className="mb-2 text-center text-lg font-semibold text-foreground">
@@ -55,7 +55,7 @@ export default function RedefinirSenhaSucessoPage() {
 
         <Link
           href="/login?password_changed=1"
-          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md"
+          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md"
         >
           Fazer login
         </Link>

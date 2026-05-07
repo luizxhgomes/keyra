@@ -108,7 +108,7 @@ export function DespesaForm({
         <select
           id="exp-cat"
           disabled={isPending}
-          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-warm-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           {...form.register('expenseCategoryId')}
         >
           <option value="">Selecione…</option>
@@ -131,7 +131,7 @@ export function DespesaForm({
         <select
           id="exp-account"
           disabled={isPending}
-          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-warm-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           {...form.register('accountId')}
         >
           <option value="">Selecione…</option>

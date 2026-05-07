@@ -114,7 +114,7 @@ export default async function ComandasPage({ searchParams }: PageProps) {
               }
             />
           ) : (
-            <ul className="divide-y divide-border">
+            <ul className="stagger-list divide-y divide-border">
               {rows.map((c) => (
                 <li key={c.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="min-w-0">

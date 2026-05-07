@@ -34,7 +34,7 @@ export default async function EditarInsumoPage({ params }: PageProps) {
 
       <header className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-h2">{sup.name}</h2>
+          <h2 className="font-serif text-h2">{sup.name}</h2>
           <p className="text-sm text-muted-foreground">
             Estoque atual: {sup.current_stock} {sup.unit}
           </p>

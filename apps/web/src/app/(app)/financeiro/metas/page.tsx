@@ -33,7 +33,7 @@ export default async function MetasPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-h2">Metas — {year}</h2>
+        <h2 className="font-serif text-h2">Metas — {year}</h2>
         <p className="text-sm text-muted-foreground">
           Defina metas mensais de receita, lucro e atendimentos. O dashboard mostra
           quanto falta ou ultrapassou.

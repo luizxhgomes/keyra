@@ -187,7 +187,7 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
           <button
             type="submit"
             disabled={pending}
-            className="w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow transition-all duration-200 hover:bg-primary-600 hover:shadow-md disabled:opacity-50 disabled:hover:bg-primary"
+            className="w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-warm-md transition-all duration-200 hover:bg-primary-600 hover:shadow-warm-md disabled:opacity-50 disabled:hover:bg-primary"
           >
             {pending ? (
               <span className="inline-flex items-center justify-center gap-2">
@@ -202,7 +202,7 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
             type="button"
             disabled
             title="Login com Google estará disponível em breve"
-            className="mb-1 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-muted-foreground shadow-sm transition-all duration-200 hover:bg-muted/60"
+            className="mb-1 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-muted-foreground shadow-warm-sm transition-all duration-200 hover:bg-muted/60"
           >
             <GoogleIcon className="h-5 w-5" />
             Continuar com Google

@@ -204,6 +204,50 @@
 }
 
 /**
+ * Story brand.9 (sweep complete) · Stagger list em CSS puro (RSC-safe).
+ *
+ * Aplicação: adicionar className="stagger-list" no `<ul>` ou container.
+ * Cada filho direto entra com fade-up + delay calculado pelo nth-child.
+ * Funciona em Server Components (não exige Framer Motion).
+ *
+ * Stagger 80ms canônico (motion-vocabulary.md). Cobertura até 20 itens.
+ * Para listas > 20 items, items 21+ entram juntos no último delay.
+ *
+ * Reference: docs/brand/03-identity/motion-system/motion-vocabulary.md §6
+ */
+@keyframes keyra-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-list > * {
+  animation: keyra-fade-up var(--motion-duration-base) var(--motion-easing-out-soft) backwards;
+}
+.stagger-list > *:nth-child(1)  { animation-delay: 0ms }
+.stagger-list > *:nth-child(2)  { animation-delay: 80ms }
+.stagger-list > *:nth-child(3)  { animation-delay: 160ms }
+.stagger-list > *:nth-child(4)  { animation-delay: 240ms }
+.stagger-list > *:nth-child(5)  { animation-delay: 320ms }
+.stagger-list > *:nth-child(6)  { animation-delay: 400ms }
+.stagger-list > *:nth-child(7)  { animation-delay: 480ms }
+.stagger-list > *:nth-child(8)  { animation-delay: 560ms }
+.stagger-list > *:nth-child(9)  { animation-delay: 640ms }
+.stagger-list > *:nth-child(10) { animation-delay: 720ms }
+.stagger-list > *:nth-child(n+11) { animation-delay: 800ms }
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-list > * {
+    animation: none;
+  }
+}
+
+/**
  * Story brand.4 (Voice migration): Sonner agora consome `classNames` direto
  * via prop `toastOptions` em layout.tsx (border-left semântica + bg-ivory-100
  * + warm shadow). Override de CSS vars do sonner removido — substituído por

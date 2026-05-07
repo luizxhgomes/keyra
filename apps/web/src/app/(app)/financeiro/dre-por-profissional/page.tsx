@@ -40,7 +40,7 @@ export default async function DreByProfessionalPage({ searchParams }: PageProps)
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-h2">DRE por profissional — {periodLabel}</h2>
+        <h2 className="font-serif text-h2">DRE por profissional — {periodLabel}</h2>
         <p className="text-sm text-muted-foreground">
           Performance individual. Use para decisões de retenção, promoção e ajuste de
           comissão.

@@ -40,7 +40,7 @@ export function ConviteForm() {
         toast.error(result.error);
         return;
       }
-      toast.success(`Convite enviado para ${values.email}.`);
+      toast.success(`Convite enviado para ${values.email}. Aguarde a aceitação.`);
       form.reset({ email: '', role: 'professional' });
     });
   }

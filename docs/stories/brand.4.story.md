@@ -1,8 +1,29 @@
-# Story brand.4: Voice migration: copy-guidelines aplicado em toasts/empty/erros
+# Story brand.4: Voice migration · tema Sonner brandbook + toasts cúmplices + anti-padrão removido
 
 ## Status
 
-Draft
+Done · PR #15 squash mergeado em main (`cc6e636`) em 2026-05-07.
+
+## Implementação executada (resumo)
+
+**Achado importante da auditoria:** zero anti-padrões de voz ("amiga", "incrível", "destravar", "rumo ao sucesso", "estamos com você") no código. Sistema já estava em tom mentora controlado antes desta story. Brand.4 **adicionou** o estado cúmplice em momentos onde a Camila ganha algo concreto.
+
+- **Toaster (sonner) reconfigurado** em `layout.tsx`: `richColors` removido (evita verde-neon e vermelho-frio defaults), `classNames` brandbook (border-left 4px semântica + bg-ivory-100 + shadow-warm-md):
+  - `success`: `border-l-success-leaf` (oliva editorial)
+  - `error`: `border-l-rust-800` (rust quente)
+  - `warning`: `border-l-amber-500`
+  - `info`: `border-l-bronze-500`
+- **`globals.css`**: override antigo de `--success-bg` removido (tema agora vem 100% via classNames)
+- **4 toasts elevados para tom cúmplice** (ação + consequência financeira):
+  - "Despesa lançada. Já entrou no fluxo de caixa."
+  - "Despesa atualizada. O DRE deste mês foi recalculado."
+  - "Meta salva. O dashboard mostra quanto falta a cada dia."
+  - "Paciente cadastrado. Agora você pode agendar atendimentos."
+- **Anti-padrão "Use o botão acima" removido** em `financeiro/custos-fixos/page.tsx`
+
+**Validação técnica:** typecheck verde · lint zero warnings · build verde (38 rotas) · RSC Boundary Audit PASS · Cross-tenant PASS · Vercel SUCCESS.
+
+---
 
 ## Story
 

@@ -2,7 +2,23 @@
 
 ## Status
 
-Draft
+Done · PR #14 squash mergeado em main (`ba3d396`) em 2026-05-07.
+
+## Implementação executada (resumo)
+
+10 componentes shadcn migrados para palette canônica KEYRA + motion tokens + warm shadows:
+
+- **button.tsx**: motion tokens (`duration-fast` + `ease-out-soft`) + warm shadow (`shadow-warm-sm` + `hover:shadow-warm-md`) + `active:scale-[0.98]` (press feedback tátil) + variant `premium` adicionada (`bg-gold-500` + `hover:shadow-premium-glow`)
+- **card.tsx**: `shadow-warm-sm` + transition motion + CardTitle ganha `font-serif` (Fraunces) + `tracking-tight`
+- **input.tsx + textarea.tsx**: motion tokens + `hover:border-bronze-500` + `focus-visible:border-bronze-500` (calor crescente)
+- **badge.tsx**: 3 variants novos: `success` (success-leaf/20 + success-deep), `warning` (amber-300/40 + cocoa-900), `premium` (gold-500 + cocoa-900)
+- **checkbox.tsx**: motion + hover bronze-500
+- **alert-dialog.tsx + sheet.tsx**: backdrop `bg-black/80` → `bg-cocoa-900/60` (warm overlay editorial); `shadow-lg` → `shadow-warm-lg`
+- **dropdown-menu.tsx + select.tsx**: `shadow-md/lg` → `shadow-warm-md/lg`
+
+**Validação técnica:** typecheck verde · lint zero warnings · build verde (38 rotas) · RSC Boundary Audit PASS · Cross-tenant PASS · Vercel SUCCESS.
+
+---
 
 ## Story
 

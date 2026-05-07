@@ -55,7 +55,12 @@ export function DespesaForm({
         toast.error(result.error);
         return;
       }
-      toast.success(initial?.id ? 'Despesa atualizada.' : 'Despesa lançada.');
+      // Story brand.4 — toast cúmplice: ação + consequência financeira
+      toast.success(
+        initial?.id
+          ? 'Despesa atualizada. O DRE deste mês foi recalculado.'
+          : 'Despesa lançada. Já entrou no fluxo de caixa.',
+      );
       if (redirectTo) router.push(redirectTo);
       else router.refresh();
     });

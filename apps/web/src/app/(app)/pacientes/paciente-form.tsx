@@ -42,7 +42,12 @@ export function PacienteForm({ initial, submitLabel, redirectTo }: Props) {
         toast.error(result.error);
         return;
       }
-      toast.success(initial?.id ? 'Paciente atualizado.' : 'Paciente cadastrado.');
+      // Story brand.4 — toast cúmplice: cadastro + próximo passo natural
+      toast.success(
+        initial?.id
+          ? 'Paciente atualizado.'
+          : 'Paciente cadastrado. Agora você pode agendar atendimentos.',
+      );
       if (redirectTo) {
         router.push(redirectTo);
       } else if (!initial?.id) {

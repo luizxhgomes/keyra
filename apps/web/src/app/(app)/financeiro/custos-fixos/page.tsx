@@ -162,7 +162,7 @@ export default async function CustosFixosPage({ searchParams }: PageProps) {
             <EmptyState
               icon={Repeat}
               title="Sem custos fixos no período"
-              description="Aluguel, salários, internet… Use o botão acima para clonar do mês passado ou cadastre uma nova despesa marcando a flag “Custo fixo”."
+              description="Aluguel, salários, internet… Clone os custos do mês passado ou cadastre uma nova despesa marcando a flag “Custo fixo”."
               action={{ label: 'Cadastrar custo fixo', href: '/financeiro/despesas/nova' }}
             />
           ) : (

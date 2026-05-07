@@ -69,49 +69,74 @@ export function KPICard({
       aria-label={label}
       className={cn(
         // Story brand.2 — container query ativo + warm shadow hover (cocoa-based).
-        // - container-type:inline-size habilita unidade `cqi` no value
-        // - hover:shadow-warm-md = sombra cor cocoa, não slate (princípio motion KEYRA)
-        // - overflow:hidden é rede de segurança caso clamp falhe em viewport extremo
         '@container flex flex-col gap-3 overflow-hidden shadow-warm-sm transition-shadow duration-base ease-out-soft hover:shadow-warm-md [container-type:inline-size]',
         VARIANT_PADDING[variant],
         className,
       )}
     >
-      <p className="text-label uppercase text-muted-foreground">{label}</p>
+      {/*
+        Story brand.5 — KPI reveal narrativo em 3 atos via kpiRevealContainer.
+        Stagger 80ms entre label → value → comparativo. Princípio CON-UX-01
+        executado em motion: cada elemento entra como ato discreto.
+        Reference: docs/brand/03-identity/motion-system/motion-vocabulary.md §3
+      */}
+      <m.div
+        variants={variants.kpiRevealContainer}
+        initial="hidden"
+        animate="visible"
+        className="contents"
+      >
+        <m.p
+          variants={variants.kpiRevealItem}
+          className="text-label uppercase text-muted-foreground"
+        >
+          {label}
+        </m.p>
 
-      {loading ? (
-        <div className={cn('h-12 w-2/3 animate-pulse rounded bg-muted', variant === 'hero' && 'h-16')} />
-      ) : (
-        // Story 6.2 (AC2.1 + P5) — `AnimatePresence mode="wait"` força fade-out
-        // completo antes do fade-in do novo valor. Princípio CON-UX-01: nunca
-        // animar morphing entre valores numéricos (poderia parecer percentual
-        // ou intermediário). Cada valor é um snapshot discreto.
-        <AnimatePresence mode="wait" initial={false}>
-          <m.span
-            key={formatted}
-            variants={variants.fadeRiseExitUp}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            aria-live="polite"
-            data-kpi-value
-            className={cn('text-foreground tabular-nums', VARIANT_VALUE_TEXT[variant])}
-          >
-            {formatted}
-          </m.span>
-        </AnimatePresence>
-      )}
+        {loading ? (
+          <m.div
+            variants={variants.kpiRevealItem}
+            className={cn('h-12 w-2/3 animate-pulse rounded bg-muted', variant === 'hero' && 'h-16')}
+          />
+        ) : (
+          // AnimatePresence preserva o pattern P5 (fade-out completo antes
+          // de fade-in quando o valor muda dinamicamente). Wrapper m.div
+          // com kpiRevealItem garante entrada narrativa no 1º render.
+          <m.div variants={variants.kpiRevealItem}>
+            <AnimatePresence mode="wait" initial={false}>
+              <m.span
+                key={formatted}
+                variants={variants.fadeRiseExitUp}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                aria-live="polite"
+                data-kpi-value
+                className={cn('text-foreground tabular-nums block', VARIANT_VALUE_TEXT[variant])}
+              >
+                {formatted}
+              </m.span>
+            </AnimatePresence>
+          </m.div>
+        )}
 
-      {helper && <p className="text-xs text-muted-foreground">{helper}</p>}
+        {helper && (
+          <m.p variants={variants.kpiRevealItem} className="text-xs text-muted-foreground">
+            {helper}
+          </m.p>
+        )}
 
-      {comparison && !loading && (
-        <ComparativoTexto
-          delta={comparison.delta}
-          period={comparison.period}
-          sentiment={comparison.sentiment}
-          format="full"
-        />
-      )}
+        {comparison && !loading && (
+          <m.div variants={variants.kpiRevealItem}>
+            <ComparativoTexto
+              delta={comparison.delta}
+              period={comparison.period}
+              sentiment={comparison.sentiment}
+              format="full"
+            />
+          </m.div>
+        )}
+      </m.div>
 
       {action && (
         <div className="mt-auto pt-2">

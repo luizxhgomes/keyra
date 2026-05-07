@@ -29,14 +29,25 @@ export function AppShell({
       <Sidebar />
 
       <div className="flex min-w-0 flex-1 flex-col">
+        {/* Story auth.9 — gradient sutil (intensidade 0.04 vs 0.08 da tela auth)
+            planta a textura KEYRA sem competir com conteúdo do dashboard. */}
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur">
-          <div className="flex items-center gap-3">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 0%, hsl(21 56% 50% / 0.04), transparent 60%)',
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 flex items-center gap-3">
             <OrgSwitcher />
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-muted-foreground sm:inline">
-              Olá, <span className="font-medium text-foreground">{displayName}</span>
+          <div className="relative z-10 flex items-center gap-3">
+            <span className="hidden text-sm tracking-tight text-muted-foreground sm:inline">
+              Olá, <span className="font-semibold text-foreground">{displayName}</span>
             </span>
             <UserMenu email={userEmail} displayName={displayName} />
           </div>

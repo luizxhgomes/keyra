@@ -4,20 +4,29 @@ import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
-// Story 6.1 — `font-medium` (500) sobe para `font-semibold` (600) padrão.
-// Modela Gestek (700) ajustado para sobriedade editorial KEYRA.
+// Story brand.3 (Epic BRAND-INTEGRATION):
+// - Motion tokens KEYRA aplicados (duration-fast + ease-out-soft)
+// - Warm shadows (cocoa-based, não slate)
+// - Variant "premium" adicionada (gold-500 com glow raro)
+// - active:scale-[0.98] dá press feedback tátil sem bounce
+// Reference: docs/brand/03-identity/preview.html §05 Componentes (Buttons)
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-all duration-fast ease-out-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary-600',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        default:
+          'bg-primary text-primary-foreground shadow-warm-sm hover:bg-primary-600 hover:shadow-warm-md',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-warm-sm hover:bg-destructive/90 hover:shadow-warm-md',
         outline:
-          'border border-border bg-background hover:bg-muted hover:text-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
-        ghost: 'hover:bg-muted hover:text-foreground',
+          'border border-mocha-300 bg-background hover:border-bronze-500 hover:bg-ivory-100 hover:text-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-warm-sm hover:bg-secondary/90 hover:shadow-warm-md',
+        ghost: 'hover:bg-ivory-100 hover:text-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        premium:
+          'bg-gold-500 text-cocoa-900 shadow-warm-sm hover:bg-gold-600 hover:shadow-premium-glow',
       },
       size: {
         default: 'h-11 px-4 py-2',

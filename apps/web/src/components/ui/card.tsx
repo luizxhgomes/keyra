@@ -2,12 +2,15 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+// Story brand.3 — Card com warm shadow (cocoa-based) e transição motion-tokens.
+// shadow-warm-sm substitui shadow-sm; transition-shadow duration-base ease-out-soft
+// prepara o terreno para hover lift em sub-cards (KPICard etc.).
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border border-border bg-card text-card-foreground shadow-sm',
+        'rounded-lg border border-border bg-card text-card-foreground shadow-warm-sm transition-shadow duration-base ease-out-soft',
         className,
       )}
       {...props}
@@ -31,9 +34,10 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      // Story 6.1 — token `text-h3` (20px / 1.3 / 600) substitui `text-lg font-semibold`.
-      // `leading-none` removido — token define lineHeight 1.3 para respiração editorial.
-      className={cn('text-h3', className)}
+      // Story brand.3 — CardTitle ganha font-serif (Fraunces) para tom editorial.
+      // Brandbook §05: títulos de card em peso 600 com tracking tight, mantendo
+      // tamanho via token text-h3. Mistura serif-sans é o personagem da marca.
+      className={cn('font-serif text-h3 tracking-tight', className)}
       {...props}
     />
   ),

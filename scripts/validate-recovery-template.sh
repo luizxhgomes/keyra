@@ -99,12 +99,22 @@ assert_contains() {
 log ""
 log "🧪 Validações:"
 assert_equals "Subject" "${EXPECTED_SUBJECT}" "${GOT_SUBJECT}"
-assert_contains "CTA do botão"        "Redefinir minha senha"   "${GOT_CONTENT}"
-assert_contains "Cor primary KEYRA"   "#c66a38"                 "${GOT_CONTENT}"
-assert_contains "Placeholder URL"     "{{ .ConfirmationURL }}"  "${GOT_CONTENT}"
-assert_contains "Disclaimer 30 min"   "30 minutos"              "${GOT_CONTENT}"
-assert_contains "Wordmark"            "KEYRA"                   "${GOT_CONTENT}"
-assert_contains "Tamanho mínimo HTML" "<!doctype html>"         "${GOT_CONTENT}"
+assert_contains "CTA do botão"               "Redefinir minha senha"                                   "${GOT_CONTENT}"
+assert_contains "Cor primary KEYRA"          "#c66a38"                                                 "${GOT_CONTENT}"
+assert_contains "Token hash flow (SSR)"      "token_hash={{ .TokenHash }}&type=recovery"               "${GOT_CONTENT}"
+assert_contains "URL custom KEYRA"           "https://usekeyra.com/auth/callback"                      "${GOT_CONTENT}"
+assert_contains "Disclaimer 30 min"          "30 minutos"                                              "${GOT_CONTENT}"
+assert_contains "Wordmark"                   "KEYRA"                                                   "${GOT_CONTENT}"
+assert_contains "Tamanho mínimo HTML"        "<!doctype html>"                                         "${GOT_CONTENT}"
+
+# Anti-regressão: garante que NÃO está mais usando ConfirmationURL (legacy implicit
+# grant flow — quebrado em SSR, foi a causa raiz do bug de fiscalização 2026-05-06).
+if [[ "${GOT_CONTENT}" == *"{{ .ConfirmationURL }}"* ]]; then
+  echo "  ❌ REGRESSÃO: template voltou a usar {{ .ConfirmationURL }} (hash fragment — quebra SSR!)"
+  ASSERTS_FAILED=$((ASSERTS_FAILED + 1))
+else
+  log "  ✅ Sem .ConfirmationURL legacy (anti-regressão)"
+fi
 
 log ""
 if [[ ${ASSERTS_FAILED} -eq 0 ]]; then

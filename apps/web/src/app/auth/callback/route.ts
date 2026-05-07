@@ -1,83 +1,107 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import type { EmailOtpType } from '@supabase/supabase-js';
 
 import { getActiveOrgId } from '@/lib/auth/get-current-user';
 import { isSafeNextPath } from '@/lib/auth/safe-next';
 import { createServerClient } from '@/lib/supabase/server';
 
 /**
- * Magic link callback handler.
+ * Auth callback handler — suporta DOIS fluxos de email-based auth:
  *
- * Flow:
- *   1. Supabase Auth emails the user a link of the form
- *      `{SITE_URL}/auth/callback?code=<one-time-code>`.
- *   2. User clicks it → browser GETs this handler.
- *   3. We exchange the code for a session (sets auth cookies via `@supabase/ssr`).
- *   4. We route based on whether the user already has a membership.
+ * 1. Token Hash flow (recomendado pra SSR — usado por recovery/auth.5):
+ *    - Email link: /auth/callback?token_hash=<hash>&type=recovery
+ *    - Server-side: verifyOtp({type, token_hash}) — cross-device safe
+ *      (não exige code_verifier no browser do usuário)
+ *    - Doc: https://supabase.com/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr
  *
- * Error handling:
- *   - Missing/invalid code → /login?error=invalid_code
- *   - Exchange failure → /login?error=exchange_failed
+ * 2. PKCE code flow (legacy magic link / OAuth):
+ *    - Email link: /auth/callback?code=<code>
+ *    - Server-side: exchangeCodeForSession(code) — exige code_verifier
+ *      no cookie (mesmo browser que iniciou o flow)
  *
- * Traceability: ADR-010, ADR-012.
+ * Roteamento pós-sucesso:
+ *   - type=recovery → /redefinir-senha (sessão temporária pra updateUser)
+ *   - default → /dashboard (se org_id no JWT) ou /onboarding (se sem membership)
+ *   - ?next= seguro → preserva (convites, etc.)
+ *
+ * Erros:
+ *   - Missing token_hash & code → /login?error=invalid_code
+ *   - Verify/exchange falha → /login?error=exchange_failed
+ *   - Link expirado (Supabase reporta via ?error=) → /login?error=link_expired
+ *
+ * Traceability: ADR-010, ADR-012, Story auth.5 AC4 (token_hash flow), Story
+ * auth.8 (BroadcastChannel cross-tab depois deste callback).
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const type = searchParams.get('type');
+  const tokenHash = searchParams.get('token_hash');
+  const type = searchParams.get('type') as EmailOtpType | null;
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
   // Supabase surfaces errors (expired link, etc.) via query params directly.
   if (errorParam) {
     const reason = mapSupabaseAuthError(errorParam, errorDescription);
-    // Recovery links expirados também voltam pro login com sinal específico
-    // para a UI exibir CTA "Solicite um novo link" (Story auth.5 AC4).
-    const target = type === 'recovery' ? `/login?error=${reason}` : `/login?error=${reason}`;
-    return NextResponse.redirect(new URL(target, origin));
-  }
-
-  if (!code) {
-    return NextResponse.redirect(new URL('/login?error=invalid_code', origin));
+    return NextResponse.redirect(new URL(`/login?error=${reason}`, origin));
   }
 
   const supabase = await createServerClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-  if (error) {
-    return NextResponse.redirect(new URL('/login?error=exchange_failed', origin));
+  // ---- Path 1: Token Hash flow (verifyOtp server-side, cross-device safe) ----
+  if (tokenHash && type) {
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+
+    if (error) {
+      return NextResponse.redirect(
+        new URL(`/login?error=${classifyVerifyError(error.message)}`, origin),
+      );
+    }
+
+    // Recovery: sessão temporária — manda direto pro form de nova senha
+    if (type === 'recovery') {
+      return NextResponse.redirect(new URL('/redefinir-senha', origin));
+    }
+
+    // Outros tipos (signup, email_change, etc.): rota padrão pós-login
+    return routeAfterAuth(supabase, searchParams, origin);
   }
 
-  // Recovery flow (Story auth.5): a sessão criada acima é uma sessão temporária
-  // de recuperação. Não rotear pra dashboard nem onboarding — manda direto
-  // pra tela de definir nova senha, onde a Server Action chamará
-  // updateUser({ password }) e em seguida signOut({ scope: 'global' }).
-  if (type === 'recovery') {
-    return NextResponse.redirect(new URL('/redefinir-senha', origin));
+  // ---- Path 2: PKCE code flow (exchangeCodeForSession) ----
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      return NextResponse.redirect(new URL('/login?error=exchange_failed', origin));
+    }
+
+    if (type === 'recovery') {
+      return NextResponse.redirect(new URL('/redefinir-senha', origin));
+    }
+
+    // Magic link / OAuth: refresh session pra Auth Hook injetar org_id no JWT
+    await supabase.auth.refreshSession();
+    return routeAfterAuth(supabase, searchParams, origin);
   }
 
-  // Session cookies are now set. Force one more refresh so the Auth Hook
-  // gets to run on the fresh session — this guarantees the JWT has the
-  // `org_id` claim for returning users (users who already have membership)
-  // and keeps the new-user path deterministic.
-  await supabase.auth.refreshSession();
+  // Sem token_hash nem code — link mal formado
+  return NextResponse.redirect(new URL('/login?error=invalid_code', origin));
+}
 
-  // Se o magic link veio com `?next=` (ex.: aceite de convite), priorizamos
-  // sempre que o caminho for seguro — o destino do convite resolve por conta
-  // própria a UX correta (a página `/invites/[token]` mostra "aceitar",
-  // "email diferente", "expirado" etc.). Sem isto, um convidado novo cairia
-  // em `/onboarding/nova-organizacao` em vez do convite que disparou o login.
+async function routeAfterAuth(
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
+  searchParams: URLSearchParams,
+  origin: string,
+): Promise<NextResponse> {
+  // ?next= seguro tem precedência (convites, etc.)
   const rawNext = searchParams.get('next');
   if (isSafeNextPath(rawNext)) {
     return NextResponse.redirect(new URL(rawNext, origin));
   }
 
-  // Default: onboarding se não houver membership; dashboard caso contrário.
-  // `getActiveOrgId()` lê o claim do JWT (ADR-012) com fallback em
-  // `user_preferences` (migration 021), garantindo roteamento correto mesmo
-  // antes do access token novo terminar de propagar.
+  // Sem next: dashboard se membership existe, senão onboarding
   const orgId = await getActiveOrgId();
   const target = orgId ? '/dashboard' : '/onboarding/nova-organizacao';
-
   return NextResponse.redirect(new URL(target, origin));
 }
 
@@ -86,4 +110,11 @@ function mapSupabaseAuthError(code: string, description: string | null): string 
   if (blob.includes('expired')) return 'link_expired';
   if (blob.includes('otp') || blob.includes('invalid')) return 'invalid_code';
   return 'auth_error';
+}
+
+function classifyVerifyError(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes('expired')) return 'link_expired';
+  if (m.includes('invalid') || m.includes('not found')) return 'invalid_code';
+  return 'exchange_failed';
 }

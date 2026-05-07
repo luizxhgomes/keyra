@@ -92,7 +92,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                             {isTop ? (
                               <Badge
                                 variant="outline"
-                                className="border-emerald-500 text-emerald-700"
+                                className="border-success-leaf text-success-deep"
                               >
                                 <Award className="mr-1 h-3 w-3" /> Top
                               </Badge>
@@ -100,7 +100,7 @@ export default async function DreByServicePage({ searchParams }: PageProps) {
                             {isLowMargin ? (
                               <Badge
                                 variant="outline"
-                                className="border-amber-500 text-amber-700"
+                                className="border-amber-500 text-cocoa-800"
                               >
                                 <AlertTriangle className="mr-1 h-3 w-3" /> Margem baixa
                               </Badge>

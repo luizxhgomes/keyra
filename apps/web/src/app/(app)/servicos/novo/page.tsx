@@ -18,7 +18,7 @@ export default async function NovoServicoPage() {
   return (
     <div className="max-w-3xl space-y-6">
       <header>
-        <h1 className="text-display">Novo serviço</h1>
+        <h1 className="font-serif text-display">Novo serviço</h1>
         <p className="text-sm text-muted-foreground">
           Preencha os dados. Apenas nome e preço são obrigatórios.
         </p>

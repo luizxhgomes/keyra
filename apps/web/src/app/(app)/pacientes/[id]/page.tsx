@@ -39,7 +39,7 @@ export default async function PacienteEditarPage({ params }: PageProps) {
 
       <header className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-display">{patient.full_name}</h1>
+          <h1 className="font-serif text-display">{patient.full_name}</h1>
           <p className="text-sm text-muted-foreground">Editar cadastro.</p>
         </div>
         {patient.deleted_at ? <Badge variant="outline">Arquivado</Badge> : null}

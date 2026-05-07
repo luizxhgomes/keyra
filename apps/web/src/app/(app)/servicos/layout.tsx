@@ -8,7 +8,7 @@ export default async function ServicosLayout({ children }: { children: React.Rea
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-display">Catálogo</h1>
+        <h1 className="font-serif text-display">Catálogo</h1>
         <p className="text-sm text-muted-foreground">
           Procedimentos e categorias que alimentam a agenda, os atendimentos e o DRE.
         </p>

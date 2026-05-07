@@ -130,12 +130,15 @@ export function Sidebar() {
           title={collapsed ? 'KEYRA' : undefined}
           aria-label="KEYRA — ir para Dashboard"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-transform duration-200 hover:scale-110">
-            <span className="text-sm font-bold tracking-tight">K</span>
+          {/* Story brand.7 — bolha "K." com ponto signature gold consistente
+              com header fixo do brandbook preview.html. Wordmark expandido
+              em Fraunces editorial. */}
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm-sm transition-transform duration-fast ease-out-soft hover:scale-110">
+            <span className="font-serif text-sm font-bold tracking-tight">K<span className="text-gold-300">.</span></span>
           </span>
           {!collapsed && (
-            <span className="text-base font-bold uppercase tracking-[0.18em] text-foreground">
-              KEYRA
+            <span className="font-serif text-lg font-bold tracking-tight text-foreground">
+              KEYRA<span className="text-gold-500">.</span>
             </span>
           )}
         </Link>

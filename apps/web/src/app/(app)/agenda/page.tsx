@@ -44,7 +44,7 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
       <ReceitaCard />
 
       <header className="flex flex-col gap-1">
-        <h1 className="text-display text-foreground">Agenda</h1>
+        <h1 className="font-serif text-display text-foreground">Agenda</h1>
         <p className="text-sm text-muted-foreground">
           Visualize agendamentos por dia, semana ou mês. Clique em um evento para
           ver detalhes.

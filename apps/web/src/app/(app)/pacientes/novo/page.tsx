@@ -9,7 +9,7 @@ export default async function NovoPacientePage() {
   return (
     <div className="max-w-3xl space-y-6">
       <header>
-        <h1 className="text-display">Novo cliente</h1>
+        <h1 className="font-serif text-display">Novo cliente</h1>
         <p className="text-sm text-muted-foreground">Preencha os dados para cadastrar.</p>
       </header>
 

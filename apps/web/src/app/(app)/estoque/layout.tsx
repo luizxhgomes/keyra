@@ -17,7 +17,7 @@ export default async function EstoqueLayout({ children }: { children: ReactNode 
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-display">Estoque</h1>
+        <h1 className="font-serif text-display">Estoque</h1>
         <p className="text-sm text-muted-foreground">
           Insumos cadastrados e histórico de movimentações.
         </p>

@@ -65,7 +65,7 @@ export default async function PacientesPage({ searchParams }: PageProps) {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-display">Clientes</h1>
+          <h1 className="font-serif text-display">Clientes</h1>
           <p className="text-sm text-muted-foreground">
             {count ?? 0} {count === 1 ? 'cliente' : 'clientes'}
             {showArchived ? ' (incluindo arquivados)' : ''}

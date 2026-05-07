@@ -47,9 +47,12 @@ export function ComparativoTexto({
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
       <span className="sr-only">{srDirection}</span>
-      <span className="font-medium tabular-nums">{absoluteValue}</span>
+      <span className="font-semibold tabular-nums">{absoluteValue}</span>
       {format === 'full' && (
-        <span className="font-normal text-muted-foreground">
+        // Story brand.2 — direção + período em Fraunces italic light.
+        // Brandbook: itálico como sussurro (voice-tone.md §3.3), reforça
+        // tom mentora confiável sem competir com o número absoluto protagonista.
+        <span className="font-serif font-light italic text-muted-foreground">
           {direction} que {period}
         </span>
       )}

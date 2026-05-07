@@ -65,7 +65,10 @@ export function EmptyState({
           />
         </div>
       ) : null}
-      <h3 className="text-base font-semibold tracking-tight text-foreground">
+      {/* Story brand.2 — título em Fraunces (font-serif) peso medium.
+          Brandbook §05 documenta empty state com título serif editorial +
+          body sans. Tom mentora calorosa, premium sem ostentação. */}
+      <h3 className="font-serif text-xl font-medium tracking-tight text-foreground">
         {title}
       </h3>
       <p className="max-w-sm text-sm text-muted-foreground">{description}</p>

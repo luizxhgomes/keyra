@@ -33,7 +33,15 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', '*.tsbuildinfo'],
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'next-env.d.ts',
+      '*.tsbuildinfo',
+      // Remotion compositions são bundled separadamente (não pelo Next).
+      // Story brand.8: deps Remotion são opt-in, ESLint não processa.
+      'remotion/**',
+    ],
   },
 ];
 

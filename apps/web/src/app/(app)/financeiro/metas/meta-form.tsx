@@ -42,7 +42,8 @@ export function MetaForm({ initial }: Props) {
         toast.error(result.error);
         return;
       }
-      toast.success('Meta salva.');
+      // Story brand.4 — toast cúmplice: meta confirmada + onde aparece
+      toast.success('Meta salva. O dashboard mostra quanto falta a cada dia.');
       router.refresh();
     });
   }

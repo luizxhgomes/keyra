@@ -204,12 +204,10 @@
 }
 
 /**
- * Story 6.2 AC2.6 — Toast sucesso re-tematizado para sálvia (text-secondary).
- * Sonner usa CSS vars `--success-bg`, `--success-text`, `--success-border`.
- * Override aqui mantém branding KEYRA (sem emerald-600 default do sonner).
+ * Story brand.4 (Voice migration): Sonner agora consome `classNames` direto
+ * via prop `toastOptions` em layout.tsx (border-left semântica + bg-ivory-100
+ * + warm shadow). Override de CSS vars do sonner removido — substituído por
+ * Tailwind classes canônicas KEYRA.
+ *
+ * Reference: docs/brand/03-identity/voice-tone.md §6 (Aplicação por touchpoint).
  */
-[data-sonner-toaster] {
-  --success-bg: hsl(var(--secondary));
-  --success-text: hsl(var(--secondary-foreground));
-  --success-border: hsl(var(--secondary));
-}

@@ -29,6 +29,10 @@ export const durations = {
 export const easings = {
   out: [0.16, 1, 0.3, 1] as [number, number, number, number], // expo-out — entrada
   inOut: [0.65, 0, 0.35, 1] as [number, number, number, number], // ease custom — transições
+  // Story brand.5 (Epic BRAND-INTEGRATION) — Easings canônicos KEYRA do brandbook.
+  // Reference: docs/brand/03-identity/motion-system/motion-tokens.md
+  outSoft: [0.22, 1, 0.36, 1] as [number, number, number, number], // canonical default
+  inQuiet: [0.7, 0, 0.84, 0] as [number, number, number, number], // saída/dismiss
 } as const;
 
 export const springs = {
@@ -150,6 +154,75 @@ export const variants = {
         staggerChildren: 0.06,
         delayChildren: 0.05,
       },
+    },
+  },
+  /**
+   * Story brand.5 (Epic BRAND-INTEGRATION) — Padrões canônicos KEYRA.
+   * Reference: docs/brand/03-identity/motion-system/motion-vocabulary.md
+   */
+  /**
+   * `kpiRevealItem` — item da sequência narrativa do KPICard.
+   * Combinar com `kpiRevealContainer` que orquestra stagger 80ms entre
+   * número (1º), label (2º), comparativo (3º).
+   * Princípio: "número absoluto protagonista" (CON-UX-01) executado em motion.
+   */
+  kpiRevealItem: {
+    hidden: { opacity: 0, y: 8 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: durations.base, ease: easings.outSoft },
+    },
+  },
+  /**
+   * `kpiRevealContainer` — orquestra a entrada do KPI em 3 atos:
+   * t=0ms: número | t=80ms: label | t=160ms: comparativo
+   */
+  kpiRevealContainer: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08, // 80ms — stagger small canônico do brandbook
+        delayChildren: 0.05,
+      },
+    },
+  },
+  /**
+   * `staggerList` — listagens (pacientes, comandas, transações) entrando
+   * em cascata. Stagger 80ms (small canônico). Para listas densas (≥10
+   * items), preferir `staggerListTight` com 40ms.
+   */
+  staggerList: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0,
+      },
+    },
+  },
+  staggerListTight: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.04,
+        delayChildren: 0,
+      },
+    },
+  },
+  /**
+   * `pageEnter` — entrada de página com fade-up small (320ms ease-out-soft).
+   * Para usar em template.tsx ou wrapper de página específico.
+   */
+  pageEnter: {
+    hidden: { opacity: 0, y: 8 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.32, ease: easings.outSoft },
     },
   },
 } satisfies Record<string, Variants>;

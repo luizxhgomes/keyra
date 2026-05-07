@@ -1,8 +1,19 @@
-# Story brand.6: Auth flows + onboarding com novo visual brand layer
+# Story brand.6: Auth flows com wordmark KEYRA. + Cadeia Viva no onboarding
 
 ## Status
 
-Draft
+Done · PR #17 squash mergeado em main (`bc0c521`) em 2026-05-07.
+
+## Implementação executada (resumo)
+
+- **4 cards de auth** (SignInCard, SignUpCard, RequestResetCard, NewPasswordCard): wordmark "KEYRA" simples → "KEYRA." em Fraunces text-3xl + ponto gold-500 signature
+- **Onboarding** (`nova-organizacao/page.tsx`): wordmark Fraunces text-4xl + título Fraunces editorial + copy reforça conceito **Cadeia Viva**: "A partir do primeiro atendimento, a operação vira financeiro sozinha — sem planilha, sem domingo perdido, sem achismo."
+- **Migração de cores Tailwind defaults** em SignInCard e PasswordStrengthMeter: `emerald-*` → `success-leaf/success-deep`, `amber-50/200/900` → palette KEYRA, `red-*` → `rust-800`
+- **Warm shadows**: `shadow-xl` → `shadow-warm-xl`, `hover:shadow-md/lg` → warm
+
+**Validação técnica:** typecheck verde · lint zero warnings · build verde (38 rotas) · RSC PASS · Cross-tenant PASS · Vercel SUCCESS.
+
+---
 
 ## Story
 

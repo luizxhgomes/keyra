@@ -1,6 +1,8 @@
 # KEYRA — Onde Paramos (snapshot executivo)
 
-> **Data deste snapshot:** 2026-05-06 — 🎉🎉 **STORY `auth.8` Done na sequência da `auth.5` (8/10 do EPIC-AUTH-V2 — 80%).** Fix do bug de 2 abas via `BroadcastChannel` API: aba antiga em `/esqueci-senha` agora detecta automaticamente quando outra aba completa o reset e exibe CTA "Ir para o login". Mudança cirúrgica em 4 arquivos: 1 helper novo (`lib/auth/broadcast.ts` com defensive no-op em SSR/browsers antigos) + 1 action ajustada (`setNewPasswordAction` retorna `{success:true}` em vez de `redirect()` server-side, para liberar broadcast antes da navegação) + 2 cards (`NewPasswordCard` posta evento + `router.push`; `RequestResetCard` escuta com `useEffect` + cleanup, estado `completedElsewhere` toma precedência sobre `submitted`). Sem schema/envs/Management API — story XS de 1 ponto. Quality gates verdes: `pnpm typecheck` ✅ · `pnpm lint --max-warnings 0` ✅ · `./scripts/check-rsc-boundaries.sh` PASS · QA self-gate 7/7 PASS. Branch `feat/auth-v2-story-8` (commit `29c8e7e`) pendente push + merge + deploy. **Fase C agora só tem `auth.6` (Google OAuth) restante; Fase D só `auth.9` (visual revamp AppShell).**
+> **Data deste snapshot:** 2026-05-06 (encerramento de sessão) — 🎉🎉🎉 **EPIC-AUTH-V2 FECHADO PARCIALMENTE — 9/10 stories Done (90%) em prod. `auth.6` (Google OAuth) deferida pendente setup manual no Google Cloud Console pelo Luiz.** Esta sessão entregou em prod: `auth.5` (recovery com cooldown + signOut global + template recovery pt-BR) + `auth.8` (BroadcastChannel cross-tab) + `auth.9` (jornada afunilada com JourneyProgress + indicador força senha + tela /redefinir-senha/sucesso + visual revamp AppShell — bolha "K" Sidebar, header gradient sutil, UserMenu avatar bg-primary). **🔴 P0 fix descoberto via fiscalização E2E real:** usuário REAL caía em `/login?error=invalid_code` ao clicar no email de recovery (Supabase emite hash fragment, não chega no server) — corrigido com **token_hash flow** (Supabase recommended pra SSR, cross-device safe) + callback handler usando `verifyOtp({type, token_hash})` server-side. Smoke real validado pelo Luiz em mobile com email real chegando: 4 telas da jornada confirmadas funcionais + senha trocada com sucesso + login com nova senha funciona. **PRs mergeadas hoje:** #8 (auth.5 inicial, `5d9e71d`) + #9 (auth.8, `c54d443`) + #10 (P0 fix token_hash + smokes E2E reais, `f5256ba`) + #11 (auth.9, `3e3ab97`). **Migration 031 em prod:** `password_reset_attempts` + RPC cooldown + 4 deny-all policies. **Template recovery v2.0 em prod** com identidade KEYRA. **Próximo (em outra sessão):** ou rodar `auth.6` Google OAuth (após Luiz fazer setup Google Cloud — instruções em [`docs/setup/google-oauth-setup.md`](setup/google-oauth-setup.md)) **OU** abrir Phases 5-7 Pós-MVP (precificação inteligente, projeções, OCR/Asaas/WhatsApp). **Pode encerrar terminal com segurança** — todos os documentos sincronizados.
+
+> **Data anterior:** 2026-05-06 — 🎉🎉 **STORY `auth.8` Done na sequência da `auth.5` (8/10 do EPIC-AUTH-V2 — 80%).** Fix do bug de 2 abas via `BroadcastChannel` API: aba antiga em `/esqueci-senha` agora detecta automaticamente quando outra aba completa o reset e exibe CTA "Ir para o login". Mudança cirúrgica em 4 arquivos: 1 helper novo (`lib/auth/broadcast.ts` com defensive no-op em SSR/browsers antigos) + 1 action ajustada (`setNewPasswordAction` retorna `{success:true}` em vez de `redirect()` server-side, para liberar broadcast antes da navegação) + 2 cards (`NewPasswordCard` posta evento + `router.push`; `RequestResetCard` escuta com `useEffect` + cleanup, estado `completedElsewhere` toma precedência sobre `submitted`). Sem schema/envs/Management API — story XS de 1 ponto. Quality gates verdes: `pnpm typecheck` ✅ · `pnpm lint --max-warnings 0` ✅ · `./scripts/check-rsc-boundaries.sh` PASS · QA self-gate 7/7 PASS. Branch `feat/auth-v2-story-8` (commit `29c8e7e`) pendente push + merge + deploy. **Fase C agora só tem `auth.6` (Google OAuth) restante; Fase D só `auth.9` (visual revamp AppShell).**
 
 > **Data anterior:** 2026-05-06 — 🎉 **STORY `auth.5` Done em prod (7/10 do EPIC-AUTH-V2 — 73%).** Migration `20260506000100_password_reset_attempts` aplicada via `supabase db push` com smoke transacional verde via psql (table_exists ✅, rls_enabled+forced ✅, rpc_exists ✅, 4 policies ✅, RPC primeira=true / segunda=false (cooldown ativo) / outro-email=true). Template recovery pt-BR aplicado via Management API com snapshot defensivo + validação GET — `mailer_subjects_recovery="Redefinir sua senha do KEYRA"` + 6925 chars HTML identidade KEYRA. **6 riscos da auditoria mitigados nesta story:** R3 Turnstile · R8 anti-enumeration · R11 signOut global · R12 otp 30min · R14 cooldown 60s server-side · R16 Sentry breadcrumb sem PII. Branch `feat/auth-v2-story-5` com 17 arquivos / +1683 linhas commitada localmente; PR pendente push. Quality gates verdes: `pnpm typecheck` ✅ · `pnpm lint --max-warnings 0` ✅ · `./scripts/check-rsc-boundaries.sh` PASS · QA self-gate 7/7 PASS. **Próximo:** push do PR + smoke E2E real da idealizadora (clicar link de email + redefinir senha) + abrir `auth.6` (Google OAuth) ou `auth.8` (BroadcastChannel) ou `auth.9` (visual revamp AppShell).
 
@@ -46,7 +48,7 @@
 | **Sprint 5 — Higienização visual** | ✅ **100% (~28 pts)** | 5.1-5.7 todas Done. Score saiu de 6.8 para alvo 8.0+. |
 | **Sprint 6 — Editorial + Motion** | ✅ **100% (25/25 pts)** | **Sprint 6 FECHADA.** 6.0 + 6.1 + 6.2 + 6.3 + 6.4 + 6.5 Done. DS editorial + Motion + Painel visual interativo + Navegação contextual. Phase 2.5 Anti-Regression Gates instaurada. AC2.3 e AC2.5 deferidos para Story 6.2.1. |
 | **Sprint 7 — Auth UX & Reliability** | 🟢🟢 **ENCERRADA — código + observabilidade + branding email ativos** | **7.0 ✅** (Sentry capture) · **7.0.1 ✅** (`withSentryConfig` + source maps) · **7.0.2 ✅ HOTFIX** (template.tsx passthrough — root cause `<m.div className="contents">` UB) · **7.1 ✅** (login UX: cooldown 60s + "Reenviar link") · **7.2 ✅** (template magic-link pt-BR aplicado via Supabase Management API) · **7.3 ✅** (`/mais` + `/configuracoes`) · **7.4 ✅** (3× not-found.tsx + global-error.tsx + Phase 2.6 Gate G5) · **7.5 ⏭️** (coberta — `(app)/error.tsx` mantém AppShell) · **7.6 ⏸️** (home cleanup opcional). Commits: `8ab06b1` → `58988d4` → `02ec96f` → `0f8888f` → `1cfb177`. Vercel envs Sentry corrigidas (`SENTRY_ORG=seal-digital`, `SENTRY_PROJECT=keyra`, novo `SENTRY_AUTH_TOKEN` `sntrys_*`). Source maps subindo. Repo `luizxhgomes/keyra` ↔ Sentry GitHub `status=active`. Todos deploys produção READY. **Único pendente:** validação manual em mobile da idealizadora. |
-| **EPIC-AUTH-V2 — Auth UX V2 + LGPD** | 🟡 **80% — 8/10 stories Done (33/44 pts)** | Fase A (auth.0+1) ✅ · Fase B (auth.2+3+4+7) ✅ · Fase C (auth.5 ✅ + auth.8 ✅ · auth.6 ⏸️ pendente) · Fase D (auth.9 ⏸️ pendente). Migration 031 aplicada em prod com smoke verde + template recovery pt-BR aplicado via Management API + BroadcastChannel sincronizando 2 abas. PR de `auth.8` pendente push. |
+| **EPIC-AUTH-V2 — Auth UX V2 + LGPD** | 🟢 **90% — 9/10 stories Done (41/47 pts) · auth.6 deferida** | Fase A (auth.0+1) ✅ · Fase B (auth.2+3+4+7) ✅ · Fase C (auth.5 ✅ + auth.8 ✅ · auth.6 ⏸️ **deferida**) · Fase D (auth.9 ✅). Migration 031 + template recovery v2.0 (token_hash flow cross-device safe) em prod. P0 fix do callback handler validado E2E real 12/12 PASS contra usekeyra.com. Story auth.9 entregou jornada afunilada (JourneyProgress 4 fases) + indicador força senha + tela `/redefinir-senha/sucesso` + visual revamp AppShell (Sidebar bolha "K", header gradient terracota, UserMenu avatar bg-primary). **`auth.6` (Google OAuth)** aguarda setup manual Google Cloud Console pelo Luiz — guia completo em [`docs/setup/google-oauth-setup.md`](setup/google-oauth-setup.md). Não bloqueia mais nada. |
 | **Phases 5–7 — Pós-MVP** | ⏸️ 0% UI | Phase 5 = Precificação inteligente, pacotes, alertas de recompra, Stripe. Phase 6 = Projeções, prontuário financeiro. Phase 7 = OCR, Asaas Pix, WhatsApp, NFS-e. |
 | **Testes automatizados** | 🔴 0 | Nenhum arquivo `.test.*` ou `.spec.*` no repo. Validação manual + typecheck + lint + build apenas |
 
@@ -159,27 +161,47 @@ Nenhum impede a próxima Story (2.4 — Agenda); cada um trava uma Story especí
 
 ---
 
-## 6. Próxima Ação Concreta — Luiz
+## 6. Próxima Ação Concreta — Luiz (sessão 2026-05-06 encerrada)
 
-🎉 **Story `auth.0` Done em main. Foundation de segurança ativa em produção (`usekeyra.com`).**
+🎉 **EPIC-AUTH-V2 fechado parcialmente — 9/10 stories Done (90%) em prod.** Tudo validado via E2E real contra `usekeyra.com` + smoke real visual da idealizadora em mobile com email entregando. Pode encerrar terminal com segurança.
 
-### O que ficou pronto agora
+### O que ficou pronto nesta sessão (4 PRs mergeadas em prod)
 
-| # | Ação | Status |
-|---|---|---|
-| 1 | Cloudflare Turnstile widget criado | ✅ |
-| 2 | Site key + secret key validadas + persistidas | ✅ |
-| 3 | Vercel envs Turnstile (3 targets × 2 vars) | ✅ |
-| 4 | `configure-supabase-auth-prod.sh` aplicado em prod (7/7 universais) | ✅ |
-| 5 | Validação GET dos campos aplicados (defesa contra silent-drop) | ✅ |
-| 6 | Story `auth.0` Status final | ✅ Done |
-| 7 | Gate Phase 3.5 `@compliance-br` | ✅ APPROVE + 2 CONCERNS |
-| 8 | PR #3 aberta com 14 conformidades verificadas | ✅ |
-| 9 | CI checks (RSC audit + RLS cross-tenant) | ✅ pass |
-| 10 | Squash merge → main (`dbc753e`) | ✅ |
-| 11 | Vercel prod deploy READY | ✅ ~75s |
-| 12 | Branch `feat/auth-v2` deletada (local + remote) | ✅ |
-| 13 | STATE.md sync (este snapshot) | ✅ |
+| # | PR | Conteúdo | SHA |
+|---|----|----------|-----|
+| 1 | #8 | Story `auth.5` inicial — recovery + cooldown + signOut global | `5d9e71d` |
+| 2 | #9 | Story `auth.8` — BroadcastChannel cross-tab | `c54d443` |
+| 3 | #10 | **🔴 P0 fix** — token_hash flow no callback handler (recovery estava 100% quebrado pra usuário real) + scripts de smoke E2E reais | `f5256ba` |
+| 4 | #11 | Story `auth.9` — jornada afunilada + força senha + visual revamp AppShell | `3e3ab97` |
+
+### Abertura disponível na próxima sessão (sua escolha)
+
+#### Opção A — Rodar `auth.6` (Google OAuth) — fecha o EPIC em 100%
+
+**Pré-condição mandatória sua:** setup manual no Google Cloud Console (criar OAuth 2.0 Client ID + consent screen + scopes email/profile/openid + Authorized redirect URI). Guia passo-a-passo completo em [`docs/setup/google-oauth-setup.md`](setup/google-oauth-setup.md). Tempo estimado: 10-15 min seu + 30-40 min meu (Supabase Mgmt API + código KEYRA + smokes).
+
+#### Opção B — Pular pra Pós-MVP (recomendado, EPIC-AUTH-V2 não bloqueia mais nada)
+
+3 frentes possíveis:
+
+- **Phase 5 — Precificação inteligente** (motor BOM + margem, pacotes, alertas de recompra, Stripe billing). Squad: `squad-keyra-intelligence`. Workflow: `keyra-inteligencia-spec-sdc`
+- **Phase 6 — Projeções & inteligência** (what-if, prontuário financeiro, rentabilidade por horário). Squad: `squad-keyra-intelligence`
+- **Phase 7 — Integrações externas** (OCR de extratos, Asaas Pix, WhatsApp Business, NFS-e). Squad: `squad-keyra-integrations`. Workflow: `keyra-integracoes-spec-sdc`
+
+Disparo: `@aiox-master *workflow {nome-do-workflow}` ou comando direto do squad.
+
+#### Opção C — Resolver débitos técnicos remanescentes (Sprint 9 hardening)
+
+- Stories h8.1-h8.8 em `docs/stories/h8.*.story.md` (descongela Sprint 8 hardening original — vira Sprint 9)
+- Inclui: typegen Supabase com privilégio correto (script já é atômico, falta token); Sentry breadcrumb cooldown rate-alarm; cleanup automático `password_reset_attempts` >24h; etc.
+
+### Como retomar contexto rápido na próxima sessão
+
+1. Abra terminal no `~/keyra/`
+2. Leia este `docs/STATE.md` (header já tem snapshot de 60s)
+3. Memory `project_keyra_state.md` é auto-loaded — confirma o que está em prod
+4. EPIC-AUTH-V2 com tabela 9/10 Done em `docs/stories/EPIC-AUTH-V2.md`
+5. Mapa completo desta sessão de encerramento em `docs/sessions/2026-05-06-session-update-map.md`
 
 ### Próximas decisões — sua escolha
 

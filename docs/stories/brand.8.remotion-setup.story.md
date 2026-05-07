@@ -1,8 +1,23 @@
-# Story brand.2: Setup Remotion + primeiro template (Brand Intro 3-5s)
+# Story brand.8: Remotion setup + Brand Intro template (4s vinheta canônica)
 
 ## Status
 
-Draft
+Done · PR #19 squash mergeado em main (`f48325b`) em 2026-05-07. **Última do Epic BRAND-INTEGRATION (8/8 · 100%).**
+
+## Implementação executada (resumo)
+
+Estrutura `apps/web/remotion/` com:
+- **lib/tokens.ts**: palette KEYRA tipada em TypeScript + helper `msToFrames(ms, fps=30)`
+- **compositions/BrandIntro.tsx**: vinheta 4s (120 frames @ 30fps) — sequência canônica wordmark letra a letra (stagger 6f), gold sublinha animada, tagline italic Fraunces, fade-quiet out
+- **Root.tsx**: 2 compositions registradas (`brand-intro-16-9` 1920×1080, `brand-intro-9-16` 1080×1920)
+- **index.ts**: registerRoot entry
+- **README.md**: setup completo + scripts pnpm + decisão arquitetural
+
+**Decisão arquitetural:** deps Remotion são opt-in (não obrigatórias) para preservar velocidade do CI (Chromium ~300MB) e bundle do Next intocado. `tsconfig.json` exclui `remotion/`, `eslint.config.mjs` ignora `remotion/**`.
+
+**Validação técnica:** typecheck verde · lint zero warnings · build verde (38 rotas, bundle Next intocado) · RSC PASS · Cross-tenant PASS · Vercel SUCCESS · 7 arquivos · +423 linhas.
+
+---
 
 ## Story
 

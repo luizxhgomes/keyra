@@ -39,13 +39,37 @@ const config: Config = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        // Primary scale = terracota canônica (KEYRA brand)
+        // 500 = terracotta-600 = CTA padrão (matches CSS var --primary)
+        // 600 = terracotta-700 = hover state
+        // 700 = rust-800 = active/destructive intense
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          50: '#FAF6EE',   // ivory-50
+          100: '#F4EDE2',  // ivory-100
+          200: '#E5B473',  // amber-300 (soft warm)
+          300: '#D89A4D',  // amber-400
+          400: '#C8843A',  // amber-500
+          500: '#B8612B',  // terracotta-600 (canonical CTA)
+          600: '#A05525',  // terracotta-700 (hover)
+          700: '#843E1A',  // rust-800 (active/intense)
+          800: '#5A3E26',  // cocoa-700
+          900: '#3F2A1B',  // cocoa-800
         },
+        // Secondary scale = bronze canônico (KEYRA brand)
+        // 400 = bronze-500 = neutro warm (matches CSS var --secondary)
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
+          50: '#F4EDE2',   // ivory-100
+          100: '#EAE0CF',  // sand-200
+          200: '#C8B49A',  // mocha-300
+          300: '#946640',  // bronze-400
+          400: '#7E5A40',  // bronze-500 (canonical)
+          500: '#5A3E26',  // cocoa-700
+          600: '#3F2A1B',  // cocoa-800
+          700: '#2B1810',  // cocoa-900
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',

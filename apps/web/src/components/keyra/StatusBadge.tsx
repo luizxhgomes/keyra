@@ -67,12 +67,12 @@ const STATUS: Record<
   agendado: {
     label: 'Agendado',
     icon: Clock,
-    className: 'bg-blue-100 text-blue-900 border-transparent',
+    className: 'bg-amber-300/30 text-cocoa-800 border-transparent',
   },
   realizado: {
     label: 'Realizado',
     icon: CheckCircle2,
-    className: 'bg-secondary-100 text-secondary-700 border-transparent',
+    className: 'bg-success-leaf/20 text-success-deep border-transparent',
   },
   cancelado: {
     label: 'Cancelado',
@@ -82,29 +82,29 @@ const STATUS: Record<
   falta: {
     label: 'Falta',
     icon: Ban,
-    className: 'bg-amber-100 text-amber-900 border-transparent',
+    className: 'bg-amber-300/40 text-cocoa-900 border-transparent',
   },
   // Comanda (Story 3.1)
   aberta: {
     label: 'Aberta',
     icon: Edit3,
-    className: 'bg-amber-100 text-amber-900 border-transparent',
+    className: 'bg-amber-300/40 text-cocoa-900 border-transparent',
   },
   finalizada: {
     label: 'Finalizada',
     icon: Circle,
-    className: 'bg-blue-100 text-blue-900 border-transparent',
+    className: 'bg-amber-300/30 text-cocoa-800 border-transparent',
   },
   paga: {
     label: 'Paga',
     icon: CheckCircle2,
-    className: 'bg-secondary-100 text-secondary-700 border-transparent',
+    className: 'bg-success-leaf/20 text-success-deep border-transparent',
   },
   // Movimento de estoque (Story 2.3 + 3.8)
   entrada: {
     label: 'Entrada',
     icon: ArrowUpCircle,
-    className: 'bg-secondary-100 text-secondary-700 border-transparent',
+    className: 'bg-success-leaf/20 text-success-deep border-transparent',
   },
   saida: {
     label: 'Saída',
@@ -114,33 +114,33 @@ const STATUS: Record<
   ajuste: {
     label: 'Ajuste',
     icon: RefreshCw,
-    className: 'bg-blue-100 text-blue-900 border-transparent',
+    className: 'bg-amber-300/30 text-cocoa-800 border-transparent',
   },
   consumo: {
     label: 'Consumo',
     icon: PackageMinus,
-    className: 'bg-amber-100 text-amber-900 border-transparent',
+    className: 'bg-amber-300/40 text-cocoa-900 border-transparent',
   },
   perda: {
     label: 'Perda',
     icon: TrendingDown,
-    className: 'bg-red-100 text-red-700 border-transparent',
+    className: 'bg-rust-800/15 text-rust-800 border-transparent',
   },
   // Plano de contas (Story 3.6)
   receita: {
     label: 'Receita',
     icon: Coins,
-    className: 'bg-secondary-100 text-secondary-700 border-transparent',
+    className: 'bg-success-leaf/20 text-success-deep border-transparent',
   },
   'custo-variavel': {
     label: 'Custo variável',
     icon: Layers,
-    className: 'bg-amber-100 text-amber-900 border-transparent',
+    className: 'bg-amber-300/40 text-cocoa-900 border-transparent',
   },
   'custo-fixo': {
     label: 'Custo fixo',
     icon: Wallet,
-    className: 'bg-blue-100 text-blue-900 border-transparent',
+    className: 'bg-amber-300/30 text-cocoa-800 border-transparent',
   },
   despesa: {
     label: 'Despesa operacional',
@@ -161,17 +161,17 @@ const STATUS: Record<
   info: {
     label: 'Informação',
     icon: Info,
-    className: 'bg-blue-100 text-blue-900 border-transparent',
+    className: 'bg-amber-300/30 text-cocoa-800 border-transparent',
   },
   aviso: {
     label: 'Atenção',
     icon: AlertTriangle,
-    className: 'bg-amber-100 text-amber-900 border-transparent',
+    className: 'bg-amber-300/40 text-cocoa-900 border-transparent',
   },
   critico: {
     label: 'Crítico',
     icon: AlertTriangle,
-    className: 'bg-red-100 text-red-700 border-transparent',
+    className: 'bg-rust-800/15 text-rust-800 border-transparent',
   },
 };
 

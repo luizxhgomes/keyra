@@ -39,13 +39,15 @@ const VARIANT_PADDING: Record<NonNullable<KPICardProps['variant']>, string> = {
   compact: 'p-4',
 };
 
-// Story 6.1 — tokens semânticos `text-kpi-hero` (56px / 1.0 / 600) e
-// `text-kpi` (40px / 1.0 / 600) substituem `text-5xl`/`text-4xl`. `compact`
-// permanece sem token (caso de uso secundário, não mapeado).
+// Story brand.2 (Epic BRAND-INTEGRATION): KPI value adaptativo via container
+// queries. Escala com a largura do card (não da viewport), eliminando overflow
+// em grids estreitos e permitindo grandeza dramática em hero. Brandbook §05
+// Componentes documenta padrão `clamp(MIN, Ncqi, MAX)` em cards com tipografia
+// variável. Tokens legados text-kpi-hero/text-kpi mantidos como fallback.
 const VARIANT_VALUE_TEXT: Record<NonNullable<KPICardProps['variant']>, string> = {
-  hero: 'text-kpi-hero',
-  secondary: 'text-kpi',
-  compact: 'text-2xl',
+  hero: 'text-[clamp(40px,16cqi,56px)] font-bold leading-none tracking-tight',
+  secondary: 'text-[clamp(28px,13cqi,44px)] font-bold leading-none tracking-tight',
+  compact: 'text-2xl font-semibold',
 };
 
 export function KPICard({
@@ -66,10 +68,11 @@ export function KPICard({
       role="group"
       aria-label={label}
       className={cn(
-        // Story 6.2 (AC2.10) — sombra animada em hover sinaliza interatividade
-        // do KPICard. Usa transform implícito do `transition-shadow` (não toca
-        // dimensão — AC2.12 preservado).
-        'flex flex-col gap-3 shadow-sm transition-shadow duration-150 ease-out hover:shadow-md',
+        // Story brand.2 — container query ativo + warm shadow hover (cocoa-based).
+        // - container-type:inline-size habilita unidade `cqi` no value
+        // - hover:shadow-warm-md = sombra cor cocoa, não slate (princípio motion KEYRA)
+        // - overflow:hidden é rede de segurança caso clamp falhe em viewport extremo
+        '@container flex flex-col gap-3 overflow-hidden shadow-warm-sm transition-shadow duration-base ease-out-soft hover:shadow-warm-md [container-type:inline-size]',
         VARIANT_PADDING[variant],
         className,
       )}

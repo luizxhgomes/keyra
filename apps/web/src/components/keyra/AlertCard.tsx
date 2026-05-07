@@ -34,29 +34,34 @@ export interface AlertCardProps {
 // necessário customizar, usar `iconNode?: ReactNode` (ReactElement
 // pré-renderizado, serializável Server↔Client).
 
+// Story brand.2 (Epic BRAND-INTEGRATION) — AlertCard segue padrão brandbook:
+// border-left 4px na cor semântica + bg ivory-100 + ícone na cor.
+// Substitui bg-amber-50/border-amber-200/bg-red-50/border-red-200 (Tailwind
+// defaults frios e foras da palette KEYRA) por palette canônica warm.
+// Reference: docs/brand/03-identity/preview.html §05 Componentes
 const SEVERITY: Record<
   AlertCardProps['severity'],
   { icon: LucideIcon; bg: string; border: string; iconColor: string; role: 'status' | 'alert' }
 > = {
   warning: {
     icon: AlertTriangle,
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    iconColor: 'text-alerta',
+    bg: 'bg-ivory-100',
+    border: 'border border-sand-200 border-l-4 border-l-amber-500',
+    iconColor: 'text-amber-500',
     role: 'status',
   },
   info: {
     icon: Info,
-    bg: 'bg-muted',
-    border: 'border-border',
-    iconColor: 'text-info',
+    bg: 'bg-ivory-100',
+    border: 'border border-sand-200 border-l-4 border-l-bronze-500',
+    iconColor: 'text-bronze-500',
     role: 'status',
   },
   critical: {
     icon: AlertOctagon,
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    iconColor: 'text-prejuizo',
+    bg: 'bg-ivory-100',
+    border: 'border border-sand-200 border-l-4 border-l-rust-800',
+    iconColor: 'text-rust-800',
     role: 'alert',
   },
 };

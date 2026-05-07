@@ -1,16 +1,25 @@
 <!--
   KEYRA · template de recovery (esqueci minha senha) em pt-BR.
-  Versão: 1.0 (2026-05-06) — Story auth.5 do EPIC-AUTH-V2.
-  Estrutura, paleta e tipografia idênticas ao magic-link.html v2.0 — única
-  diferença é a copy (recovery vs login passwordless) e o copy do disclaimer
-  alinhado com o cooldown de 30min do mailer_otp_exp em prod.
+  Versão: 2.0 (2026-05-06) — Story auth.5 + fix de fluxo SSR.
+
+  MUDANÇA CRÍTICA v1.0 → v2.0:
+  Antes usava https://usekeyra.com/auth/callback?token_hash={{ .TokenHash }}&type=recovery (link Supabase verify que retornava
+  hash fragment #access_token=...). Hash NÃO chega no server, então o
+  callback handler /auth/callback rejeitava com /login?error=invalid_code
+  — usuários NÃO conseguiam redefinir senha por email.
+
+  Agora usa {{ .TokenHash }} montado em URL custom que aponta direto pro
+  /auth/callback?token_hash=...&type=recovery. Callback faz verifyOtp
+  server-side, cross-device safe (não exige code_verifier no browser do
+  user). Padrão recomendado pela Supabase pra SSR:
+  https://supabase.com/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr
 
   Variáveis Supabase disponíveis (recovery flow):
-    {{ .ConfirmationURL }}  — URL pronta de redefinição (já contém ?type=recovery)
-    {{ .Email }}            — destinatário
-    {{ .SiteURL }}          — URL canônica do app (https://usekeyra.com)
-    {{ .Token }}            — token cru (não usar — preferimos URL pronto)
-    {{ .TokenHash }}        — hash do token (debug)
+    {{ .TokenHash }}        — hash do token usado por verifyOtp (USAR ESTE)
+    {{ .Email }}             — destinatário
+    {{ .SiteURL }}           — URL canônica do app
+    {{ .Token }}             — token cru (não usar — verifyOtp espera o hash)
+    https://usekeyra.com/auth/callback?token_hash={{ .TokenHash }}&type=recovery   — link legacy implicit grant (NÃO usar em SSR)
 
   Aplicação:
     Via Management API → scripts/configure-supabase-recovery-template.sh
@@ -124,7 +133,7 @@
                       style="border-radius: 8px;"
                     >
                       <a
-                        href="{{ .ConfirmationURL }}"
+                        href="https://usekeyra.com/auth/callback?token_hash={{ .TokenHash }}&type=recovery"
                         target="_blank"
                         rel="noopener"
                         style="
@@ -168,7 +177,7 @@
                     line-height: 1.5;
                   "
                 >
-                  {{ .ConfirmationURL }}
+                  https://usekeyra.com/auth/callback?token_hash={{ .TokenHash }}&type=recovery
                 </p>
               </td>
             </tr>

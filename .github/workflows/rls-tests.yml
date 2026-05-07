@@ -140,3 +140,35 @@ jobs:
         run: |
           chmod +x scripts/check-rsc-boundaries.sh
           ./scripts/check-rsc-boundaries.sh
+
+  auth-recovery-template-drift:
+    name: Auth recovery template drift check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    # Só roda em pushes na main — pra preview, sem secrets, vira no-op.
+    # Detecta drift do template recovery em prod (alguém editou via dashboard
+    # sem passar pelo script idempotente).
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Skip if secrets not configured
+        if: env.SUPABASE_ACCESS_TOKEN == '' || env.SUPABASE_PROJECT_REF == ''
+        run: |
+          echo "⚠️ SUPABASE_ACCESS_TOKEN ou SUPABASE_PROJECT_REF ausente — pulando."
+          echo "Configure em Settings → Secrets para ativar este check."
+          exit 0
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Validate recovery template in production
+        # Story auth.5 AC7 — garante que template em prod tem identidade KEYRA.
+        # Falha bloqueia merge/deploy se alguém alterou template via dashboard.
+        run: |
+          chmod +x scripts/validate-recovery-template.sh
+          ./scripts/validate-recovery-template.sh

@@ -1337,3 +1337,257 @@ export async function getCurrentMonthGoalProgress(): Promise<ActionResult<GoalPr
 // Suprimir warnings de imports não usados em todas as branches.
 void startOfWeek;
 void endOfWeek;
+
+// ---------------------------------------------------------------------------
+// Hub Financeiro Editorial — Server Actions (Fase 1, 2026-05-08)
+// ---------------------------------------------------------------------------
+
+export type FinanceOverview = {
+  revenueMonthCents: number;
+  expensesMonthCents: number;
+  profitMonthCents: number;
+  balanceCents: number;
+  revenueLastMonthCents: number;
+  expensesLastMonthCents: number;
+  profitLastMonthCents: number;
+  /** Sparkline de 12 meses (Jan-Dec do ano corrente). Cada index = mês 1-12. */
+  revenueSparkline: number[];
+  expensesSparkline: number[];
+  profitSparkline: number[];
+};
+
+export async function getFinanceOverview(): Promise<ActionResult<FinanceOverview>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const yearStart = new Date(now.getFullYear(), 0, 1).toISOString();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().slice(0, 10);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().slice(0, 10);
+
+    const [creditYearRes, debitYearRes, monthlyRes, lastMonthRes] = await Promise.all([
+      supabase
+        .from('transactions')
+        .select('reference_date, net_amount')
+        .eq('org_id', orgId)
+        .eq('direction', 'credit')
+        .is('deleted_at', null)
+        .gte('reference_date', yearStart),
+      supabase
+        .from('transactions')
+        .select('reference_date, gross_amount')
+        .eq('org_id', orgId)
+        .eq('direction', 'debit')
+        .is('deleted_at', null)
+        .gte('reference_date', yearStart),
+      supabase
+        .from('transactions')
+        .select('direction, gross_amount, net_amount')
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .gte('reference_date', monthStart),
+      supabase
+        .from('transactions')
+        .select('direction, gross_amount, net_amount')
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .gte('reference_date', lastMonthStart)
+        .lte('reference_date', lastMonthEnd),
+    ]);
+
+    if (creditYearRes.error) return { ok: false, error: creditYearRes.error.message };
+    if (debitYearRes.error) return { ok: false, error: debitYearRes.error.message };
+    if (monthlyRes.error) return { ok: false, error: monthlyRes.error.message };
+    if (lastMonthRes.error) return { ok: false, error: lastMonthRes.error.message };
+
+    // Aggregate sparkline: 12 meses Jan-Dec
+    const revenueSpark = Array(12).fill(0) as number[];
+    const expensesSpark = Array(12).fill(0) as number[];
+    for (const r of creditYearRes.data ?? []) {
+      const m = new Date(r.reference_date).getMonth();
+      revenueSpark[m] = (revenueSpark[m] ?? 0) + Math.round(Number(r.net_amount ?? 0) * 100);
+    }
+    for (const r of debitYearRes.data ?? []) {
+      const m = new Date(r.reference_date).getMonth();
+      expensesSpark[m] = (expensesSpark[m] ?? 0) + Math.round(Number(r.gross_amount ?? 0) * 100);
+    }
+    const profitSpark = revenueSpark.map((r, i) => r - (expensesSpark[i] ?? 0));
+
+    let revenueMonthCents = 0;
+    let expensesMonthCents = 0;
+    for (const r of monthlyRes.data ?? []) {
+      const cents = Math.round(Number(r.direction === 'credit' ? r.net_amount : r.gross_amount ?? 0) * 100);
+      if (r.direction === 'credit') revenueMonthCents += cents;
+      else expensesMonthCents += cents;
+    }
+    let revenueLastCents = 0;
+    let expensesLastCents = 0;
+    for (const r of lastMonthRes.data ?? []) {
+      const cents = Math.round(Number(r.direction === 'credit' ? r.net_amount : r.gross_amount ?? 0) * 100);
+      if (r.direction === 'credit') revenueLastCents += cents;
+      else expensesLastCents += cents;
+    }
+
+    return {
+      ok: true,
+      data: {
+        revenueMonthCents,
+        expensesMonthCents,
+        profitMonthCents: revenueMonthCents - expensesMonthCents,
+        balanceCents: revenueSpark.reduce((a, b) => a + b, 0) - expensesSpark.reduce((a, b) => a + b, 0),
+        revenueLastMonthCents: revenueLastCents,
+        expensesLastMonthCents: expensesLastCents,
+        profitLastMonthCents: revenueLastCents - expensesLastCents,
+        revenueSparkline: revenueSpark,
+        expensesSparkline: expensesSpark,
+        profitSparkline: profitSpark,
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+export type OutstandingCommandRow = {
+  id: string;
+  shortId: string;
+  customerName: string | null;
+  professionalName: string | null;
+  totalCents: number;
+  openedAt: string;
+  ageDays: number;
+  /** Heurística: cliente com 3+ comandas pagas no último ano = recorrente (priority flag). */
+  priorityFlag: boolean;
+};
+
+export async function getOutstandingCommands(
+  limit = 8,
+): Promise<ActionResult<OutstandingCommandRow[]>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const { data, error } = await supabase
+      .from('commands')
+      .select(
+        `id, total, opened_at, customer_id,
+         customer:customers(full_name),
+         professional:professionals(display_name)`,
+      )
+      .eq('org_id', orgId)
+      .eq('status', 'open')
+      .is('deleted_at', null)
+      .order('opened_at', { ascending: true })
+      .limit(limit);
+
+    if (error) return { ok: false, error: error.message };
+
+    const now = Date.now();
+    const customerIds = (data ?? [])
+      .map((r) => r.customer_id)
+      .filter((id): id is string => !!id);
+
+    let recurringMap = new Set<string>();
+    if (customerIds.length > 0) {
+      const yearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: paidData } = await supabase
+        .from('commands')
+        .select('customer_id')
+        .eq('org_id', orgId)
+        .eq('status', 'paid')
+        .is('deleted_at', null)
+        .gte('paid_at', yearAgo)
+        .in('customer_id', customerIds);
+      const counts = new Map<string, number>();
+      for (const p of paidData ?? []) {
+        if (!p.customer_id) continue;
+        counts.set(p.customer_id, (counts.get(p.customer_id) ?? 0) + 1);
+      }
+      recurringMap = new Set(Array.from(counts.entries()).filter(([, c]) => c >= 3).map(([id]) => id));
+    }
+
+    const rows: OutstandingCommandRow[] = (data ?? []).map((r) => {
+      const c = r.customer as { full_name: string } | { full_name: string }[] | null;
+      const p = r.professional as { display_name: string } | { display_name: string }[] | null;
+      const cust = Array.isArray(c) ? c[0] : c;
+      const prof = Array.isArray(p) ? p[0] : p;
+      const opened = new Date(r.opened_at).getTime();
+      return {
+        id: r.id,
+        shortId: r.id.slice(0, 8).toUpperCase(),
+        customerName: cust?.full_name ?? null,
+        professionalName: prof?.display_name ?? null,
+        totalCents: Math.round(Number(r.total ?? 0) * 100),
+        openedAt: r.opened_at,
+        ageDays: Math.floor((now - opened) / (24 * 60 * 60 * 1000)),
+        priorityFlag: !!(r.customer_id && recurringMap.has(r.customer_id)),
+      };
+    });
+
+    return { ok: true, data: rows };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+export type TopExpenseCategoryRow = {
+  categoryId: string;
+  name: string;
+  amountCents: number;
+  share: number;
+};
+
+export async function getTopExpensesByCategory(): Promise<
+  ActionResult<{ rows: TopExpenseCategoryRow[]; totalCents: number }>
+> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .select(`gross_amount, category:expense_categories(id, name)`)
+      .eq('org_id', orgId)
+      .eq('direction', 'debit')
+      .is('deleted_at', null)
+      .gte('reference_date', monthStart)
+      .lte('reference_date', monthEnd);
+
+    if (error) return { ok: false, error: error.message };
+
+    const map = new Map<string, { id: string; name: string; cents: number }>();
+    let totalCents = 0;
+    for (const row of data ?? []) {
+      const cat = (Array.isArray(row.category) ? row.category[0] : row.category) as { id: string; name: string } | null;
+      const id = cat?.id ?? '__none__';
+      const name = cat?.name ?? 'Sem categoria';
+      const cents = Math.round(Number(row.gross_amount ?? 0) * 100);
+      totalCents += cents;
+      const cur = map.get(id);
+      if (cur) cur.cents += cents;
+      else map.set(id, { id, name, cents });
+    }
+    const rows: TopExpenseCategoryRow[] = Array.from(map.values())
+      .map((r) => ({
+        categoryId: r.id,
+        name: r.name,
+        amountCents: r.cents,
+        share: totalCents > 0 ? r.cents / totalCents : 0,
+      }))
+      .sort((a, b) => b.amountCents - a.amountCents)
+      .slice(0, 5);
+
+    return { ok: true, data: { rows, totalCents } };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}

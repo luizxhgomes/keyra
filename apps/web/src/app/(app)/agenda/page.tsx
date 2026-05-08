@@ -19,11 +19,11 @@ type AgendaPageProps = {
 /**
  * Server shell da Agenda. Faz auth + role gate (`viewer` mínimo) e busca a
  * lista de profissionais ativos. O calendário em si é Client Component
- * (FullCalendar precisa de DOM); a navegação por data e o refetch dos eventos
- * acontecem direto no client via Server Action `listAppointments`.
+ * (FullCalendar precisa de DOM).
  *
- * Story 2.4 — Agenda (visualização). Stories 2.5 (criar), 2.6 (status) e
- * 2.7 (receita prevista) penduram nas hooks expostas pelo `CalendarClient`.
+ * Refinamento Fase 1 (2026-05-08): layout 2-col com sidebar lateral
+ * (mini-calendário + counts mensais + próximo agendamento). Mobile mantém
+ * empilhamento. Inspirado em referência fornecida pela idealizadora.
  */
 export default async function AgendaPage({ searchParams }: AgendaPageProps) {
   const { orgId } = await requireAuth();
@@ -41,8 +41,6 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <ReceitaCard />
-
       <header className="flex flex-col gap-1">
         <h1 className="font-serif text-display text-foreground">Agenda</h1>
         <p className="text-sm text-muted-foreground">
@@ -50,6 +48,8 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
           ver detalhes.
         </p>
       </header>
+
+      <ReceitaCard />
 
       <CalendarClient
         professionals={professionals}

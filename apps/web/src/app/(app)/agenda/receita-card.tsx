@@ -1,51 +1,38 @@
-import { formatBRL } from '@/lib/money';
-
 import { getReceitaPrevista } from './actions';
+import { ReceitaCardAnimated } from './receita-card-animated';
 
 /**
- * Card sticky de receita prevista (Story 2.7).
+ * Card de receita prevista — Server Component que busca dados e delega
+ * renderização animada ao Client wrapper `ReceitaCardAnimated`.
  *
- * Server Component — `getReceitaPrevista()` é chamado direto no render.
+ * Refinamento Fase 1 (2026-05-08):
+ * - Removido pattern sticky com negative margins que causava overlap com
+ *   o título "Agenda" em Fraunces grande
+ * - Cards individuais com tipografia editorial (Fraunces) + ícones por bucket
+ * - Animação stagger 80ms via motion tokens KEYRA (kpiRevealContainer)
+ * - Labels temporais correlacionados à data atual do usuário (pt-BR)
+ *
+ * UX (princípios da idealizadora):
+ * - Números absolutos em pt-BR via `formatBRL` (Decimal.js + ROUND_HALF_EVEN)
+ * - Cores KEYRA: amber/terracota/cocoa por bucket temporal
+ * - Empty state = `R$ 0,00` (a view só agrega `scheduled`, então quando
+ *   nada está marcado o `getReceitaPrevista` devolve "0.00").
+ *
  * Atualização "automática" do card vem do `revalidatePath('/agenda')` que
  * `createAppointment` (Story 2.5) e `changeAppointmentStatus` (Story 2.6)
  * já fazem após qualquer mutação. Sem polling, sem websocket.
- *
- * UX (princípios da idealizadora):
- * - Números absolutos em pt-BR via `formatBRL` (Decimal.js + ROUND_HALF_EVEN).
- * - Sem gráficos. Sem percentuais. Apenas hoje · semana · mês.
- * - Empty state = `R$ 0,00` (a view só agrega `scheduled`, então quando
- *   nada está marcado o `getReceitaPrevista` devolve "0.00" e o `formatBRL`
- *   renderiza `R$ 0,00` — sem traços nem placeholder, conforme DoD §3).
  */
 export async function ReceitaCard() {
   const receita = await getReceitaPrevista();
 
   return (
-    <section
-      aria-label="Receita prevista"
-      className="sticky top-0 z-10 -mx-4 -mt-4 border-b border-border bg-card/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:-mt-6 sm:px-6"
-    >
-      <h2 className="mb-2 text-label uppercase text-muted-foreground">
-        Receita prevista
-      </h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <ValueCell label="Hoje" value={receita.today} />
-        <ValueCell label="Esta semana" value={receita.week} />
-        <ValueCell label="Este mês" value={receita.month} />
-      </div>
-    </section>
-  );
-}
-
-function ValueCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-label uppercase text-muted-foreground">
-        {label}
-      </span>
-      <span className="text-xl font-semibold tabular-nums text-foreground">
-        {formatBRL(value)}
-      </span>
-    </div>
+    <ReceitaCardAnimated
+      today={receita.today}
+      week={receita.week}
+      month={receita.month}
+      todayLabel={receita.todayLabel}
+      weekRangeLabel={receita.weekRangeLabel}
+      monthLabel={receita.monthLabel}
+    />
   );
 }

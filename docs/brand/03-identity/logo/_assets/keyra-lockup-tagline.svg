@@ -1,7 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-label="KEYRA — sua clínica rendendo mais.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 140" role="img" aria-label="KEYRA — sua clínica rendendo mais.">
   <title>KEYRA · Lockup com tagline</title>
-  <desc>Wordmark + tagline italic em Fraunces. Calibração canônica brand v1.1: ponto com centro na baseline, gap 18%, raio 8.5%.</desc>
-  <text x="0" y="80" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="92" font-weight="700" letter-spacing="-2.5" fill="#2B1810">KEYRA</text>
-  <circle cx="279" cy="80" r="8" fill="#B8923A"/>
+  <desc>Wordmark + tagline italic em Fraunces. Ponto via tspan natural.</desc>
+  <text x="0" y="80" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="92" font-weight="700" letter-spacing="-2.5" fill="#2B1810">KEYRA<tspan fill="#B8923A">.</tspan></text>
   <text x="0" y="120" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="22" font-weight="300" font-style="italic" fill="#7E5A40">sua clínica rendendo mais.</text>
 </svg>

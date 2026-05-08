@@ -1,31 +1,44 @@
 # KEYRA · Logo Usage & Brand Book
 
-> **Status:** Logo signature canônico ativo em produção · brand v1.1 (calibração proporcional do ponto).
+> **Status:** Logo signature canônico ativo em produção · brand v1.2 (ponto via `<tspan>` tipográfico).
 > **Componente React:** `apps/web/src/components/brand/KeyraLogo.tsx`
 > **Assets SVG:** `docs/brand/03-identity/logo/_assets/`
 > **Atualizado em:** 7 de maio de 2026.
 
-## 0. ⚠️ Regra inegociável · Calibração do ponto signature
+## 0. ⚠️ Regra inegociável · Ponto signature via `<tspan>` tipográfico
 
-O ponto dourado segue **proporção fixa em TODAS as variants**. Não alterar sem revisar este documento + o componente `<KeyraLogo />`.
+**Decisão arquitetural brand v1.2:** o ponto signature é renderizado via `<tspan>` dentro do mesmo `<text>` do wordmark, não via `<circle>` posicionado manualmente. Isso garante:
 
-| Eixo | Regra | Cálculo |
-|---|---|---|
-| **Posição vertical (cy)** | Centro do ponto na **baseline** da letra adjacente | `cy = y do <text>` (mesma baseline) |
-| **Posição horizontal (cx)** | Gap proporcional ao font-size, equivalente ao letter-spacing natural | `cx = textEndX + (fontSize × 0.18)` |
-| **Tamanho (raio)** | Proporcional ao stroke do terminal do "A"/"K" | `r = fontSize × 0.085` |
-| **Cor** | `gold-500` `#B8923A` em qualquer theme | constante em todos os formatos |
+1. **Posição automática** — kerning real do font (Fraunces) coloca o ponto na posição tipograficamente correta após a última letra, sem cálculo manual de `cx`.
+2. **Tamanho proporcional natural** — o glifo do ponto-final do Fraunces tem geometria nativa proporcional ao font-size (Sagi Haviv: "use a tipografia, não invente em cima dela").
+3. **Coerência** — o ponto é parte do mesmo objeto tipográfico, não um adorno solto.
+4. **Escalabilidade** — qualquer font-size resulta em ponto proporcional automaticamente.
 
-### Tabela de valores calibrados
+### Padrão canônico do SVG
 
-| Variant | font-size | text endX | gap (18%) | cx ponto | cy (baseline) | raio (8.5%) |
-|---|---|---|---|---|---|---|
-| Primary (240×80) | 72 | ~206 | ~13 | **219** | **62** | **6** |
-| Monogram (64×64) | 56 | ~38 | ~10 | **48** | **52** | **5** |
-| Lockup (320×140) | 92 | ~262 | ~17 | **279** | **80** | **8** |
-| Stacked K (200×240) | 140 | ~145 | ~25 | **158** | **120** | **12** |
+```svg
+<text x="0" y="62" font-family="Fraunces,serif" font-size="72" font-weight="700"
+      letter-spacing="-2" fill="#2B1810">
+  KEYRA<tspan fill="#B8923A">.</tspan>
+</text>
+```
 
-**Princípio:** o ponto NUNCA fica acima da baseline (não é altura média da letra). Sempre na linha onde os serifs descansam, à direita da última letra com gap proporcional.
+A cor do ponto vem do `fill` do `<tspan>`. Posição, tamanho e baseline são automáticos via kerning do font.
+
+### ViewBox calibrados (com folga pra ponto + tagline + kerning)
+
+| Variant | viewBox | font-size | letter-spacing |
+|---|---|---|---|
+| Primary | `0 0 280 80` | 72 | -2 |
+| Monogram | `0 0 72 64` | 56 | -1 |
+| Lockup | `0 0 360 140` | 92 | -2.5 |
+| Stacked K | `0 0 220 260` | 140 | -2 |
+
+**Regra do viewBox:** sempre dimensionar com **folga horizontal de ~15-20% sobre a largura natural do texto + ponto**, evitando recortes em qualquer fallback de font.
+
+### Cores aprovadas para o ponto
+
+- `#B8923A` (gold-500) · canônico em qualquer theme
 
 ---
 

@@ -85,16 +85,16 @@ export function KeyraLogo({
   // signature em TODAS as variants. Não alterar sem revisar usage.md.
   // dotRadius = fontSize × 0.085 · dotGap = fontSize × 0.18 · dotCY = baseline
 
+  // ABORDAGEM v1.2: usar `<tspan>` com fill diferente para o ponto.
+  // Vantagem: posição automática depois da letra (kerning real), tamanho
+  // proporcional natural ao font, coerência tipográfica perfeita.
+  // Fraunces 700 inclui ponto-final como glyph com geometria correta.
+
   if (variant === 'primary') {
-    // Wordmark KEYRA. horizontal · viewBox calibrado: 260×80
-    // Fraunces 700 fontSize 72 letterSpacing -2 · "KEYRA" termina em ~206
-    // Ponto: cx = 206 + (72 × 0.18) = 218.96 ≈ 219
-    //        cy = 62 (baseline = mesmo y do <text>)
-    //        r  = 72 × 0.085 = 6.12 ≈ 6
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 240 80"
+        viewBox="0 0 280 80"
         height={h}
         className={cn('shrink-0', className)}
         style={{ width: 'auto' }}
@@ -111,21 +111,17 @@ export function KeyraLogo({
           fill={colors.wordmark}
         >
           KEYRA
+          <tspan fill={colors.dot}>.</tspan>
         </text>
-        <circle cx="219" cy="62" r="6" fill={colors.dot} />
       </svg>
     );
   }
 
   if (variant === 'monogram') {
-    // K. monograma · viewBox 64×64 · K Fraunces 700 fontSize 56 termina em ~38
-    // Ponto: cx = 38 + (56 × 0.18) = 48.08 ≈ 48
-    //        cy = 52 (baseline = mesmo y do <text>)
-    //        r  = 56 × 0.085 = 4.76 ≈ 5
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 64 64"
+        viewBox="0 0 72 64"
         height={h}
         width={h}
         className={cn('shrink-0', className)}
@@ -142,22 +138,17 @@ export function KeyraLogo({
           fill={colors.wordmark}
         >
           K
+          <tspan fill={colors.dot}>.</tspan>
         </text>
-        <circle cx="48" cy="52" r="5" fill={colors.dot} />
       </svg>
     );
   }
 
   if (variant === 'lockup-tagline') {
-    // Wordmark + tagline italic · viewBox 320×140
-    // Fraunces 700 fontSize 92 letterSpacing -2.5 · "KEYRA" termina em ~262
-    // Ponto: cx = 262 + (92 × 0.18) = 278.56 ≈ 279
-    //        cy = 80 (baseline)
-    //        r  = 92 × 0.085 = 7.82 ≈ 8
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 320 140"
+        viewBox="0 0 360 140"
         height={h}
         className={cn('shrink-0', className)}
         style={{ width: 'auto' }}
@@ -179,8 +170,8 @@ export function KeyraLogo({
           fill={colors.wordmark}
         >
           KEYRA
+          <tspan fill={colors.dot}>.</tspan>
         </text>
-        <circle cx="279" cy="80" r="8" fill={colors.dot} />
         <text
           x="0"
           y="120"
@@ -197,16 +188,11 @@ export function KeyraLogo({
     );
   }
 
-  // stacked · K. grande centralizado + linha divisória + KEYRA letterspacing
-  // viewBox 200×240 · K text-anchor=middle x=100 fontSize=140 letterSpacing=-2
-  // K width ≈ 90 → K vai de x=55 a x=145. Ponto:
-  //   cx = 145 + (140 × 0.18) = 170.2 ≈ 170 (cabe no viewBox 200)
-  //   cy = 120 (baseline)
-  //   r  = 140 × 0.085 = 11.9 ≈ 12
+  // stacked · K. centralizado + linha divisória + KEYRA letterspacing editorial
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 200 240"
+      viewBox="0 0 220 260"
       height={h}
       className={cn('shrink-0', className)}
       style={{ width: 'auto' }}
@@ -214,8 +200,8 @@ export function KeyraLogo({
     >
       {!decorative && <title>KEYRA</title>}
       <text
-        x="100"
-        y="120"
+        x="110"
+        y="130"
         textAnchor="middle"
         fontFamily="var(--font-serif), Fraunces, 'Times New Roman', serif"
         fontSize="140"
@@ -224,20 +210,20 @@ export function KeyraLogo({
         fill={colors.wordmark}
       >
         K
+        <tspan fill={colors.dot}>.</tspan>
       </text>
-      <circle cx="158" cy="120" r="12" fill={colors.dot} />
       <line
-        x1="80"
-        y1="160"
-        x2="120"
-        y2="160"
+        x1="90"
+        y1="170"
+        x2="130"
+        y2="170"
         stroke={colors.dot}
         strokeWidth="1"
         opacity="0.6"
       />
       <text
-        x="100"
-        y="210"
+        x="110"
+        y="220"
         textAnchor="middle"
         fontFamily="var(--font-serif), Fraunces, 'Times New Roman', serif"
         fontSize="22"

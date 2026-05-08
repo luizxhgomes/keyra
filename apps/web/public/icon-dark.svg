@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="KEYRA">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 64" role="img" aria-label="KEYRA">
   <title>KEYRA</title>
-  <rect width="64" height="64" rx="12" fill="#181210"/>
-  <text x="10" y="50" font-family="'Times New Roman', Georgia, serif" font-size="52" font-weight="700" letter-spacing="-1" fill="#F0D8A8">K</text>
-  <circle cx="46" cy="50" r="4" fill="#B8923A"/>
+  <rect width="72" height="64" rx="14" fill="#181210"/>
+  <text x="6" y="52" font-family="'Times New Roman', Georgia, serif" font-size="56" font-weight="700" letter-spacing="-1" fill="#F0D8A8">K<tspan fill="#B8923A">.</tspan></text>
 </svg>

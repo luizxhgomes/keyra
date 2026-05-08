@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" role="img" aria-label="KEYRA">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" role="img" aria-label="KEYRA">
   <title>KEYRA · Logo Primário (dark premium)</title>
-  <desc>Wordmark champagne-200 + ponto gold-500. Calibração canônica brand v1.1: ponto com centro na baseline, gap 18%, raio 8.5%.</desc>
-  <text x="0" y="62" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="72" font-weight="700" letter-spacing="-2" fill="#F0D8A8">KEYRA</text>
-  <circle cx="219" cy="62" r="6" fill="#B8923A"/>
+  <desc>Wordmark champagne-200 + ponto gold-500. Tspan para posição natural.</desc>
+  <text x="0" y="62" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="72" font-weight="700" letter-spacing="-2" fill="#F0D8A8">KEYRA<tspan fill="#B8923A">.</tspan></text>
 </svg>

@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="KEYRA">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 64" role="img" aria-label="KEYRA">
   <title>KEYRA · Monograma (dark premium)</title>
-  <desc>Monograma K. champagne-200 com ponto signature gold-500. Calibração canônica brand v1.1: ponto com centro na baseline, gap 18%, raio 8.5%.</desc>
-  <text x="6" y="52" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="56" font-weight="700" letter-spacing="-1" fill="#F0D8A8">K</text>
-  <circle cx="48" cy="52" r="5" fill="#B8923A"/>
+  <desc>Monograma K. champagne-200 com ponto signature gold-500.</desc>
+  <text x="6" y="52" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="56" font-weight="700" letter-spacing="-1" fill="#F0D8A8">K<tspan fill="#B8923A">.</tspan></text>
 </svg>

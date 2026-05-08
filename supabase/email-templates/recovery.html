@@ -1,40 +1,40 @@
 <!--
   KEYRA · template de recovery (esqueci minha senha) em pt-BR.
-  Versão: 2.0 (2026-05-06) — Story auth.5 + fix de fluxo SSR.
+  Versão: 3.0 (2026-05-08) · Story brand alignment.
 
-  MUDANÇA CRÍTICA v1.0 → v2.0:
-  Antes usava https://usekeyra.com/auth/callback?token_hash={{ .TokenHash }}&type=recovery (link Supabase verify que retornava
-  hash fragment #access_token=...). Hash NÃO chega no server, então o
-  callback handler /auth/callback rejeitava com /login?error=invalid_code
-  — usuários NÃO conseguiam redefinir senha por email.
+  MUDANÇA v2.0 → v3.0:
+  Brand alignment completo com brandbook canônico v1.0 (docs/brand/03-identity/).
+  - Paleta canônica: ivory-50 #FAF6EE, cocoa-900 #2B1810, terracotta-600 #B8612B,
+    bronze-500 #7E5A40, sand-200 #EAE0CF, gold-500 #B8923A.
+  - Wordmark KEYRA agora em Fraunces 700 com ponto signature gold-500 (canônico).
+  - Headline editorial em Fraunces 600 (mistura tipográfica brand: serif drama
+    + Inter funcional no body), com fallback robusto Georgia/Times para Outlook.
+  - Voz Mentora pura: "Você pediu uma nova senha" no lugar de "Vamos redefinir".
+  - Body sem coloquialismo mobile ("toque no botão" → "te leva para criar").
+  - Disclaimer reescrito sem travessão (regra inegociável da idealizadora).
+  - Footer com forma canônica "financeiro-operacional" (com hífen).
+  - Pre-header visível na inbox preview ("O link expira em 30 minutos. Vale uma vez só.")
 
-  Agora usa {{ .TokenHash }} montado em URL custom que aponta direto pro
-  /auth/callback?token_hash=...&type=recovery. Callback faz verifyOtp
-  server-side, cross-device safe (não exige code_verifier no browser do
-  user). Padrão recomendado pela Supabase pra SSR:
-  https://supabase.com/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr
+  Cuidados de cliente de email mantidos da v2.0:
+  - <meta color-scheme light only> impede dark-mode invert que destruiria o creme.
+  - bgcolor fallback no <a> e <td> do botão para Outlook 2007-2019.
+  - Tabelas role="presentation" para compatibilidade legacy.
+  - Web fonts via <link>: Gmail web/Apple Mail renderizam, Outlook desktop fallback.
 
   Variáveis Supabase disponíveis (recovery flow):
-    {{ .TokenHash }}        — hash do token usado por verifyOtp (USAR ESTE)
-    {{ .Email }}             — destinatário
-    {{ .SiteURL }}           — URL canônica do app
-    {{ .Token }}             — token cru (não usar — verifyOtp espera o hash)
-    https://usekeyra.com/auth/callback?token_hash={{ .TokenHash }}&type=recovery   — link legacy implicit grant (NÃO usar em SSR)
+    {{ .TokenHash }}     hash do token usado por verifyOtp (USAR ESTE)
+    {{ .Email }}          destinatário
+    {{ .SiteURL }}        URL canônica do app
+    {{ .Token }}          token cru (não usar · verifyOtp espera o hash)
 
   Aplicação:
     Via Management API → scripts/configure-supabase-recovery-template.sh
     OU
     Supabase Dashboard → keyra-br → Authentication → Email Templates →
     "Reset Password" → cola tudo abaixo deste comentário (a partir de <!doctype html>).
-    Subject sugerido: "Redefinir sua senha do KEYRA"
 
-  Princípios visuais (alinhados ao magic-link.html v2.0):
-    - Background creme #FAF8F5 (neutral-50 KEYRA).
-    - Card branco sem border — contraste por luminosidade.
-    - Wordmark KEYRA 18px weight 700 letter-spacing 0.22em.
-    - Botão terracota #C66A38 (primary KEYRA) — Von Restorff puro.
-    - bgcolor fallback no <a> e <td> do botão para Outlook 2007-2019.
-    - <meta color-scheme light only> impede dark-mode invert que destruiria o creme.
+  Subject sugerido (Mentora, factual, sem KEYRA · redundante):
+    "Você pediu uma nova senha"
 -->
 <!doctype html>
 <html lang="pt-BR">
@@ -43,25 +43,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light only" />
     <meta name="supported-color-schemes" content="light" />
-    <title>Redefinir sua senha do KEYRA</title>
+    <title>Você pediu uma nova senha · KEYRA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=Inter:wght@400..600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body
     style="
       margin: 0;
       padding: 0;
-      background-color: #faf8f5;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #2e2a25;
+      background-color: #faf6ee;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #2b1810;
       line-height: 1.55;
     "
   >
+    <!-- Pre-header oculto · aparece na inbox preview do cliente de email -->
+    <div
+      style="
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+        color: transparent;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        mso-hide: all;
+      "
+    >
+      O link expira em 30 minutos. Vale uma vez só.
+    </div>
+
     <table
       role="presentation"
       width="100%"
       cellpadding="0"
       cellspacing="0"
-      bgcolor="#faf8f5"
-      style="background-color: #faf8f5; padding: 40px 16px;"
+      bgcolor="#FAF6EE"
+      style="background-color: #faf6ee; padding: 48px 16px;"
     >
       <tr>
         <td align="center">
@@ -70,7 +92,7 @@
             width="100%"
             cellpadding="0"
             cellspacing="0"
-            bgcolor="#ffffff"
+            bgcolor="#FFFFFF"
             style="
               max-width: 480px;
               background-color: #ffffff;
@@ -78,58 +100,63 @@
               padding: 48px 40px;
             "
           >
+            <!-- Wordmark KEYRA + ponto signature gold (canônico v1.0) -->
             <tr>
-              <td style="padding-bottom: 36px;">
+              <td style="padding-bottom: 40px;">
                 <p
                   style="
                     margin: 0;
-                    font-size: 18px;
+                    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+                    font-size: 22px;
                     font-weight: 700;
-                    letter-spacing: 0.22em;
-                    text-transform: uppercase;
-                    color: #2e2a25;
+                    color: #2b1810;
+                    letter-spacing: -0.02em;
+                    line-height: 1;
                   "
                 >
-                  KEYRA
+                  KEYRA<span style="color: #b8923a;">.</span>
                 </p>
               </td>
             </tr>
 
+            <!-- Headline editorial · voz Mentora -->
             <tr>
               <td>
                 <h1
                   style="
-                    margin: 0 0 16px;
-                    font-size: 26px;
-                    font-weight: 700;
-                    color: #2e2a25;
-                    line-height: 1.25;
-                    letter-spacing: -0.01em;
+                    margin: 0 0 20px;
+                    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+                    font-size: 30px;
+                    font-weight: 600;
+                    color: #2b1810;
+                    line-height: 1.15;
+                    letter-spacing: -0.02em;
                   "
                 >
-                  Vamos redefinir sua senha.
+                  Você pediu<br />uma nova senha<span style="color: #b8923a;">.</span>
                 </h1>
                 <p
                   style="
-                    margin: 0 0 28px;
+                    margin: 0 0 32px;
                     font-size: 16px;
-                    color: #5a5249;
-                    line-height: 1.55;
+                    color: #7e5a40;
+                    line-height: 1.6;
                   "
                 >
-                  Toque no botão abaixo para escolher uma senha nova. Este link
-                  é válido por 30 minutos e funciona apenas uma vez.
+                  O link abaixo te leva para criar uma senha nova. Vale por 30
+                  minutos e funciona uma única vez.
                 </p>
               </td>
             </tr>
 
+            <!-- CTA primary terracotta-600 (Von Restorff) -->
             <tr>
-              <td align="center" style="padding: 4px 0 28px;">
+              <td align="center" style="padding: 0 0 32px;">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td
                       align="center"
-                      bgcolor="#c66a38"
+                      bgcolor="#B8612B"
                       style="border-radius: 8px;"
                     >
                       <a
@@ -139,16 +166,18 @@
                         style="
                           display: inline-block;
                           padding: 16px 32px;
-                          background-color: #c66a38;
-                          color: #ffffff;
+                          background-color: #b8612b;
+                          color: #faf6ee;
                           text-decoration: none;
                           border-radius: 8px;
-                          font-size: 16px;
+                          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                          font-size: 15px;
                           font-weight: 600;
                           line-height: 1;
+                          letter-spacing: 0.01em;
                         "
                       >
-                        Redefinir minha senha
+                        Criar nova senha
                       </a>
                     </td>
                   </tr>
@@ -156,22 +185,24 @@
               </td>
             </tr>
 
+            <!-- Fallback link copy-pasteável -->
             <tr>
               <td>
                 <p
                   style="
                     margin: 0 0 8px;
                     font-size: 12px;
-                    color: #5a5249;
+                    color: #7e5a40;
+                    line-height: 1.5;
                   "
                 >
-                  Ou copie este link no seu navegador:
+                  Se o botão não abrir, copie e cole este link no navegador.
                 </p>
                 <p
                   style="
-                    margin: 0 0 28px;
+                    margin: 0 0 32px;
                     font-size: 12px;
-                    color: #8b8276;
+                    color: #946640;
                     word-break: break-all;
                     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
                     line-height: 1.5;
@@ -182,29 +213,32 @@
               </td>
             </tr>
 
+            <!-- Security disclaimer + footer brand -->
             <tr>
-              <td style="border-top: 1px solid #e8dfd0; padding-top: 24px;">
+              <td style="border-top: 1px solid #eae0cf; padding-top: 28px;">
                 <p
                   style="
-                    margin: 0 0 16px;
-                    font-size: 12px;
-                    color: #5a5249;
-                    line-height: 1.55;
+                    margin: 0 0 20px;
+                    font-size: 13px;
+                    color: #7e5a40;
+                    line-height: 1.6;
                   "
                 >
-                  Se você não pediu para redefinir sua senha, ignore este email
-                  com segurança — sua senha continua a mesma e ninguém entra na
-                  sua conta sem clicar no botão acima.
+                  Se você não pediu uma nova senha, é só ignorar este email. Sua
+                  senha continua a mesma. Ninguém entra na sua conta sem clicar
+                  no botão acima.
                 </p>
                 <p
                   style="
                     margin: 0;
                     font-size: 12px;
-                    color: #8b8276;
+                    color: #946640;
                     letter-spacing: 0.02em;
+                    line-height: 1.5;
                   "
                 >
-                  KEYRA · financeiro operacional para clínicas de estética
+                  <strong style="color: #2b1810; font-weight: 700; font-family: 'Fraunces', Georgia, 'Times New Roman', serif;">KEYRA<span style="color: #b8923a;">.</span></strong>
+                  · financeiro-operacional para clínicas de estética
                 </p>
               </td>
             </tr>

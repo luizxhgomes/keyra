@@ -1,50 +1,62 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { ErrorMessage, KPICard } from '@/components/keyra';
+import { ErrorMessage } from '@/components/keyra';
 import { Sparkles } from 'lucide-react';
 import { buildComparativo } from '@/lib/financeiro/comparativo';
+import { getCurrentUserDisplayName } from '@/lib/auth/get-current-user';
 
-import { getDashboardKpis } from './actions';
+import { getDashboardKpis, getExpensesByCategoryThisMonth } from './actions';
 import { AgendaHojeCard } from './agenda-hoje-card';
 import { AlertasCard } from './alertas-card';
 import { IndicadoresCard } from './indicadores-card';
 import { MetaCard } from './meta-card';
+import { DashboardHero } from './dashboard-hero';
+import { KPICardActions } from './kpi-card-actions';
+import { MonthScheduleCard } from './month-schedule-card';
+import { TopServicesCard } from './top-services-card';
+import { MajorExpensesCard } from './major-expenses-card';
+import { DREProportionalCard } from './dre-proportional-card';
+import { UpgradeCTACard } from './upgrade-cta-card';
 
 /**
- * Story 4.4 — Dashboard tela única (restaurado pós-HOTFIX 2026-05-02).
+ * Dashboard editorial KEYRA — versão inspirada em referência fornecida pela
+ * idealizadora (2026-05-07). Layout adaptado para Editorial Beauty Luxury:
  *
- * Pós-HOTFIX:
- * - `ScrollFadeRise` removido (motion volta em story dedicada com pattern
- *   correto pra hidratação Next 16).
- * - `EmptyState` (no-data branch) substituído por `InlineEmptyState` (Server-safe
- *   sem motion).
- * - `useDismissedAlerts` (em AlertasList) reescrito sem `useSyncExternalStore`.
+ * - Saudação editorial em Fraunces (dashboard-hero)
+ * - 3 KPIs hero com pill buttons inline (kpi-card-actions)
+ * - Calendário do mês com heatmap de agendamentos (month-schedule-card)
+ * - DRE proporcional segmentado (dre-proportional-card)
+ * - Top serviços com avatares (top-services-card)
+ * - Despesas por categoria com mini-bars (major-expenses-card)
+ * - CTA cocoa de upgrade (upgrade-cta-card)
  *
- * Server Component. KPIs reais via `v_dashboard_kpis` + comparativo absoluto
- * vs mês passado (Story 4.7). Cards filhos: AlertasCard, AgendaHojeCard,
- * IndicadoresCard, MetaCard.
+ * Cards legados preservados na parte inferior (Alertas, Agenda Hoje,
+ * Indicadores, Meta) — nada foi removido.
+ *
+ * Princípio UX atualizado (feedback 2026-05-07): tabelas e gráficos
+ * proporcionais permitidos como reforço, desde que números absolutos
+ * continuem como herói visual.
  */
 export default async function DashboardPage() {
-  const result = await getDashboardKpis();
+  const [kpisResult, expensesResult, displayName] = await Promise.all([
+    getDashboardKpis(),
+    getExpensesByCategoryThisMonth(),
+    getCurrentUserDisplayName(),
+  ]);
 
-  if (!result.ok) {
+  if (!kpisResult.ok) {
     return (
       <div className="flex flex-col gap-6">
-        <header>
-          <h1 className="font-serif text-display-hero text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Visão única do seu mês — números absolutos, sem gráfico.
-          </p>
-        </header>
+        <DashboardHero displayName={displayName} />
         <Card>
           <CardContent className="py-6">
-            <ErrorMessage detail={result.error} />
+            <ErrorMessage detail={kpisResult.error} />
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  const k = result.data;
+  const k = kpisResult.data;
   const period = k.lastMonthLabel;
 
   const revenueComp = buildComparativo(
@@ -73,13 +85,11 @@ export default async function DashboardPage() {
     k.appointmentsToday === 0;
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="font-serif text-display-hero text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Visão única do seu mês — números absolutos, sem gráfico.
-        </p>
-      </header>
+    <div className="flex flex-col gap-page">
+      <DashboardHero
+        displayName={displayName}
+        subtitle="Visão única do seu mês — números absolutos primeiro, proporções como reforço."
+      />
 
       {noData ? (
         <Card>
@@ -89,35 +99,75 @@ export default async function DashboardPage() {
         </Card>
       ) : null}
 
+      {/* ─── Grid editorial unificado (4 cols xl) — casa com referência ─── */}
       <section
-        aria-label="Indicadores financeiros do mês"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        aria-label="Painel financeiro do mês"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:auto-rows-fr xl:grid-cols-4"
       >
-        <KPICard
-          label="Receita realizada"
+        {/* Row 1 — 3 KPIs hero + Schedule (rowspan 2) */}
+        <KPICardActions
+          label="Receita do mês"
           value={k.revenueMtdCents}
+          variant="hero"
           {...(revenueComp ? { comparison: revenueComp } : {})}
+          actions={[
+            { label: 'Lançar', href: '/financeiro/lancar', variant: 'primary' },
+            { label: 'Detalhes', href: '/financeiro/dre', variant: 'secondary' },
+          ]}
         />
-        <KPICard
-          label="Receita prevista"
-          value={k.expectedRevenueMtdCents}
-          helper="Agendamentos do mês ainda não concluídos"
-        />
-        <KPICard
-          label="Despesas"
+        <KPICardActions
+          label="Despesas do mês"
           value={k.expensesMtdCents}
+          variant="hero"
           {...(expensesComp ? { comparison: expensesComp } : {})}
+          actions={[
+            { label: 'Lançar', href: '/financeiro/despesas/nova', variant: 'primary' },
+            { label: 'Categorias', href: '/financeiro/categorias', variant: 'secondary' },
+          ]}
         />
-        <KPICard
+        <KPICardActions
           label="Lucro do mês"
           value={k.profitMtdCents}
+          variant="hero"
           {...(profitComp ? { comparison: profitComp } : {})}
+          actions={[
+            { label: 'DRE completo', href: '/financeiro/dre', variant: 'primary' },
+            { label: 'Por serviço', href: '/financeiro/dre-por-servico', variant: 'secondary' },
+          ]}
         />
+        <div className="md:col-span-2 xl:col-span-1 xl:row-span-2">
+          <MonthScheduleCard />
+        </div>
+
+        {/* Row 2 — DRE Proporcional ocupa 3 cols (Schedule continua à direita) */}
+        <div className="md:col-span-2 xl:col-span-3">
+          <DREProportionalCard
+            revenueCents={k.revenueMtdCents}
+            expensesCents={k.expensesMtdCents}
+            profitCents={k.profitMtdCents}
+          />
+        </div>
+
+        {/* Row 3 — Major Expenses (2) + Top Services (1) + CTA (1) */}
+        <div className="md:col-span-2 xl:col-span-2">
+          {expensesResult.ok ? (
+            <MajorExpensesCard data={expensesResult.data} />
+          ) : (
+            <Card className="h-full">
+              <CardContent className="py-6">
+                <ErrorMessage detail={expensesResult.error} />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+        <TopServicesCard />
+        <UpgradeCTACard />
       </section>
 
+      {/* ─── Bloco 4: Cards legados preservados ────────────────────────── */}
       <AlertasCard />
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <section className="grid grid-cols-1 gap-section lg:grid-cols-2">
         <AgendaHojeCard />
         <IndicadoresCard />
       </section>

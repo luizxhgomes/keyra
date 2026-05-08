@@ -6,8 +6,9 @@ import { EmptyState, ErrorMessage } from '@/components/keyra';
 import { Target } from 'lucide-react';
 import { formatBRL } from '@/lib/money';
 
-import { listGoals } from '../actions';
+import { getVarianceMonthly, listGoals } from '../actions';
 import { MetaForm } from './meta-form';
+import { VarianceTable } from './variance-table';
 
 type PageProps = {
   searchParams: Promise<{ year?: string }>;
@@ -16,7 +17,10 @@ type PageProps = {
 export default async function MetasPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const year = params.year ? Number(params.year) : new Date().getFullYear();
-  const result = await listGoals({ year });
+  const [result, varianceRes] = await Promise.all([
+    listGoals({ year }),
+    getVarianceMonthly({ year }),
+  ]);
 
   if (!result.ok) {
     return (
@@ -31,14 +35,18 @@ export default async function MetasPage({ searchParams }: PageProps) {
   const goals = result.data;
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div>
-        <h2 className="font-serif text-h2">Metas — {year}</h2>
+        <h2 className="font-serif text-display text-foreground">Metas · {year}</h2>
         <p className="text-sm text-muted-foreground">
-          Defina metas mensais de receita, lucro e atendimentos. O dashboard mostra
-          quanto falta ou ultrapassou.
+          Defina metas mensais de receita, lucro e atendimentos. Compare com o
+          realizado mês a mês.
         </p>
       </div>
+
+      {varianceRes.ok ? (
+        <VarianceTable months={varianceRes.data} />
+      ) : null}
 
       <Card>
         <CardHeader>

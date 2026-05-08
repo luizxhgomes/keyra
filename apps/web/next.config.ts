@@ -13,13 +13,25 @@ const nextConfig: NextConfig = {
       preventFullImport: true,
     },
   },
-  // Rewrite estático: serve a sales page (apps/web/public/comecar.html) sob /comecar
-  // sem expor a extensão .html. Não toca rotas autenticadas.
+  // Rewrite estático: serve a sales page (apps/web/public/landing.html) sob /
+  // sem expor a extensão .html. Não toca rotas autenticadas — `proxy.ts` segue
+  // gating só os PROTECTED_PREFIXES.
   async rewrites() {
     return [
       {
+        source: '/',
+        destination: '/landing.html',
+      },
+    ];
+  },
+  // /comecar foi a URL provisória da sales page; agora é a /. Mantemos um
+  // 301 permanente para preservar links externos já compartilhados.
+  async redirects() {
+    return [
+      {
         source: '/comecar',
-        destination: '/comecar.html',
+        destination: '/',
+        permanent: true,
       },
     ];
   },

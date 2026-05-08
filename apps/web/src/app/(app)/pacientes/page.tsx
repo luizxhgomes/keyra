@@ -10,6 +10,7 @@ import { requireAuth } from '@/lib/auth/require-auth';
 import { createServerClient } from '@/lib/supabase/server';
 
 import { PacienteRowActions } from './paciente-row-actions';
+import { SeedDemoButton } from './seed-demo-button';
 
 const PAGE_SIZE = 20;
 
@@ -122,15 +123,23 @@ export default async function PacientesPage({ searchParams }: PageProps) {
                 description={`Nenhum cliente encontrado para "${q}". Tente outro termo ou limpe a busca.`}
               />
             ) : (
-              <EmptyState
-                icon={Users}
-                title="Você ainda não tem clientes"
-                description="Cadastre quem atende você para ver histórico, ticket médio e LTV de cada cliente."
-                action={{
-                  label: 'Cadastrar cliente',
-                  href: '/pacientes/novo',
-                }}
-              />
+              <div className="flex flex-col gap-4">
+                <EmptyState
+                  icon={Users}
+                  title="Você ainda não tem clientes"
+                  description="Cadastre quem atende você para ver histórico, ticket médio e LTV de cada cliente."
+                  action={{
+                    label: 'Cadastrar cliente',
+                    href: '/pacientes/novo',
+                  }}
+                />
+                <div className="flex flex-col items-center gap-2 border-t border-border pt-4">
+                  <p className="text-xs text-muted-foreground">
+                    Quer ver o painel completo funcionando antes de cadastrar?
+                  </p>
+                  <SeedDemoButton />
+                </div>
+              </div>
             )
           ) : (
             <ul className="stagger-list divide-y divide-border">

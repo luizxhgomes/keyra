@@ -2,87 +2,144 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ErrorMessage } from '@/components/keyra';
 import { requireAuth } from '@/lib/auth/require-auth';
-import { createServerClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/roles';
 
+import {
+  getPatientEncounters,
+  getPatientPayments,
+  getPatientProfile,
+} from '../actions';
 import { PacienteForm } from '../paciente-form';
+import { PatientBillingSummary } from './patient-billing-summary';
+import { PatientEncountersTable } from './patient-encounters-table';
+import { PatientHeaderCard } from './patient-header-card';
+import { PatientOverviewCard } from './patient-overview-card';
+import { PatientPackageCard } from './patient-package-card';
+import { PatientPaymentsTable } from './patient-payments-table';
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export default async function PacienteEditarPage({ params }: PageProps) {
+/**
+ * Perfil completo do cliente — refinado conforme referência fornecida pela
+ * idealizadora (2026-05-08, Linda Miller layout).
+ *
+ * Adaptação Editorial Beauty Luxury KEYRA:
+ * - Layout 2-col: sidebar (header card + overview + pacote/assinatura) +
+ *   coluna principal (4 KPIs financeiros + atendimentos + pagamentos)
+ * - "Insurance" da referência → "Pacote ou assinatura" (placeholder até feature)
+ * - 4 KPIs: Total gasto / Pendente / Atendimentos / Frequência
+ * - Tabelas de Atendimentos e Pagamentos com placeholders quando vazias
+ * - Form de edição preservado no rodapé (mantém compatibilidade com fluxo
+ *   existente — Story 1.x cadastro)
+ */
+export default async function PacienteDetalhePage({ params }: PageProps) {
   const { orgId } = await requireAuth();
+  await requireRole(orgId, 'viewer');
   const { id } = await params;
 
-  const supabase = await createServerClient();
+  const [profileRes, encountersRes, paymentsRes] = await Promise.all([
+    getPatientProfile(id),
+    getPatientEncounters(id),
+    getPatientPayments(id),
+  ]);
 
-  const { data: patient } = await supabase
-    .from('customers')
-    .select('id, full_name, phone, email, birth_date, notes, deleted_at, created_at')
-    .eq('id', id)
-    .eq('org_id', orgId)
-    .maybeSingle();
-
-  if (!patient) {
-    notFound();
+  if (!profileRes.ok) {
+    if (profileRes.error.includes('não encontrado')) notFound();
+    return (
+      <div className="flex flex-col gap-4">
+        <Link
+          href="/pacientes"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="mr-1 h-4 w-4" /> Voltar para a lista
+        </Link>
+        <Card>
+          <CardContent className="py-6">
+            <ErrorMessage detail={profileRes.error} />
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
+  const profile = profileRes.data;
+  const encounters = encountersRes.ok ? encountersRes.data : [];
+  const payments = paymentsRes.ok ? paymentsRes.data : [];
+
   return (
-    <div className="max-w-3xl space-y-6">
-      <Link href="/pacientes" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="mr-1 h-4 w-4" /> Voltar para a lista
+    <div className="flex flex-col gap-6">
+      <Link
+        href="/pacientes"
+        className="inline-flex w-fit items-center text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="mr-1 h-4 w-4" aria-hidden="true" /> Voltar para a lista
       </Link>
 
-      <header className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="font-serif text-display">{patient.full_name}</h1>
-          <p className="text-sm text-muted-foreground">Editar cadastro.</p>
-        </div>
-        {patient.deleted_at ? <Badge variant="outline">Arquivado</Badge> : null}
-      </header>
+      {/* Layout 2-col: sidebar (sticky em xl) + main */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[360px_1fr]">
+        {/* Coluna esquerda — sidebar */}
+        <aside className="flex flex-col gap-4">
+          <PatientHeaderCard
+            fullName={profile.fullName}
+            age={profile.age}
+            phone={profile.phone}
+            shortId={profile.shortId}
+            archived={profile.archived}
+          />
+          <PatientOverviewCard
+            shortId={profile.shortId}
+            phone={profile.phone}
+            email={profile.email}
+            birthDate={profile.birthDate}
+            age={profile.age}
+            notes={profile.notes}
+            createdAt={profile.createdAt}
+            lastVisit={profile.metrics.lastVisit}
+          />
+          <PatientPackageCard />
+        </aside>
 
-      <Card>
+        {/* Coluna principal — KPIs + tabelas */}
+        <main className="flex min-w-0 flex-col gap-6">
+          <PatientBillingSummary
+            totalSpentCents={profile.metrics.totalSpentCents}
+            pendingCents={profile.metrics.pendingCents}
+            encountersTotal={profile.metrics.encountersTotal}
+            appointmentsPerMonth={profile.metrics.appointmentsPerMonth}
+          />
+          <PatientEncountersTable rows={encounters} />
+          <PatientPaymentsTable rows={payments} />
+        </main>
+      </div>
+
+      {/* Form de edição preservado — mantém fluxo de cadastro existente */}
+      <Card className="shadow-warm-sm">
         <CardHeader>
-          <CardTitle>Dados do cliente</CardTitle>
-          <CardDescription>As mudanças são salvas imediatamente ao clicar em Salvar.</CardDescription>
+          <CardTitle className="font-serif">Editar dados</CardTitle>
+          <CardDescription>
+            As mudanças são salvas imediatamente ao clicar em Salvar.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <PacienteForm
             submitLabel="Salvar alterações"
             redirectTo="/pacientes"
             initial={{
-              id: patient.id,
-              fullName: patient.full_name,
-              ...(patient.phone ? { phone: patient.phone } : {}),
-              ...(patient.email ? { email: patient.email } : {}),
-              ...(patient.birth_date ? { birthDate: patient.birth_date } : {}),
-              ...(patient.notes ? { notes: patient.notes } : {}),
+              id: profile.id,
+              fullName: profile.fullName,
+              ...(profile.phone ? { phone: profile.phone } : {}),
+              ...(profile.email ? { email: profile.email } : {}),
+              ...(profile.birthDate ? { birthDate: profile.birthDate } : {}),
+              ...(profile.notes ? { notes: profile.notes } : {}),
             }}
           />
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Histórico de atendimentos</CardTitle>
-          <CardDescription>Em construção — será preenchido pela Story 2.4.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Ainda sem atendimentos cadastrados.
-          </p>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end">
-        <Link href="/pacientes">
-          <Button variant="ghost">Voltar</Button>
-        </Link>
-      </div>
     </div>
   );
 }

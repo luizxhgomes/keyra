@@ -448,3 +448,226 @@ export async function getActiveAlerts(): Promise<ActionResult<Alert[]>> {
     return { ok: false, error: toError(err) };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Dashboard Editorial — Top Serviços por Receita
+// ---------------------------------------------------------------------------
+
+export type TopServiceRow = {
+  serviceId: string;
+  name: string;
+  quantity: number;
+  revenueCents: number;
+};
+
+export async function getTopServicesByRevenue(
+  limit = 3,
+): Promise<ActionResult<TopServiceRow[]>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+
+    const { data, error } = await supabase
+      .from('v_dre_by_service')
+      .select('service_id, service_name, total_quantity, revenue_gross')
+      .eq('org_id', orgId)
+      .eq('period_month', monthStart);
+
+    if (error) return { ok: false, error: error.message };
+
+    const rows: TopServiceRow[] = (data ?? [])
+      .map((r) => ({
+        serviceId: String(r.service_id ?? ''),
+        name: r.service_name ?? '(sem nome)',
+        quantity: Number(r.total_quantity ?? 0),
+        revenueCents: Math.round(Number(r.revenue_gross ?? 0) * 100),
+      }))
+      .sort((a, b) => b.revenueCents - a.revenueCents)
+      .slice(0, limit);
+
+    return { ok: true, data: rows };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dashboard Editorial — Despesas por Categoria
+// ---------------------------------------------------------------------------
+
+export type ExpenseCategoryRow = {
+  categoryId: string;
+  name: string;
+  amountCents: number;
+  /** Proporção 0-1 do total de despesas do período. */
+  share: number;
+};
+
+export type ExpensesByCategoryData = {
+  totalCents: number;
+  averageCents: number;
+  rows: ExpenseCategoryRow[];
+};
+
+export async function getExpensesByCategoryThisMonth(): Promise<
+  ActionResult<ExpensesByCategoryData>
+> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+    const monthEnd = format(endOfMonth(now), 'yyyy-MM-dd');
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .select(
+        `gross_amount,
+         category:expense_categories(id, name)`,
+      )
+      .eq('org_id', orgId)
+      .eq('direction', 'debit')
+      .gte('reference_date', monthStart)
+      .lte('reference_date', monthEnd)
+      .is('deleted_at', null);
+
+    if (error) return { ok: false, error: error.message };
+
+    const map = new Map<string, { id: string; name: string; cents: number }>();
+    let totalCents = 0;
+    let count = 0;
+
+    for (const row of data ?? []) {
+      const cat = (Array.isArray(row.category) ? row.category[0] : row.category) as
+        | { id: string; name: string }
+        | null;
+      const id = cat?.id ?? '__uncategorized__';
+      const name = cat?.name ?? 'Sem categoria';
+      const cents = reaisToCents(row.gross_amount);
+      totalCents += cents;
+      count += 1;
+      const cur = map.get(id);
+      if (cur) cur.cents += cents;
+      else map.set(id, { id, name, cents });
+    }
+
+    const rows: ExpenseCategoryRow[] = Array.from(map.values())
+      .map((r) => ({
+        categoryId: r.id,
+        name: r.name,
+        amountCents: r.cents,
+        share: totalCents > 0 ? r.cents / totalCents : 0,
+      }))
+      .sort((a, b) => b.amountCents - a.amountCents);
+
+    const averageCents = count > 0 ? Math.round(totalCents / count) : 0;
+
+    return { ok: true, data: { totalCents, averageCents, rows } };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dashboard Editorial — Schedule Heatmap (agendamentos por dia do mês)
+// ---------------------------------------------------------------------------
+
+export type ScheduleHeatmapDay = {
+  /** Dia do mês (1-31). */
+  day: number;
+  /** Número de agendamentos no dia. */
+  count: number;
+  /** Marcador de severity para coloração: low / mid / high / critical. */
+  intensity: 'none' | 'low' | 'mid' | 'high';
+  /** True se é hoje. */
+  isToday: boolean;
+  /** True se é fim de semana (sa/dom). */
+  isWeekend: boolean;
+};
+
+export type MonthScheduleData = {
+  /** Label do mês corrente (ex: "Maio"). */
+  monthLabel: string;
+  /** Ano corrente. */
+  year: number;
+  /** Dia da semana (0=domingo, 6=sábado) em que o mês começa. */
+  firstWeekday: number;
+  /** Total de dias no mês. */
+  daysInMonth: number;
+  /** Array com 1 entrada por dia. */
+  days: ScheduleHeatmapDay[];
+  /** Total de agendamentos do mês. */
+  totalAppointments: number;
+};
+
+export async function getMonthScheduleHeatmap(): Promise<ActionResult<MonthScheduleData>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
+    const todayDay = now.getDate();
+
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('starts_at')
+      .eq('org_id', orgId)
+      .is('deleted_at', null)
+      .gte('starts_at', monthStart.toISOString())
+      .lte('starts_at', monthEnd.toISOString())
+      .neq('status', 'cancelled');
+
+    if (error) return { ok: false, error: error.message };
+
+    const counts = new Map<number, number>();
+    for (const r of data ?? []) {
+      const d = new Date(r.starts_at).getDate();
+      counts.set(d, (counts.get(d) ?? 0) + 1);
+    }
+
+    const daysInMonth = monthEnd.getDate();
+    const max = Math.max(0, ...Array.from(counts.values()));
+
+    const days: ScheduleHeatmapDay[] = [];
+    let total = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const count = counts.get(d) ?? 0;
+      total += count;
+      const ratio = max > 0 ? count / max : 0;
+      const intensity: ScheduleHeatmapDay['intensity'] =
+        count === 0 ? 'none' : ratio < 0.34 ? 'low' : ratio < 0.67 ? 'mid' : 'high';
+      const date = new Date(now.getFullYear(), now.getMonth(), d);
+      const wd = date.getDay();
+      days.push({
+        day: d,
+        count,
+        intensity,
+        isToday: d === todayDay,
+        isWeekend: wd === 0 || wd === 6,
+      });
+    }
+
+    return {
+      ok: true,
+      data: {
+        monthLabel: format(now, 'MMMM', { locale: ptBR }),
+        year: now.getFullYear(),
+        firstWeekday: monthStart.getDay(),
+        daysInMonth,
+        days,
+        totalAppointments: total,
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}

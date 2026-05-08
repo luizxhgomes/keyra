@@ -1591,3 +1591,219 @@ export async function getTopExpensesByCategory(): Promise<
     return { ok: false, error: toError(err) };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Despesas Analytics (Fase 2 — Kodo-style charts)
+// ---------------------------------------------------------------------------
+
+export type ExpenseAnalytics = {
+  /** Despesas do mês corrente, agregadas por dia (1-31). 0 onde não há. */
+  monthDaily: Array<{ day: number; cents: number }>;
+  /** Despesas da semana corrente (Sun=0 → Sat=6). */
+  weekDaily: Array<{ weekday: number; cents: number }>;
+  monthLabel: string;
+  totalMonthCents: number;
+  totalWeekCents: number;
+  /** Dia de hoje (1-31) para destacar. */
+  today: number;
+  /** Dia da semana de hoje (0-6). */
+  todayWeekday: number;
+};
+
+export async function getExpenseAnalytics(): Promise<ActionResult<ExpenseAnalytics>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    // Início da semana = domingo
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59);
+
+    const [monthRes, weekRes] = await Promise.all([
+      supabase
+        .from('transactions')
+        .select('reference_date, gross_amount')
+        .eq('org_id', orgId)
+        .eq('direction', 'debit')
+        .is('deleted_at', null)
+        .gte('reference_date', monthStart.toISOString().slice(0, 10))
+        .lte('reference_date', monthEnd.toISOString().slice(0, 10)),
+      supabase
+        .from('transactions')
+        .select('reference_date, gross_amount')
+        .eq('org_id', orgId)
+        .eq('direction', 'debit')
+        .is('deleted_at', null)
+        .gte('reference_date', weekStart.toISOString().slice(0, 10))
+        .lte('reference_date', weekEnd.toISOString().slice(0, 10)),
+    ]);
+
+    if (monthRes.error) return { ok: false, error: monthRes.error.message };
+    if (weekRes.error) return { ok: false, error: weekRes.error.message };
+
+    const daysInMonth = monthEnd.getDate();
+    const monthMap = new Map<number, number>();
+    let totalMonthCents = 0;
+    for (const r of monthRes.data ?? []) {
+      const day = new Date(r.reference_date).getDate();
+      const cents = Math.round(Number(r.gross_amount ?? 0) * 100);
+      monthMap.set(day, (monthMap.get(day) ?? 0) + cents);
+      totalMonthCents += cents;
+    }
+    const monthDaily = Array.from({ length: daysInMonth }, (_, i) => ({
+      day: i + 1,
+      cents: monthMap.get(i + 1) ?? 0,
+    }));
+
+    const weekMap = new Map<number, number>();
+    let totalWeekCents = 0;
+    for (const r of weekRes.data ?? []) {
+      const wd = new Date(r.reference_date).getDay();
+      const cents = Math.round(Number(r.gross_amount ?? 0) * 100);
+      weekMap.set(wd, (weekMap.get(wd) ?? 0) + cents);
+      totalWeekCents += cents;
+    }
+    const weekDaily = Array.from({ length: 7 }, (_, i) => ({
+      weekday: i,
+      cents: weekMap.get(i) ?? 0,
+    }));
+
+    const monthLabel = monthStart.toLocaleString('pt-BR', { month: 'long' });
+    return {
+      ok: true,
+      data: {
+        monthDaily,
+        weekDaily,
+        monthLabel: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
+        totalMonthCents,
+        totalWeekCents,
+        today: now.getDate(),
+        todayWeekday: now.getDay(),
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Variance Analysis (Fase 3 — Actual vs Budgeted)
+// ---------------------------------------------------------------------------
+
+export type VarianceMonth = {
+  periodMonth: string; // YYYY-MM-01
+  monthLabel: string;
+  /** Targets cadastrados (podem ser null). */
+  targetRevenueCents: number | null;
+  targetProfitCents: number | null;
+  targetAppointments: number | null;
+  /** Realizados. */
+  actualRevenueCents: number;
+  actualExpensesCents: number;
+  actualProfitCents: number;
+  actualAppointments: number;
+};
+
+export async function getVarianceMonthly(input: {
+  year?: number;
+}): Promise<ActionResult<VarianceMonth[]>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const year = input.year ?? new Date().getFullYear();
+    const yearStart = `${year}-01-01`;
+    const yearEnd = `${year}-12-31`;
+
+    const [goalsRes, txRes, apptsRes] = await Promise.all([
+      supabase
+        .from('goals')
+        .select('period_month, target_revenue, target_profit, target_appointments')
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .gte('period_month', yearStart)
+        .lte('period_month', yearEnd),
+      supabase
+        .from('transactions')
+        .select('reference_date, direction, gross_amount, net_amount')
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .gte('reference_date', yearStart)
+        .lte('reference_date', yearEnd),
+      supabase
+        .from('appointments')
+        .select('starts_at, status')
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .gte('starts_at', `${yearStart}T00:00:00`)
+        .lte('starts_at', `${yearEnd}T23:59:59`),
+    ]);
+
+    if (goalsRes.error) return { ok: false, error: goalsRes.error.message };
+    if (txRes.error) return { ok: false, error: txRes.error.message };
+    if (apptsRes.error) return { ok: false, error: apptsRes.error.message };
+
+    type MonthlyAgg = {
+      revCents: number;
+      expCents: number;
+      apptDone: number;
+    };
+    const monthly = new Map<number, MonthlyAgg>();
+    for (const r of txRes.data ?? []) {
+      const m = new Date(r.reference_date).getMonth();
+      const cur = monthly.get(m) ?? { revCents: 0, expCents: 0, apptDone: 0 };
+      const cents = Math.round(
+        Number(r.direction === 'credit' ? r.net_amount : r.gross_amount ?? 0) * 100,
+      );
+      if (r.direction === 'credit') cur.revCents += cents;
+      else cur.expCents += cents;
+      monthly.set(m, cur);
+    }
+    for (const a of apptsRes.data ?? []) {
+      if (a.status !== 'done') continue;
+      const m = new Date(a.starts_at).getMonth();
+      const cur = monthly.get(m) ?? { revCents: 0, expCents: 0, apptDone: 0 };
+      cur.apptDone += 1;
+      monthly.set(m, cur);
+    }
+
+    const months: VarianceMonth[] = [];
+    for (let m = 0; m < 12; m++) {
+      const date = new Date(year, m, 1);
+      const periodMonth = date.toISOString().slice(0, 10);
+      const goal = (goalsRes.data ?? []).find(
+        (g) => g.period_month === periodMonth,
+      );
+      const agg = monthly.get(m) ?? { revCents: 0, expCents: 0, apptDone: 0 };
+      months.push({
+        periodMonth,
+        monthLabel: date.toLocaleString('pt-BR', { month: 'short' }),
+        targetRevenueCents:
+          goal?.target_revenue !== null && goal?.target_revenue !== undefined
+            ? Math.round(Number(goal.target_revenue) * 100)
+            : null,
+        targetProfitCents:
+          goal?.target_profit !== null && goal?.target_profit !== undefined
+            ? Math.round(Number(goal.target_profit) * 100)
+            : null,
+        targetAppointments: goal?.target_appointments ?? null,
+        actualRevenueCents: agg.revCents,
+        actualExpensesCents: agg.expCents,
+        actualProfitCents: agg.revCents - agg.expCents,
+        actualAppointments: agg.apptDone,
+      });
+    }
+    return { ok: true, data: months };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}

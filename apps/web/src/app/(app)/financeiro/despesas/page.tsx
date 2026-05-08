@@ -12,10 +12,15 @@ import { formatBRL } from '@/lib/money';
 
 import {
   getDefaultPeriod,
+  getExpenseAnalytics,
+  getTopExpensesByCategory,
   listExpenseCategoriesForPicker,
   listExpenses,
 } from '../actions';
+import { TopExpensesProgress } from '../top-expenses-progress';
 import { DespesaRowActions } from './despesa-row-actions';
+import { DailyCostingChart } from './daily-costing-chart';
+import { ExpenseTrackerAnimated } from './expense-tracker-animated';
 
 type PageProps = {
   searchParams: Promise<{
@@ -35,7 +40,7 @@ export default async function DespesasPage({ searchParams }: PageProps) {
   const showArchived = params.archived === '1';
   const page = Math.max(1, Number(params.page ?? 1) || 1);
 
-  const [expRes, catRes] = await Promise.all([
+  const [expRes, catRes, analyticsRes, topCatRes] = await Promise.all([
     listExpenses({
       start,
       end,
@@ -44,6 +49,8 @@ export default async function DespesasPage({ searchParams }: PageProps) {
       page,
     }),
     listExpenseCategoriesForPicker(),
+    getExpenseAnalytics(),
+    getTopExpensesByCategory(),
   ]);
 
   if (!expRes.ok) {
@@ -61,21 +68,49 @@ export default async function DespesasPage({ searchParams }: PageProps) {
   const categories = catRes.ok ? catRes.data : [];
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-serif text-h2">Despesas</h2>
+          <h2 className="font-serif text-display text-foreground">Despesas</h2>
           <p className="text-sm text-muted-foreground">
             {total} {total === 1 ? 'lançamento' : 'lançamentos'} no período · Total{' '}
             <span className="font-semibold tabular-nums">{formatBRL(totalNet)}</span>
           </p>
         </div>
-        <Link href="/financeiro/despesas/nova">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Nova despesa
-          </Button>
+        <Link
+          href="/financeiro/despesas/nova"
+          className="inline-flex items-center gap-1.5 rounded-full bg-cocoa-900 px-4 py-2 text-sm font-medium text-ivory-50 transition-colors hover:bg-cocoa-800"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+          Nova despesa
         </Link>
       </div>
+
+      {/* Analytics — Expense Tracker animado + Daily Costing + Top categorias */}
+      {analyticsRes.ok ? (
+        <ExpenseTrackerAnimated
+          monthLabel={analyticsRes.data.monthLabel}
+          totalMonthCents={analyticsRes.data.totalMonthCents}
+          monthDaily={analyticsRes.data.monthDaily}
+          today={analyticsRes.data.today}
+        />
+      ) : null}
+
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {analyticsRes.ok ? (
+          <DailyCostingChart
+            weekDaily={analyticsRes.data.weekDaily}
+            totalWeekCents={analyticsRes.data.totalWeekCents}
+            todayWeekday={analyticsRes.data.todayWeekday}
+          />
+        ) : null}
+        {topCatRes.ok ? (
+          <TopExpensesProgress
+            rows={topCatRes.data.rows}
+            totalCents={topCatRes.data.totalCents}
+          />
+        ) : null}
+      </section>
 
       <Card>
         <CardHeader>

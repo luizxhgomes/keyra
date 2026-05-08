@@ -4,6 +4,7 @@ import {
   endOfDay,
   endOfMonth,
   endOfWeek,
+  format,
   startOfDay,
   startOfMonth,
   startOfWeek,
@@ -50,6 +51,12 @@ const rangeSchema = z.object({
   start: z.string().min(1),
   end: z.string().min(1),
   professionalId: z.string().uuid().optional(),
+  /** Filtra para os status listados. Vazio/undefined = todos. */
+  statusIn: z
+    .array(z.enum(['scheduled', 'done', 'cancelled', 'no_show']))
+    .optional(),
+  /** Busca textual case-insensitive em cliente, serviço ou profissional. */
+  search: z.string().trim().max(120).optional(),
 });
 
 const HARD_CAP = 200;
@@ -102,12 +109,35 @@ export async function listAppointments(input: z.infer<typeof rangeSchema>): Prom
     query = query.eq('professional_id', parsed.professionalId);
   }
 
+  if (parsed.statusIn && parsed.statusIn.length > 0 && parsed.statusIn.length < 4) {
+    query = query.in('status', parsed.statusIn);
+  }
+
   const { data, error } = await query;
   if (error) {
     throw new Error(`Erro ao carregar agenda: ${error.message}`);
   }
 
-  const rows = (data ?? []) as unknown as AppointmentRow[];
+  let rows = (data ?? []) as unknown as AppointmentRow[];
+
+  // Search post-filter (case-insensitive) — feito em memória para cobrir
+  // joins (customer.full_name, service.name, professional.display_name) sem
+  // precisar de RPC. Mantém limite de HARD_CAP da query.
+  if (parsed.search && parsed.search.length > 0) {
+    const q = parsed.search.toLowerCase();
+    rows = rows.filter((r) => {
+      const t = [
+        r.customer?.full_name ?? '',
+        r.service?.name ?? '',
+        r.professional?.display_name ?? '',
+        r.title ?? '',
+      ]
+        .join(' ')
+        .toLowerCase();
+      return t.includes(q);
+    });
+  }
+
   const truncated = rows.length > HARD_CAP;
   const slice = truncated ? rows.slice(0, HARD_CAP) : rows;
 
@@ -141,6 +171,106 @@ export async function listAppointments(input: z.infer<typeof rangeSchema>): Prom
   });
 
   return { events, truncated };
+}
+
+// ---------------------------------------------------------------------------
+// Refinamento Fase 1 — counts mensais (mini-calendário lateral)
+// ---------------------------------------------------------------------------
+
+export type AgendaMonthCounts = {
+  /** Mapa diaDoMês (1-31) → total de agendamentos não cancelados naquele dia. */
+  perDay: Record<number, number>;
+  /** Total por status (scheduled/done/cancelled/no_show). */
+  totals: Record<AgendaStatus, number>;
+  /** Próximo agendamento futuro (em qualquer dia) ou null. */
+  next: {
+    id: string;
+    starts_at: string;
+    customerName: string | null;
+    serviceName: string;
+    professionalName: string;
+  } | null;
+};
+
+const monthSchema = z.object({
+  /** ISO date (YYYY-MM-DD) de qualquer dia do mês alvo. */
+  monthDate: z.string().min(1),
+  professionalId: z.string().uuid().optional(),
+});
+
+export async function getMonthCounts(
+  input: z.infer<typeof monthSchema>,
+): Promise<AgendaMonthCounts> {
+  const { orgId } = await requireAuth();
+  await requireRole(orgId, 'viewer');
+  const parsed = monthSchema.parse(input);
+  const supabase = await createServerClient();
+
+  const ref = new Date(parsed.monthDate);
+  const start = startOfMonth(ref).toISOString();
+  const end = endOfMonth(ref).toISOString();
+
+  let query = supabase
+    .from('appointments')
+    .select(
+      `id, starts_at, status,
+       customer:customers(full_name),
+       service:services(name),
+       professional:professionals(display_name)`,
+    )
+    .eq('org_id', orgId)
+    .is('deleted_at', null)
+    .gte('starts_at', start)
+    .lte('starts_at', end)
+    .order('starts_at', { ascending: true });
+
+  if (parsed.professionalId) {
+    query = query.eq('professional_id', parsed.professionalId);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    throw new Error(`Erro ao contar agendamentos: ${error.message}`);
+  }
+
+  const perDay: Record<number, number> = {};
+  const totals: Record<AgendaStatus, number> = {
+    scheduled: 0,
+    done: 0,
+    cancelled: 0,
+    no_show: 0,
+  };
+  let next: AgendaMonthCounts['next'] = null;
+  const now = new Date();
+
+  for (const row of data ?? []) {
+    const status = (row as { status: AgendaStatus }).status;
+    totals[status] += 1;
+    if (status !== 'cancelled') {
+      const day = new Date((row as { starts_at: string }).starts_at).getDate();
+      perDay[day] = (perDay[day] ?? 0) + 1;
+    }
+    const startsAt = new Date((row as { starts_at: string }).starts_at);
+    if (
+      !next &&
+      status === 'scheduled' &&
+      startsAt.getTime() >= now.getTime()
+    ) {
+      const c = (row as { customer: { full_name: string } | null }).customer;
+      const s = (row as { service: { name: string } | null }).service;
+      const p = (row as { professional: { display_name: string } | null })
+        .professional;
+      next = {
+        id: (row as { id: string }).id,
+        starts_at: (row as { starts_at: string }).starts_at,
+        customerName: c?.full_name ?? null,
+        serviceName: s?.name ?? 'Serviço',
+        professionalName: p?.display_name ?? 'Profissional',
+      };
+    }
+  }
+
+  return { perDay, totals, next };
 }
 
 export async function listAgendaProfessionals(): Promise<AgendaProfessional[]> {
@@ -476,6 +606,10 @@ export type ReceitaPrevista = {
   today: string;
   week: string;
   month: string;
+  /** Labels correlacionados com a data atual do usuário (pt-BR). */
+  todayLabel: string;
+  weekRangeLabel: string;
+  monthLabel: string;
 };
 
 /**
@@ -542,9 +676,21 @@ export async function getReceitaPrevista(): Promise<ReceitaPrevista> {
     if (dayMs >= dayStartMs && dayMs <= dayEndMs) todayCents += cents;
   }
 
+  // Labels temporais correlacionados com a data atual do usuário.
+  // Format pt-BR: "qua, 8 de mai", "5 a 11 de mai", "Maio 2026".
+  const todayLabel = format(now, "EEE, d 'de' MMM", { locale: ptBR });
+  const sameMonth = weekStart.getMonth() === weekEnd.getMonth();
+  const weekRangeLabel = sameMonth
+    ? `${format(weekStart, 'd', { locale: ptBR })} a ${format(weekEnd, "d 'de' MMM", { locale: ptBR })}`
+    : `${format(weekStart, "d 'de' MMM", { locale: ptBR })} a ${format(weekEnd, "d 'de' MMM", { locale: ptBR })}`;
+  const monthLabel = format(now, "MMMM 'de' yyyy", { locale: ptBR });
+
   return {
     today: (todayCents / 100).toFixed(2),
     week: (weekCents / 100).toFixed(2),
     month: (monthCents / 100).toFixed(2),
+    todayLabel,
+    weekRangeLabel,
+    monthLabel,
   };
 }

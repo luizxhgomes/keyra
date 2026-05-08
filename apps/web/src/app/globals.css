@@ -255,3 +255,85 @@
  *
  * Reference: docs/brand/03-identity/voice-tone.md §6 (Aplicação por touchpoint).
  */
+
+/**
+ * ─── FullCalendar Editorial Override (Refinamento Fase 1 — 2026-05-08) ────
+ *
+ * Customizações leves para alinhar visual do FullCalendar v6 ao Editorial
+ * Beauty Luxury KEYRA: paleta cocoa/mocha/terracota, transições calmas,
+ * hatching para cancelados, now indicator em terracota.
+ */
+
+/* Eventos: cantos arredondados + tipografia */
+.fc .keyra-event {
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: -0.01em;
+  padding: 2px 6px;
+  border-width: 1px;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.fc .keyra-event:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Status: cancelados com hatching (Ref Studio 813) + faltas em rust */
+.fc .keyra-event-cancelled {
+  opacity: 0.45;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    rgba(43, 24, 16, 0.08) 4px,
+    rgba(43, 24, 16, 0.08) 8px
+  ) !important;
+  text-decoration: line-through;
+  text-decoration-color: rgba(43, 24, 16, 0.4);
+}
+.fc .keyra-event-no_show {
+  background-color: #843E1A !important; /* rust-800 */
+  border-color: #843E1A !important;
+  color: #FAF6EE !important;
+}
+.fc .keyra-event-done {
+  background-color: #6E8C5A !important; /* success-leaf */
+  border-color: #6E8C5A !important;
+  color: #FAF6EE !important;
+}
+
+/* Now indicator: linha terracota */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #C26832 !important; /* terracotta-500 */
+  border-width: 2px;
+}
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #C26832 !important;
+  background-color: #C26832 !important;
+}
+
+/* Today highlight: tom warm ivory ao invés de azul-cinza default */
+.fc .fc-day-today {
+  background-color: rgba(229, 180, 115, 0.08) !important; /* amber-300/8 */
+}
+
+/* Headers do FullCalendar — tipografia */
+.fc .fc-col-header-cell-cushion,
+.fc .fc-timegrid-axis-cushion,
+.fc .fc-timegrid-slot-label-cushion {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Borders sutis — substitui cinza chumbo default */
+.fc .fc-scrollgrid,
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th,
+.fc .fc-timegrid-slot,
+.fc .fc-col-header-cell {
+  border-color: hsl(var(--border)) !important;
+}

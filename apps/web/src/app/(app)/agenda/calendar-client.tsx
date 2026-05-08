@@ -23,9 +23,14 @@ import {
 } from './actions';
 import { AlertCard } from '@/components/keyra';
 
-import { AgendaToolbar, type AgendaView } from './agenda-toolbar';
+import {
+  AgendaToolbar,
+  type AgendaStatusFilter,
+  type AgendaView,
+} from './agenda-toolbar';
 import { AgendamentoForm } from './agendamento-form';
 import { EventDetailSheet } from './event-detail-sheet';
+import { MiniCalendarSide } from './mini-calendar-side';
 
 type Props = {
   professionals: AgendaProfessional[];
@@ -40,16 +45,19 @@ type Props = {
 /**
  * Calendar client da Agenda.
  *
- * - FullCalendar v6 com plugins gratuitos: dayGrid (mês), timeGrid (dia/semana),
- *   interaction (click). `resource-timegrid` é premium e foi excluído do MVP;
- *   filtro por profissional usa Select no toolbar (AC1.4).
- * - Locale pt-br + `firstDay=1` (semana começa na segunda).
- * - Eventos são carregados via Server Action `listAppointments` (com cap de 200
- *   por range; banner exibido se truncar — AC4 + Dev Notes).
- * - Sem timezone plugin: FullCalendar usa o TZ do navegador, o que para o
- *   mercado brasileiro padrão é equivalente a `America/Sao_Paulo`. Tech debt
- *   conhecido — quando expandirmos pra equipes em fuso diferente, adicionar
- *   `@fullcalendar/luxon3` e configurar `timeZone: 'America/Sao_Paulo'`.
+ * Refinamento Fase 1 (2026-05-08):
+ * - Layout 2-col com sidebar lateral (mini-cal + counts + próximo agendamento)
+ * - Filtro de status (tabs no toolbar)
+ * - Search textual (cliente/serviço/profissional)
+ * - Mantém TODA arquitetura existente: FullCalendar v6, EventDetailSheet,
+ *   AgendamentoForm, cancel dialog, ReceitaCard.
+ *
+ * Não muda comportamento legado:
+ * - 3 views (Day/Week/Month), pt-BR, firstDay=1, mobile=Day
+ * - Cap 200 eventos com warning AlertCard
+ * - Filtro por profissional (Select)
+ * - Click slot vazio → abre formulário
+ * - Click evento → abre drawer
  */
 export function CalendarClient({ professionals, pickers, initialProfessionalId }: Props) {
   const calendarRef = useRef<FullCalendar | null>(null);
@@ -60,20 +68,18 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
 
   const [view, setView] = useState<AgendaView>('timeGridWeek');
   const [title, setTitle] = useState('');
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<AgendaEvent | null>(null);
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(
     initialProfessionalId,
   );
+  const [statusFilter, setStatusFilter] = useState<AgendaStatusFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [truncated, setTruncated] = useState(false);
 
-  // Story 2.5 — formulário de novo agendamento.
-  // Story 5.7 — `?novo=1` (FAB do BottomNav, J2 mobile) abre o sheet automático.
+  // Story 2.5 + 5.7 — formulário de novo agendamento.
   const [formOpen, setFormOpen] = useState(false);
   const [formInitialStartsAt, setFormInitialStartsAt] = useState<Date | null>(null);
-  // Pattern "adjust state during render" (React docs) — reage a mudanças de
-  // `novoParam` (hook reativo) sem violar a regra `react-hooks/set-state-in-effect`
-  // do React 19. Inicializa com `false` para que o primeiro render com
-  // `?novo=1` na URL dispare a abertura corretamente.
   const [prevNovoParam, setPrevNovoParam] = useState(false);
   if (prevNovoParam !== novoParam) {
     setPrevNovoParam(novoParam);
@@ -83,20 +89,17 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
     }
   }
 
-  // Mobile default = day view (AC1.1). Não chamamos setState aqui — a
-  // sincronização do state acontece via callback `datesSet` do FullCalendar
-  // assim que ele aplica a mudança de view (evita warning React 19 de
-  // setState em effect e elimina hydration mismatch).
+  // Mobile default = day view (AC1.1).
   useEffect(() => {
     if (typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches) {
       calendarRef.current?.getApi().changeView('timeGridDay');
     }
   }, []);
 
-  // Refetch quando filtro de profissional muda.
+  // Refetch quando qualquer filtro muda.
   useEffect(() => {
     calendarRef.current?.getApi().refetchEvents();
-  }, [selectedProfessionalId]);
+  }, [selectedProfessionalId, statusFilter, searchQuery]);
 
   const handleViewChange = useCallback((next: AgendaView) => {
     setView(next);
@@ -107,12 +110,19 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
   const handleNext = useCallback(() => calendarRef.current?.getApi().next(), []);
   const handleToday = useCallback(() => calendarRef.current?.getApi().today(), []);
 
+  // Mini-cal: clicar num dia navega o FullCalendar para esse dia.
+  const handleSelectDayFromMini = useCallback((date: Date) => {
+    const api = calendarRef.current?.getApi();
+    if (!api) return;
+    api.gotoDate(date);
+    api.changeView('timeGridDay');
+  }, []);
+
   const handleEventClick = useCallback((arg: EventClickArg) => {
     const cached = eventsRef.current.get(arg.event.id);
     if (cached) setSelectedEvent(cached);
   }, []);
 
-  // Story 2.5 — abre o formulário de novo agendamento.
   const handleNewAppointment = useCallback(() => {
     setFormInitialStartsAt(null);
     setFormOpen(true);
@@ -127,9 +137,6 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
     calendarRef.current?.getApi().refetchEvents();
   }, []);
 
-  // Quando o sheet fecha, limpa o `?novo=1` para que o próximo toque no FAB
-  // gere uma nova navegação (e o useEffect dispare a reabertura). Sem isso,
-  // tocar `+` duas vezes seguidas no mesmo URL não tem efeito.
   const handleFormOpenChange = useCallback(
     (open: boolean) => {
       setFormOpen(open);
@@ -150,10 +157,16 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
       failure: (err: Error) => void,
     ) => {
       try {
+        const statusIn =
+          statusFilter === 'all'
+            ? undefined
+            : ([statusFilter] as Array<'scheduled' | 'done' | 'cancelled' | 'no_show'>);
         const result = await listAppointments({
           start: info.startStr,
           end: info.endStr,
-          professionalId: selectedProfessionalId ?? undefined,
+          ...(selectedProfessionalId ? { professionalId: selectedProfessionalId } : {}),
+          ...(statusIn ? { statusIn } : {}),
+          ...(searchQuery.trim() ? { search: searchQuery.trim() } : {}),
         });
         setTruncated(result.truncated);
 
@@ -167,9 +180,10 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
             start: e.start,
             end: e.end,
             ...(e.color ? { backgroundColor: e.color, borderColor: e.color } : {}),
-            ...(e.extendedProps.status === 'cancelled'
-              ? { classNames: ['opacity-40'] }
-              : {}),
+            classNames: [
+              'keyra-event',
+              `keyra-event-${e.extendedProps.status}`,
+            ],
             extendedProps: e.extendedProps as unknown as Record<string, unknown>,
           })),
         );
@@ -177,58 +191,72 @@ export function CalendarClient({ professionals, pickers, initialProfessionalId }
         failure(err instanceof Error ? err : new Error(String(err)));
       }
     },
-    [selectedProfessionalId],
+    [selectedProfessionalId, statusFilter, searchQuery],
   );
 
   return (
-    <div className="flex flex-1 flex-col gap-3">
-      <AgendaToolbar
-        view={view}
-        onViewChange={handleViewChange}
-        onPrev={handlePrev}
-        onNext={handleNext}
-        onToday={handleToday}
-        title={title}
-        professionals={professionals}
-        selectedProfessionalId={selectedProfessionalId}
-        onProfessionalChange={setSelectedProfessionalId}
-        onNewAppointment={handleNewAppointment}
-      />
-
-      {truncated ? (
-        // Story 6.0 (AC4) — fonte única de "warning visual" via AlertCard.
-        // Substitui banner inline cru `border-amber-300 bg-amber-50` que
-        // duplicava a linguagem do <AlertCard severity="warning">.
-        <AlertCard
-          severity="warning"
-          title="Período com muitos agendamentos"
-          subtitle="Mais de 200 eventos neste intervalo. Refine o filtro de profissional ou diminua a faixa de datas para ver todos."
+    <div className="flex flex-1 flex-col gap-4 lg:flex-row">
+      {/* Sidebar lateral — mini-cal + counts + próximo agendamento */}
+      <aside className="lg:w-72 lg:shrink-0">
+        <MiniCalendarSide
+          currentDate={currentDate}
+          onSelectDay={handleSelectDayFromMini}
+          professionalId={selectedProfessionalId}
         />
-      ) : null}
+      </aside>
 
-      <div className="flex-1 overflow-x-auto rounded-lg border border-border bg-card p-2">
-        <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          initialView={view}
-          headerToolbar={false}
-          locale={ptBrLocale}
-          height="auto"
-          slotMinTime="06:00:00"
-          slotMaxTime="22:00:00"
-          allDaySlot={false}
-          firstDay={1}
-          nowIndicator
-          events={fetchEvents}
-          eventClick={handleEventClick}
-          dateClick={handleSlotClick}
-          datesSet={(arg) => {
-            setTitle(arg.view.title);
-            setView(arg.view.type as AgendaView);
-          }}
-          dayMaxEventRows={3}
-          eventDisplay="block"
+      {/* Coluna principal — toolbar + calendário */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <AgendaToolbar
+          view={view}
+          onViewChange={handleViewChange}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          onToday={handleToday}
+          title={title}
+          professionals={professionals}
+          selectedProfessionalId={selectedProfessionalId}
+          onProfessionalChange={setSelectedProfessionalId}
+          onNewAppointment={handleNewAppointment}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
         />
+
+        {truncated ? (
+          <AlertCard
+            severity="warning"
+            title="Período com muitos agendamentos"
+            subtitle="Mais de 200 eventos neste intervalo. Refine o filtro de profissional ou diminua a faixa de datas para ver todos."
+          />
+        ) : null}
+
+        <div className="flex-1 overflow-x-auto rounded-lg border border-border bg-card p-2 shadow-warm-sm">
+          <FullCalendar
+            ref={calendarRef}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            initialView={view}
+            headerToolbar={false}
+            locale={ptBrLocale}
+            height="auto"
+            slotMinTime="06:00:00"
+            slotMaxTime="22:00:00"
+            allDaySlot={false}
+            firstDay={1}
+            nowIndicator
+            events={fetchEvents}
+            eventClick={handleEventClick}
+            dateClick={handleSlotClick}
+            datesSet={(arg) => {
+              setTitle(arg.view.title);
+              setView(arg.view.type as AgendaView);
+              setCurrentDate(arg.view.currentStart);
+            }}
+            dayMaxEventRows={3}
+            eventDisplay="block"
+          />
+        </div>
       </div>
 
       <EventDetailSheet

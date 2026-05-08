@@ -6,6 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { KeyraLogo } from '@/components/brand/KeyraLogo';
 import { z } from 'zod';
 
 import { JourneyProgress } from '@/components/auth/JourneyProgress';
@@ -88,7 +90,7 @@ export function RequestResetCard() {
           <span className="text-xl font-bold tracking-tight">K</span>
         </div>
 
-        <h2 className="mb-1 text-center font-serif text-3xl font-bold tracking-tight text-cocoa-900">KEYRA<span className="text-gold-500">.</span></h2>
+        <KeyraLogo variant="primary" theme="light" height={32} className="mb-1" />
         <p className="mb-6 text-center text-xs text-muted-foreground">Recuperação de senha</p>
 
         {completedElsewhere ? (

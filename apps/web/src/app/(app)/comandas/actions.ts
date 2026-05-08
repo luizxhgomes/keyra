@@ -690,3 +690,75 @@ export async function listActiveServicesForPicker(): Promise<ActionResult<Servic
     return { ok: false, error: toError(err) };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Refinamento Editorial — Stats das comandas (4 KPIs com variação MoM)
+// ---------------------------------------------------------------------------
+
+export type CommandsStats = {
+  totalThisMonth: number;
+  openCount: number;
+  paidThisMonth: number;
+  revenueThisMonthCents: number;
+  totalLastMonth: number;
+  openCountLastMonth: number;
+  paidLastMonth: number;
+  revenueLastMonthCents: number;
+};
+
+export async function getCommandsStats(): Promise<ActionResult<CommandsStats>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59).toISOString();
+
+    const [allMonthRes, openRes, paidMonthRes, allLastRes, openLastRes, paidLastRes] = await Promise.all([
+      supabase.from('commands').select('total', { count: 'exact' }).eq('org_id', orgId).is('deleted_at', null).gte('opened_at', monthStart),
+      supabase.from('commands').select('total', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'open').is('deleted_at', null),
+      supabase.from('commands').select('total').eq('org_id', orgId).eq('status', 'paid').is('deleted_at', null).gte('paid_at', monthStart),
+      supabase.from('commands').select('id', { count: 'exact', head: true }).eq('org_id', orgId).gte('opened_at', lastMonthStart).lte('opened_at', lastMonthEnd),
+      supabase.from('commands').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'open').is('deleted_at', null).gte('opened_at', lastMonthStart).lte('opened_at', lastMonthEnd),
+      supabase.from('commands').select('total').eq('org_id', orgId).eq('status', 'paid').is('deleted_at', null).gte('paid_at', lastMonthStart).lte('paid_at', lastMonthEnd),
+    ]);
+
+    if (allMonthRes.error) return { ok: false, error: allMonthRes.error.message };
+    if (openRes.error) return { ok: false, error: openRes.error.message };
+    if (paidMonthRes.error) return { ok: false, error: paidMonthRes.error.message };
+
+    const totalThisMonth = allMonthRes.count ?? 0;
+    const openCount = openRes.count ?? 0;
+    const paidThisMonth = (paidMonthRes.data ?? []).length;
+    const revenueThisMonthCents = (paidMonthRes.data ?? []).reduce(
+      (acc, c) => acc + Math.round(Number(c.total ?? 0) * 100),
+      0,
+    );
+    const totalLastMonth = allLastRes.count ?? 0;
+    const openCountLastMonth = openLastRes.count ?? 0;
+    const paidLastMonth = (paidLastRes.data ?? []).length;
+    const revenueLastMonthCents = (paidLastRes.data ?? []).reduce(
+      (acc, c) => acc + Math.round(Number(c.total ?? 0) * 100),
+      0,
+    );
+
+    return {
+      ok: true,
+      data: {
+        totalThisMonth,
+        openCount,
+        paidThisMonth,
+        revenueThisMonthCents,
+        totalLastMonth,
+        openCountLastMonth,
+        paidLastMonth,
+        revenueLastMonthCents,
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}

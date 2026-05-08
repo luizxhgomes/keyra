@@ -17,6 +17,7 @@ import {
   Wallet,
 } from 'lucide-react';
 
+import { KeyraLogo } from '@/components/brand/KeyraLogo';
 import { cn } from '@/lib/utils';
 
 /**
@@ -130,17 +131,13 @@ export function Sidebar() {
           title={collapsed ? 'KEYRA' : undefined}
           aria-label="KEYRA — ir para Dashboard"
         >
-          {/* Story brand.7 — bolha "K." com ponto signature gold consistente
-              com header fixo do brandbook preview.html. Wordmark expandido
-              em Fraunces editorial. */}
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-warm-sm transition-transform duration-fast ease-out-soft hover:scale-110">
-            <span className="font-serif text-sm font-bold tracking-tight">K<span className="text-gold-300">.</span></span>
+          {/* Story brand.10 — KeyraLogo SVG profissional substituindo wordmarks textuais.
+              Bolha "K." sempre visível (theme=dark sobre primary), wordmark expandido
+              só quando sidebar não está collapsed. */}
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary shadow-warm-sm transition-transform duration-fast ease-out-soft hover:scale-110">
+            <KeyraLogo variant="monogram" theme="dark" height={20} decorative />
           </span>
-          {!collapsed && (
-            <span className="font-serif text-lg font-bold tracking-tight text-foreground">
-              KEYRA<span className="text-gold-500">.</span>
-            </span>
-          )}
+          {!collapsed && <KeyraLogo variant="primary" theme="light" height={22} />}
         </Link>
       </div>
 

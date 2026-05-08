@@ -190,3 +190,132 @@ export async function archiveService(
     return { ok: false, error: toError(err) };
   }
 }
+
+// ---------------------------------------------------------------------------
+// Refinamento Fase 1 — Catálogo stats (4 KPIs com variação MoM)
+// ---------------------------------------------------------------------------
+
+export type CatalogStats = {
+  totalItems: number;
+  activeItems: number;
+  totalCategories: number;
+  uncategorizedItems: number;
+  /** Variação % vs final do mês passado (positivo = cresceu). null se sem base. */
+  totalItemsDelta: number | null;
+  activeItemsDelta: number | null;
+  totalCategoriesDelta: number | null;
+  uncategorizedItemsDelta: number | null;
+};
+
+export async function getCatalogStats(): Promise<ActionResult<CatalogStats>> {
+  try {
+    const { orgId } = await requireAuth();
+    await requireRole(orgId, 'viewer');
+    const supabase = await createServerClient();
+
+    // Cutoff: fim do mês passado às 23:59:59 (compara contagens "antes" vs "agora")
+    const now = new Date();
+    const endOfLastMonth = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      0,
+      23,
+      59,
+      59,
+    ).toISOString();
+
+    const [
+      svcAllRes,
+      svcActiveRes,
+      svcAllPastRes,
+      svcActivePastRes,
+      catAllRes,
+      uncatRes,
+      catAllPastRes,
+      uncatPastRes,
+    ] = await Promise.all([
+      supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .is('deleted_at', null),
+      supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .eq('active', true)
+        .is('deleted_at', null),
+      supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .lte('created_at', endOfLastMonth),
+      supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .eq('active', true)
+        .lte('created_at', endOfLastMonth),
+      supabase
+        .from('service_categories')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .is('deleted_at', null),
+      supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .is('category_id', null)
+        .is('deleted_at', null),
+      supabase
+        .from('service_categories')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .is('deleted_at', null)
+        .lte('created_at', endOfLastMonth),
+      supabase
+        .from('services')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .is('category_id', null)
+        .is('deleted_at', null)
+        .lte('created_at', endOfLastMonth),
+    ]);
+
+    if (svcAllRes.error) return { ok: false, error: svcAllRes.error.message };
+    if (svcActiveRes.error)
+      return { ok: false, error: svcActiveRes.error.message };
+    if (catAllRes.error) return { ok: false, error: catAllRes.error.message };
+    if (uncatRes.error) return { ok: false, error: uncatRes.error.message };
+
+    const totalItems = svcAllRes.count ?? 0;
+    const activeItems = svcActiveRes.count ?? 0;
+    const totalCategories = catAllRes.count ?? 0;
+    const uncategorizedItems = uncatRes.count ?? 0;
+    const totalItemsPast = svcAllPastRes.count ?? 0;
+    const activeItemsPast = svcActivePastRes.count ?? 0;
+    const totalCategoriesPast = catAllPastRes.count ?? 0;
+    const uncategorizedItemsPast = uncatPastRes.count ?? 0;
+
+    function delta(now: number, past: number): number | null {
+      if (past === 0) return now > 0 ? 100 : null;
+      return Math.round(((now - past) / past) * 100);
+    }
+
+    return {
+      ok: true,
+      data: {
+        totalItems,
+        activeItems,
+        totalCategories,
+        uncategorizedItems,
+        totalItemsDelta: delta(totalItems, totalItemsPast),
+        activeItemsDelta: delta(activeItems, activeItemsPast),
+        totalCategoriesDelta: delta(totalCategories, totalCategoriesPast),
+        uncategorizedItemsDelta: delta(uncategorizedItems, uncategorizedItemsPast),
+      },
+    };
+  } catch (err) {
+    return { ok: false, error: toError(err) };
+  }
+}

@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
       preventFullImport: true,
     },
   },
+  // Rewrite estático: serve a sales page (apps/web/public/comecar.html) sob /comecar
+  // sem expor a extensão .html. Não toca rotas autenticadas.
+  async rewrites() {
+    return [
+      {
+        source: '/comecar',
+        destination: '/comecar.html',
+      },
+    ];
+  },
 };
 
 /**

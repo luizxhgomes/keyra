@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KEYRA · Sua clínica rendendo mais. A partir desta segunda.</title>
+<meta name="description" content="A KEYRA é onde o financeiro da sua clínica recomeça do zero. Não na planilha. Não no caderno. Recomeça aqui dentro, automaticamente, a partir da operação." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,200..900;1,9..144,200..900&family=Inter:wght@200..700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  /* ─── Tokens canônicos (espelham docs/brand/03-identity/preview.html) ─── */
+  --ivory-50:#FAF6EE; --ivory-100:#F4EDE2; --sand-200:#EAE0CF; --mocha-300:#C8B49A;
+  --bronze-400:#946640; --bronze-500:#7E5A40;
+  --cocoa-700:#5A3E26; --cocoa-800:#3F2A1B; --cocoa-900:#2B1810; --ink-950:#181210;
+  --amber-300:#E5B473; --amber-400:#D89A4D; --amber-500:#C8843A;
+  --terracotta-500:#C26832; --terracotta-600:#B8612B; --terracotta-700:#A05525; --rust-800:#843E1A;
+  --champagne-200:#F0D8A8; --gold-300:#E5C690; --gold-400:#D4A752; --gold-500:#B8923A; --gold-600:#9A7A2C;
+  --success-leaf:#6E8C5A; --success-deep:#4F6840; --info:#5A6C7E;
+
+  /* Semantic */
+  --background:var(--ivory-50);
+  --surface:#fff;
+  --surface-muted:var(--ivory-100);
+  --foreground:var(--cocoa-900);
+  --foreground-secondary:var(--bronze-500);
+  --foreground-muted:var(--bronze-400);
+  --border-subtle:var(--sand-200);
+  --border-default:var(--mocha-300);
+  --cta-primary:var(--terracotta-600);
+  --cta-primary-hover:var(--terracotta-700);
+  --cta-primary-fg:var(--ivory-50);
+  --premium-accent:var(--gold-500);
+
+  /* Typography */
+  --font-serif:'Fraunces',Times,serif;
+  --font-sans:'Inter',-apple-system,system-ui,sans-serif;
+
+  /* Motion */
+  --d-instant:100ms; --d-fast:200ms; --d-base:320ms; --d-slow:480ms; --d-cinematic:720ms;
+  --e-out-soft:cubic-bezier(0.22,1,0.36,1);
+  --e-in-out-editorial:cubic-bezier(0.65,0,0.35,1);
+
+  /* Shadows warm */
+  --sh-xs:0 1px 2px rgba(43,24,16,.04);
+  --sh-sm:0 2px 4px rgba(43,24,16,.06);
+  --sh-md:0 4px 8px rgba(43,24,16,.08);
+  --sh-lg:0 8px 16px rgba(43,24,16,.12);
+  --sh-xl:0 16px 32px rgba(43,24,16,.16);
+  --sh-glow:0 0 24px rgba(184,146,58,.18);
+  --sh-glow-strong:0 0 40px rgba(184,146,58,.28);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--background);
+  color:var(--foreground);
+  font-family:var(--font-sans);
+  font-feature-settings:"tnum";
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+  text-wrap:pretty;
+}
+
+/* ─── Tipografia sistêmica · text-wrap consistente em toda a página ─── */
+h1, h2, h3, h4,
+.title, .subtitle,
+.plan-name, .plan-tagline,
+.timeline-step h4,
+.chain h3,
+.guarantee h3,
+.cta-final h2,
+.cta-final p,
+.lead-quote,
+.ps-quote,
+.empty h4,
+.hero h1, .hero p.hero-sub{
+  text-wrap:balance;
+}
+p, li, .lead, .app-msg, .pricing-note p, .ps-block p, .cost-card{
+  text-wrap:pretty;
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--d-instant:0ms;--d-fast:0ms;--d-base:0ms;--d-slow:0ms;--d-cinematic:0ms}
+}
+
+.editorial{font-family:var(--font-serif);font-feature-settings:"ss01","liga"}
+.shell{max-width:1200px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border-subtle)}
+section:first-of-type{border-top:none}
+
+.eyebrow{
+  font-family:var(--font-sans);
+  font-size:12px;font-weight:600;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gold-500);margin-bottom:24px;
+  display:inline-flex;align-items:center;gap:14px;
+}
+.eyebrow::before{content:"";width:32px;height:1px;background:var(--gold-500)}
+
+.title{
+  font-family:var(--font-serif);font-weight:300;
+  font-size:clamp(36px,4.4vw,60px);
+  line-height:1.08;letter-spacing:-0.02em;
+  color:var(--cocoa-900);margin-bottom:24px;
+  max-width:24ch;
+}
+.title strong{font-weight:700}
+.title em{font-weight:200;font-style:italic;color:var(--bronze-500)}
+
+.subtitle{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:22px;color:var(--bronze-500);margin-bottom:48px;max-width:32ch;
+  line-height:1.4;
+}
+
+.lead{
+  font-size:17px;color:var(--cocoa-800);margin-bottom:20px;
+  max-width:62ch;line-height:1.7;
+}
+.lead strong{color:var(--cocoa-900);font-weight:600}
+.lead em{font-style:italic;font-weight:300}
+
+.lead-quote{
+  font-family:var(--font-serif);font-weight:300;font-style:italic;
+  font-size:clamp(22px,2.4vw,28px);line-height:1.4;
+  color:var(--cocoa-800);
+  border-left:2px solid var(--gold-500);
+  padding:8px 0 8px 28px;
+  margin:32px 0;max-width:34ch;
+}
+
+/* ─── Header / TOC sticky ─── */
+.toc{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,246,238,.92);
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:1px solid var(--border-subtle);
+  padding:16px 32px;
+  display:flex;gap:32px;flex-wrap:wrap;align-items:center;
+  font-size:13px;font-weight:500;
+}
+.toc-brand{
+  font-family:var(--font-serif);font-weight:700;font-size:22px;
+  color:var(--cocoa-900);letter-spacing:-0.02em;margin-right:auto;
+  text-decoration:none;display:inline-flex;align-items:baseline;
+  transition:opacity var(--d-fast) var(--e-out-soft);
+}
+.toc-brand:hover{opacity:0.7}
+.toc-brand .dot{color:var(--gold-500);font-weight:700;margin-left:1px}
+.toc a:not(.toc-brand){
+  color:var(--bronze-500);text-decoration:none;
+  transition:color var(--d-fast) var(--e-out-soft);
+}
+.toc a:not(.toc-brand):hover{color:var(--cocoa-900)}
+.toc-cta{
+  font-family:var(--font-sans);font-weight:500;font-size:14px;
+  padding:10px 20px;border-radius:8px;
+  background:var(--cta-primary);color:var(--cta-primary-fg) !important;
+  transition:background-color var(--d-fast) var(--e-out-soft);
+}
+.toc-cta:hover{background:var(--cta-primary-hover);color:var(--cta-primary-fg) !important}
+
+/* ─── Hero ─── */
+.hero{
+  padding:120px 0 72px;
+  border-top:none;
+  position:relative;
+  overflow:hidden;
+}
+.hero + section{padding-top:64px}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at top right,var(--ivory-100),transparent 60%);
+  pointer-events:none;z-index:0;
+}
+.hero .shell{position:relative;z-index:1}
+.hero h1{
+  font-family:var(--font-serif);
+  font-size:clamp(36px,4.6vw,60px);
+  line-height:1.08;letter-spacing:-0.02em;
+  color:var(--cocoa-900);margin-bottom:28px;
+  font-weight:700;max-width:30ch;
+  text-wrap:balance;
+}
+.hero h1 .thin{font-weight:200;font-style:italic;color:var(--bronze-500)}
+.hero h1 .dot{color:var(--gold-500)}
+.hero p.hero-sub{
+  font-family:var(--font-sans);font-weight:400;
+  font-size:clamp(17px,1.5vw,19px);
+  color:var(--cocoa-700);max-width:58ch;line-height:1.6;
+  margin-bottom:40px;
+}
+.hero p.hero-sub em{font-family:var(--font-serif);font-style:italic;font-weight:300;color:var(--cocoa-900)}
+/* ─── Botões (do brandbook) ─── */
+.btn{
+  font-family:var(--font-sans);font-weight:500;font-size:14px;
+  letter-spacing:0.01em;
+  padding:12px 24px;border-radius:8px;border:1px solid transparent;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  text-decoration:none;line-height:1.4;
+  transition:background-color var(--d-fast) var(--e-out-soft),
+             color var(--d-fast) var(--e-out-soft),
+             border-color var(--d-fast) var(--e-out-soft),
+             transform var(--d-instant) var(--e-out-soft),
+             box-shadow var(--d-base) var(--e-out-soft);
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--cta-primary);color:var(--cta-primary-fg);border-color:var(--cta-primary)}
+.btn-primary:hover{background:var(--cta-primary-hover);border-color:var(--cta-primary-hover);box-shadow:var(--sh-md)}
+.btn-secondary{background:var(--ivory-50);color:var(--cocoa-900);border-color:var(--mocha-300)}
+.btn-secondary:hover{background:var(--ivory-100);border-color:var(--cocoa-700)}
+.btn-ghost{background:transparent;color:var(--bronze-500);border-color:transparent}
+.btn-ghost:hover{background:transparent;color:var(--cocoa-900);border-color:transparent}
+.btn-premium{
+  background:var(--gold-500);color:var(--cocoa-900);font-weight:600;
+  border-color:var(--gold-500);box-shadow:var(--sh-md);
+}
+.btn-premium:hover{background:var(--gold-600);border-color:var(--gold-600);color:var(--ivory-50);box-shadow:var(--sh-glow-strong)}
+.btn-large{padding:14px 28px;font-size:15px;letter-spacing:0.01em}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* ─── Bloco 4 · Custo do "mês que vem" (cards de prejuízo silencioso) ─── */
+.cost-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:24px;
+  margin-top:40px;
+}
+@media (max-width:768px){.cost-grid{grid-template-columns:1fr}}
+.cost-card{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-left:3px solid var(--rust-800);
+  border-radius:8px;
+  padding:24px 28px;
+  font-size:15px;color:var(--cocoa-800);line-height:1.55;
+  transition:transform var(--d-base) var(--e-out-soft),
+             box-shadow var(--d-base) var(--e-out-soft);
+}
+.cost-card:hover{transform:translateY(-1px);box-shadow:var(--sh-md)}
+.cost-card b{color:var(--cocoa-900);font-weight:600}
+
+/* ─── Bloco 5 · 3 fases temporais ─── */
+.timeline{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  margin-top:48px;
+}
+@media (max-width:768px){.timeline{grid-template-columns:1fr}}
+.timeline-step{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:12px;
+  padding:32px 28px;
+  position:relative;
+}
+.timeline-step .step-no{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:64px;line-height:1;color:var(--gold-500);
+  margin-bottom:16px;
+}
+.timeline-step h4{
+  font-family:var(--font-serif);font-weight:600;font-size:24px;
+  color:var(--cocoa-900);margin-bottom:12px;
+}
+.timeline-step p{font-size:15px;color:var(--bronze-500);line-height:1.55}
+
+/* ─── Bloco 6 · Cadeia Viva (mecanismo único) ─── */
+.chain{
+  background:var(--cocoa-900);
+  color:var(--ivory-50);
+  border-radius:16px;
+  padding:64px 56px;
+  margin:48px 0;
+  position:relative;
+  overflow:hidden;
+}
+.chain::before{
+  content:"";position:absolute;top:0;right:0;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(184,146,58,.18),transparent 70%);
+  pointer-events:none;
+}
+.chain h3{
+  font-family:var(--font-serif);font-weight:300;font-style:italic;
+  font-size:clamp(32px,4vw,52px);line-height:1.1;
+  color:var(--champagne-200);margin-bottom:32px;letter-spacing:-0.02em;
+}
+.chain h3 strong{font-weight:700;font-style:normal}
+.chain-flow{
+  display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+  font-family:var(--font-serif);font-weight:300;font-size:18px;
+  color:var(--champagne-200);margin-top:32px;
+}
+.chain-flow b{color:var(--ivory-50);font-weight:600;font-style:normal}
+.chain-flow .arrow{color:var(--gold-500);font-size:14px}
+.chain p{color:var(--mocha-300);font-size:16px;line-height:1.7;max-width:60ch}
+
+/* ─── Bloco 7 · Bullets Bencivenga ─── */
+.bullets{
+  list-style:none;padding:0;margin-top:32px;
+  display:grid;grid-template-columns:1fr;gap:0;
+  max-width:68ch;
+}
+.bullets li{
+  font-size:17px;line-height:1.7;color:var(--cocoa-800);
+  padding:24px 0;border-bottom:1px solid var(--border-subtle);
+  position:relative;padding-left:36px;
+}
+.bullets li:last-child{border-bottom:none}
+.bullets li::before{
+  content:"";position:absolute;left:0;top:34px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold-500);
+}
+.bullets li b{color:var(--cocoa-900);font-weight:600}
+
+/* ─── Bloco 8 · App preview (frases) ─── */
+.app-preview{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:24px;
+  margin-top:40px;max-width:880px;
+}
+@media (max-width:640px){.app-preview{grid-template-columns:1fr}}
+.app-msg{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:12px;
+  padding:24px 28px;
+  font-size:15px;color:var(--cocoa-800);line-height:1.55;
+  box-shadow:var(--sh-xs);
+}
+.app-msg b{
+  display:block;color:var(--cocoa-900);font-weight:600;margin-bottom:6px;
+  font-size:13px;letter-spacing:0.04em;text-transform:uppercase;color:var(--bronze-500);
+}
+.app-msg .num{
+  font-family:var(--font-sans);font-weight:700;font-feature-settings:"tnum";
+  color:var(--cocoa-900);font-size:17px;
+}
+.app-msg .pos{color:var(--success-leaf)}
+
+/* ─── Bloco 9 · 3 PLANOS (Lei da Densidade Proporcional) ─── */
+.pricing{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:24px;margin-top:48px;align-items:stretch;
+}
+@media (max-width:1024px){.pricing{grid-template-columns:1fr;max-width:480px;margin-left:auto;margin-right:auto}}
+
+.plan{
+  background:var(--surface);
+  border:1px solid var(--border-subtle);
+  border-radius:16px;
+  padding:40px 32px;
+  display:flex;flex-direction:column;gap:20px;
+  position:relative;
+  transition:transform var(--d-base) var(--e-out-soft),
+             box-shadow var(--d-base) var(--e-out-soft);
+}
+.plan:hover{transform:translateY(-2px);box-shadow:var(--sh-lg)}
+
+.plan-eyebrow{
+  font-size:11px;font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--bronze-500);
+}
+.plan-name{
+  font-family:var(--font-serif);font-weight:600;font-size:32px;
+  color:var(--cocoa-900);line-height:1.1;letter-spacing:-0.02em;
+}
+.plan-tagline{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:17px;color:var(--bronze-500);line-height:1.4;
+}
+.plan-price{
+  display:flex;align-items:baseline;gap:6px;
+  padding:20px 0 12px;border-top:1px solid var(--border-subtle);
+  font-feature-settings:"tnum";
+}
+.plan-price .currency{font-size:18px;color:var(--bronze-500);font-weight:500}
+.plan-price .amount{
+  font-family:var(--font-sans);font-weight:700;font-size:48px;
+  color:var(--cocoa-900);letter-spacing:-0.02em;line-height:1;
+}
+.plan-price .cents{font-size:24px;color:var(--cocoa-700);font-weight:600}
+.plan-price .period{font-size:14px;color:var(--bronze-500);margin-left:4px}
+.plan-trial{
+  font-size:13px;color:var(--bronze-500);font-style:italic;
+  margin-top:-8px;
+}
+
+.plan-includes{
+  font-family:var(--font-sans);font-size:11px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--bronze-500);
+  padding-top:12px;
+  border-top:1px solid var(--border-subtle);
+  margin-bottom:0;
+}
+.plan-features{
+  list-style:none;padding:0;margin:0;
+  display:flex;flex-direction:column;gap:12px;flex:1;
+}
+.plan-features li{
+  font-size:14px;color:var(--cocoa-800);line-height:1.55;
+  padding-left:26px;position:relative;
+  text-wrap:pretty;
+}
+.plan-features li::before{
+  content:"";position:absolute;left:2px;top:7px;
+  width:14px;height:8px;
+  border-left:1.5px solid var(--success-leaf);
+  border-bottom:1.5px solid var(--success-leaf);
+  transform:rotate(-45deg);
+}
+.plan-features li b{font-weight:600;color:var(--cocoa-900)}
+
+.plan-cta{
+  margin-top:auto;
+  width:100%;justify-content:center;
+}
+
+/* Plano Executive · destaque editorial */
+.plan-featured{
+  background:var(--cocoa-900);
+  color:var(--ivory-50);
+  border:2px solid var(--gold-500);
+  box-shadow:var(--sh-glow);
+  transform:translateY(-12px);
+}
+@media (max-width:1024px){.plan-featured{transform:none}}
+.plan-featured:hover{transform:translateY(-14px);box-shadow:var(--sh-glow-strong)}
+@media (max-width:1024px){.plan-featured:hover{transform:translateY(-2px)}}
+
+.plan-featured .plan-eyebrow{color:var(--gold-400)}
+.plan-featured .plan-name{color:var(--champagne-200)}
+.plan-featured .plan-tagline{color:var(--mocha-300)}
+.plan-featured .plan-price{border-top-color:rgba(240,216,168,.2)}
+.plan-featured .plan-price .currency{color:var(--mocha-300)}
+.plan-featured .plan-price .amount{color:var(--ivory-50)}
+.plan-featured .plan-price .cents{color:var(--champagne-200)}
+.plan-featured .plan-price .period{color:var(--mocha-300)}
+.plan-featured .plan-trial{color:var(--gold-400)}
+.plan-featured .plan-includes{color:var(--gold-400);border-top-color:rgba(240,216,168,.2)}
+.plan-featured .plan-features li{color:var(--champagne-200)}
+.plan-featured .plan-features li b{color:var(--ivory-50)}
+.plan-featured .plan-features li::before{
+  border-color:var(--gold-400);
+}
+
+.plan-ribbon{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:var(--gold-500);color:var(--cocoa-900);
+  font-family:var(--font-sans);font-weight:600;font-size:11px;
+  letter-spacing:0.16em;text-transform:uppercase;
+  padding:8px 18px;border-radius:6px;
+  box-shadow:var(--sh-md);
+  white-space:nowrap;
+}
+
+.pricing-note{
+  margin-top:48px;padding:32px;
+  background:var(--surface-muted);
+  border-left:3px solid var(--gold-500);
+  border-radius:8px;
+  font-size:15px;color:var(--cocoa-800);line-height:1.7;
+  max-width:72ch;
+}
+.pricing-note b{color:var(--cocoa-900);font-weight:600}
+.pricing-note em{font-style:italic;color:var(--bronze-500)}
+
+/* ─── Bloco 10 · Garantia ─── */
+.guarantee{
+  background:var(--ivory-100);
+  border-radius:16px;
+  padding:64px 56px;
+  text-align:center;
+  margin:48px 0;
+  position:relative;
+}
+.guarantee-seal{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:160px;height:160px;border-radius:50%;
+  border:1.5px solid var(--gold-500);
+  background:var(--ivory-50);
+  font-family:var(--font-serif);font-weight:600;
+  color:var(--cocoa-900);
+  margin-bottom:16px;letter-spacing:-0.02em;
+  text-align:center;line-height:1;
+  position:relative;
+}
+.guarantee-seal .num{
+  display:block;
+  font-size:56px;font-weight:700;
+  color:var(--gold-500);line-height:1;
+  margin-bottom:6px;
+}
+.guarantee-seal .label{
+  display:block;
+  font-family:var(--font-serif);font-weight:500;font-style:italic;
+  font-size:22px;color:var(--cocoa-900);
+  letter-spacing:0;
+}
+.guarantee-meta{
+  display:block;
+  font-family:var(--font-sans);font-size:11px;font-weight:600;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--bronze-500);
+  margin-bottom:32px;
+}
+.guarantee h3{
+  font-family:var(--font-serif);font-weight:300;
+  font-size:clamp(28px,3.4vw,42px);
+  color:var(--cocoa-900);margin-bottom:24px;line-height:1.15;letter-spacing:-0.02em;
+}
+.guarantee h3 strong{font-weight:700}
+.guarantee p{
+  max-width:58ch;margin:0 auto 16px;
+  font-size:16px;color:var(--cocoa-800);line-height:1.7;
+}
+
+/* ─── CTA final ─── */
+.cta-final{
+  text-align:center;padding:96px 0;
+  background:var(--ivory-100);
+  border-top:1px solid var(--border-subtle);
+}
+.cta-final h2{
+  font-family:var(--font-serif);font-weight:300;
+  font-size:clamp(36px,4.4vw,60px);line-height:1.08;letter-spacing:-0.02em;
+  color:var(--cocoa-900);margin-bottom:24px;
+  max-width:18ch;margin-left:auto;margin-right:auto;
+}
+.cta-final h2 strong{font-weight:700}
+.cta-final h2 em{font-weight:200;font-style:italic;color:var(--bronze-500)}
+.cta-final p{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:20px;color:var(--bronze-500);max-width:32ch;margin:0 auto 40px;
+  line-height:1.45;
+}
+.cta-final-row{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  margin-top:40px;
+}
+.cta-final-row .btn{min-width:280px;justify-content:center}
+.cta-meta{
+  font-size:13px;color:var(--bronze-500);letter-spacing:0.04em;
+  margin-top:24px;
+}
+
+/* ─── PS Halbert ─── */
+.ps-block{
+  max-width:60ch;margin:0 auto;
+  border-top:1px solid var(--border-subtle);
+  padding-top:48px;
+}
+.ps-block .label{
+  font-family:var(--font-sans);font-weight:600;font-size:11px;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gold-500);margin-bottom:16px;
+}
+.ps-block p{
+  font-family:var(--font-serif);font-weight:300;
+  font-size:18px;line-height:1.65;color:var(--cocoa-800);
+  margin-bottom:18px;
+}
+.ps-block p em{font-style:italic;color:var(--bronze-500)}
+.ps-block p strong{font-weight:600;color:var(--cocoa-900)}
+.ps-quote{
+  font-family:var(--font-serif);font-style:italic;font-weight:300;
+  font-size:24px;line-height:1.4;
+  color:var(--cocoa-900);margin-top:32px;
+  padding:0 28px;border-left:2px solid var(--gold-500);
+}
+
+/* ─── Footer ─── */
+footer{
+  background:var(--cocoa-900);color:var(--mocha-300);
+  padding:64px 32px;text-align:center;
+  font-size:13px;line-height:1.7;
+}
+footer .brand{
+  font-family:var(--font-serif);font-weight:700;font-size:24px;
+  color:var(--ivory-50);margin-bottom:16px;letter-spacing:-0.02em;
+  display:inline-block;
+}
+footer .brand .dot{color:var(--gold-500)}
+footer p{margin-bottom:8px;max-width:54ch;margin-left:auto;margin-right:auto}
+footer a{color:var(--champagne-200);text-decoration:none;border-bottom:1px solid rgba(240,216,168,.3);transition:color var(--d-fast) var(--e-out-soft)}
+footer a:hover{color:var(--ivory-50)}
+
+/* ─── Reveal-on-scroll ─── */
+.reveal{
+  opacity:0;transform:translateY(8px);
+  transition:opacity var(--d-slow) var(--e-out-soft),
+             transform var(--d-slow) var(--e-out-soft);
+}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* ─── Mobile tweaks ─── */
+@media (max-width:768px){
+  section{padding:64px 0}
+  .shell{padding:0 24px}
+  .toc{padding:14px 24px;gap:16px}
+  .toc a:not(.toc-brand):not(.toc-cta){display:none}
+  .chain{padding:40px 32px}
+  .guarantee{padding:48px 32px}
+  .btn-row{flex-direction:column;align-items:stretch}
+  .btn-row .btn{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TOC sticky ─── -->
+<nav class="toc" aria-label="Navegação principal">
+  <a href="#hero" class="toc-brand">KEYRA<span class="dot">.</span></a>
+  <a href="#problema">o problema</a>
+  <a href="#mecanismo">como funciona</a>
+  <a href="#planos">planos</a>
+  <a href="#garantia">garantia</a>
+  <a href="#planos" class="toc-cta">Começar agora</a>
+</nav>
+
+<!-- ─── Hero ─── -->
+<header class="hero" id="hero">
+  <div class="shell">
+    <div class="eyebrow reveal">Para a empresária que decidiu, hoje, parar de adiar</div>
+    <h1 class="reveal">
+      Sua clínica <em>atendendo bem</em>, há meses<span class="dot">.</span><br>
+      <span class="thin">Sua planilha,</span> parada no mesmo lugar<span class="dot">.</span>
+    </h1>
+    <p class="hero-sub reveal">
+      A KEYRA é onde o financeiro da sua clínica <em>recomeça do zero</em>. Não na planilha. Não no caderno. Não na madrugada cruzando dado a mão. Recomeça aqui dentro, a partir da próxima comanda fechada. Sem você precisar lançar nada.
+    </p>
+    <div class="btn-row reveal">
+      <a href="#planos" class="btn btn-primary btn-large">Ver o que muda já na primeira semana →</a>
+    </div>
+  </div>
+</header>
+
+<!-- ─── Lead emocional ─── -->
+<section id="problema">
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 01 · O que está acontecendo</div>
+    <h2 class="title reveal">
+      Há um momento em que você percebe que <em>o problema não é mais conseguir cliente</em>.
+    </h2>
+    <p class="lead reveal">A agenda fechou. A recepção sabe receber. A esteticista é boa. As clientes voltam.</p>
+    <p class="lead reveal">E mesmo assim, todo fim de mês, vem a mesma cena. Você abre a planilha que sua prima fez no Excel em 2022. Abre o relatório da maquininha. Abre o caderno de comanda. E tenta cruzar tudo na mão para entender <strong>quanto sobrou</strong>.</p>
+    <p class="lead reveal">Aí é dia 12, dia 15, e o número finalmente aparece. Menor do que você esperava.</p>
+    <p class="lead reveal">E aí vem a parte que ninguém fala: você decide que <em>"no mês que vem eu organizo de verdade"</em>. E não organiza. Porque na segunda já tem cliente, na terça tem fornecedor, na quarta acabou produto, na quinta tem WhatsApp para responder, na sexta vem o cansaço. Aí vira mais um mês. Mais um. Mais um.</p>
+
+    <blockquote class="lead-quote reveal">
+      O problema da sua clínica não é falta de organização. É que a planilha foi criada para um problema que a KEYRA já resolve sozinha.
+    </blockquote>
+
+    <p class="lead reveal">Quando o financeiro nasce automaticamente da agenda, da comanda, do pagamento, você não precisa "se organizar". Você precisa <strong>começar do zero, num lugar que organiza por você.</strong></p>
+    <p class="lead reveal">É isso que esta página oferece. Não é um software a mais. É o pontapé inicial da reorganização financeira da sua clínica. E a partir do dia em que você entra na KEYRA, a planilha pode parar onde está. Porque ela não vai mais precisar existir.</p>
+  </div>
+</section>
+
+<!-- ─── Bloco 4 · Custo do mês adiado ─── -->
+<section>
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 02 · O que cada mês adiado custa</div>
+    <h2 class="title reveal">
+      <strong>Cada mês</strong> que você adia,<br/>sua clínica paga em silêncio<span style="color:var(--gold-500)">.</span>
+    </h2>
+    <p class="lead reveal">A diferença entre uma clínica que cresce com folga e uma que cresce no sufoco quase nunca é o número de clientes. É <strong>o tempo entre o evento operacional e a decisão financeira que ele exige.</strong> Hoje, na sua clínica, esse tempo é de 30 a 45 dias. Na KEYRA, é zero.</p>
+
+    <div class="cost-grid reveal">
+      <div class="cost-card">
+        <b>Pacote vendido com desconto abaixo da margem</b> continua sendo oferecido pela recepção sem que ninguém perceba. Saem R$ 200, R$ 400, R$ 800 por mês. Todo mês.
+      </div>
+      <div class="cost-card">
+        <b>Produto comprado num fornecedor 20% mais caro</b> continua sendo recomprado mês após mês porque ninguém revisita o cadastro.
+      </div>
+      <div class="cost-card">
+        <b>Maquininha que cobra taxa maior</b> continua sendo a primeira a ser passada, porque está mais perto do balcão.
+      </div>
+      <div class="cost-card">
+        <b>Atendimento que dá prejuízo</b> continua na agenda por mais 30 dias antes de você descobrir.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Bloco 5 · 3 fases · começar do zero ─── -->
+<section>
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 03 · Como você começa do zero</div>
+    <h2 class="title reveal">
+      A reorganização da sua clínica<br/>
+      <em>não é projeto.</em> É <strong>uma decisão tomada hoje.</strong>
+    </h2>
+    <p class="lead reveal">Você não precisa "primeiro arrumar a planilha". Não precisa esperar fechar o mês. Não precisa estudar finanças. Você precisa de uma chave que ligue tudo: o atendimento à comanda, a comanda ao pagamento, o pagamento ao DRE, o DRE à decisão. Essa chave existe.</p>
+
+    <div class="timeline reveal">
+      <div class="timeline-step">
+        <div class="step-no">01.</div>
+        <h4>Hoje à noite</h4>
+        <p>Sua agenda da semana já está dentro da KEYRA. As comandas começam a nascer sozinhas, sem cadastro manual.</p>
+      </div>
+      <div class="timeline-step">
+        <div class="step-no">02.</div>
+        <h4>Em 7 dias</h4>
+        <p>Você tem o primeiro DRE real da sua clínica. Não estimativa, não projeção. Real, com números absolutos.</p>
+      </div>
+      <div class="timeline-step">
+        <div class="step-no">03.</div>
+        <h4>Em 30 dias</h4>
+        <p>Você fecha o primeiro mês olhando uma tela de celular. Em reais. Sem planilha. Sem caderno. Sem pedir relatório pra ninguém.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Bloco 6 · Cadeia Viva ─── -->
+<section id="mecanismo">
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 04 · Por que ninguém fez isso antes</div>
+    <h2 class="title reveal">
+      Os outros sistemas resolveram <em>agenda</em>.<br/>
+      A KEYRA resolve a <strong>linha contínua.</strong>
+    </h2>
+    <p class="lead reveal">Quando o cliente paga num sistema comum, o atendimento é marcado como "feito". Ponto. O dado financeiro fica numa segunda camada (em outra tela, em outro relatório, em outro fornecedor) e cabe a você cruzar manualmente. <strong>A KEYRA inverte essa lógica.</strong></p>
+
+    <div class="chain reveal">
+      <h3>Na KEYRA, o financeiro <strong>nasce</strong> da operação. Não é cadastro. Não é lançamento manual.</h3>
+      <div class="chain-flow">
+        <b>Atendimento</b><span class="arrow">→</span>
+        <b>Comanda</b><span class="arrow">→</span>
+        <b>Pagamento</b><span class="arrow">→</span>
+        <b>Transação</b><span class="arrow">→</span>
+        <b>DRE</b><span class="arrow">→</span>
+        <b>Decisão</b>
+      </div>
+      <p style="margin-top:32px">Tudo isso acontece dentro do banco de dados, sem você abrir nenhuma tela. Você termina o último atendimento da terça, fecha a porta, abre o app no celular dentro do carro, e já vê o resultado do dia. <em>Quanto entrou. Quanto saiu. Quanto sobrou.</em> Em reais.</p>
+      <p style="margin-top:16px;color:var(--gold-400);font-style:italic">Não é "30% acima da média". É "R$ 4.730 a mais que a terça da semana passada".</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Bloco 7 · Bullets ─── -->
+<section>
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 05 · O que muda no seu dia</div>
+    <h2 class="title reveal">
+      O que você passa a ver <em>na primeira semana</em><span style="color:var(--gold-500)">.</span>
+    </h2>
+
+    <ul class="bullets reveal">
+      <li>O motivo exato pelo qual o seu pacote de "5 sessões de limpeza" pode estar te dando <b>menos lucro</b> que uma sessão avulsa, e como o app mostra isso na primeira semana.</li>
+      <li>Como saber, antes de aceitar uma parceria com fornecedor novo, se ela vai aumentar ou diminuir sua margem real, e não só a margem que aparece na proposta dele.</li>
+      <li>Por que mulheres que passaram da planilha para a KEYRA descrevem a mudança não como "ganhar tempo", mas como <b>ganhar de volta a noite</b>.</li>
+      <li>A diferença em reais entre rodar a mesma agenda do jeito que você roda hoje e rodar pelo método de "comanda nasce da operação". Spoiler: equivale a três atendimentos a mais por semana, <b>só por deixar de cruzar dado</b>.</li>
+      <li>O que olhar no app na <b>última segunda do mês</b> para saber se você tem espaço para tirar pró-labore, sem ligar para o contador.</li>
+      <li>Como saber, no dia 5 do mês, se este vai ser o melhor mês do ano. Antes, você só sabia no dia 28.</li>
+      <li>Por que clínicas que abriram a segunda unidade depois de adotar a KEYRA dizem "deu para escalar sem perder o controle", e qual mecanismo dentro do app garante isso.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── Bloco 8 · App preview ─── -->
+<section>
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 06 · Como você vai ver isso no app</div>
+    <h2 class="title reveal">
+      <em>Tudo em frases.</em> Em três segundos no celular<span style="color:var(--gold-500)">.</span>
+    </h2>
+    <p class="lead reveal">Não é gráfico. Não é dashboard com 14 indicadores. São frases que você lê na fila do café e decide na hora.</p>
+
+    <div class="app-preview reveal">
+      <div class="app-msg">
+        <b>Comanda fechada</b>
+        <span class="num pos">+R$ 850</span> entraram agora.
+      </div>
+      <div class="app-msg">
+        <b>Sua semana fechou</b>
+        <span class="num pos">+R$ 18.420</span> a mais que a anterior.
+      </div>
+      <div class="app-msg">
+        <b>Margem do mês</b>
+        <span class="num">31%</span> · mês passado fechou em 27%.
+      </div>
+      <div class="app-msg">
+        <b>Decisão pendente</b>
+        Pacote de limpeza está com margem de <span class="num">R$ 17</span> por sessão. Veja onde ajustar →
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Bloco 9 · 3 PLANOS ─── -->
+<section id="planos" style="background:var(--surface-muted)">
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 07 · Como você entra</div>
+    <h2 class="title reveal">
+      Três caminhos para começar<span style="color:var(--gold-500)">.</span><br/>
+      <em>Um destino.</em>
+    </h2>
+    <p class="lead reveal">A diferença entre os três planos não é "quanto software você ganha". Todos têm a Cadeia Viva, todos têm DRE em tempo real, todos rodam sua agenda. <strong>A diferença é quanto da reorganização vem com você sozinha, e quanto vem com mentora ao lado.</strong></p>
+
+    <div class="pricing reveal">
+
+      <!-- · Plano A -->
+      <article class="plan">
+        <div class="plan-eyebrow">Plano Essencial</div>
+        <h3 class="plan-name">Para começar<br/>sozinha.</h3>
+        <p class="plan-tagline">Para a clínica solo, com agenda em caderno hoje, que quer testar antes de assumir.</p>
+        <div class="plan-price">
+          <span class="currency">R$</span>
+          <span class="amount">59</span>
+          <span class="cents">,90</span>
+          <span class="period">/mês</span>
+        </div>
+        <p class="plan-trial">7 dias de teste grátis · cancela do app</p>
+        <p class="plan-includes">O que está incluso</p>
+        <ul class="plan-features">
+          <li><b>Cadeia Viva completa</b>: agenda, comanda, pagamento e DRE em uma linha contínua.</li>
+          <li><b>DRE em tempo real</b>, atualizado a cada comanda fechada na agenda.</li>
+          <li><b>Comparativos textuais</b> semana a semana e mês a mês, em frases curtas.</li>
+          <li><b>App mobile completo</b>, com versões nativas para iOS e Android.</li>
+          <li><b>1 unidade</b> com 1 usuária de acesso total ao painel.</li>
+          <li><b>Suporte por email</b> com retorno em até 24 horas úteis.</li>
+        </ul>
+        <a href="/login" class="btn btn-secondary plan-cta">Começar pelo Essencial</a>
+      </article>
+
+      <!-- · Plano B -->
+      <article class="plan">
+        <div class="plan-eyebrow">Plano Profissional</div>
+        <h3 class="plan-name">Para a clínica<br/>com time.</h3>
+        <p class="plan-tagline">Para clínicas com 2 ou 3 atendentes, recepção, e financeiro que já não cabe numa pessoa só.</p>
+        <div class="plan-price">
+          <span class="currency">R$</span>
+          <span class="amount">99</span>
+          <span class="cents">,70</span>
+          <span class="period">/mês</span>
+        </div>
+        <p class="plan-trial">7 dias de teste grátis · cancela do app</p>
+        <p class="plan-includes">Inclui tudo do Essencial, mais</p>
+        <ul class="plan-features">
+          <li><b>Margem por serviço</b>: descubra qual procedimento dá lucro real e qual está te custando.</li>
+          <li><b>Conciliação automática</b> com Cielo, Rede e Stone, sem subir extrato a mão.</li>
+          <li><b>Multi-usuária</b> com até 3 acessos simultâneos: dona, recepção e gerente.</li>
+          <li><b>Permissões por papel</b>, cada acesso vê só o que precisa para o trabalho.</li>
+          <li><b>Suporte por WhatsApp</b> em horário comercial, com tempo médio de resposta abaixo de 1h.</li>
+          <li><b>Relatórios exportáveis</b> em CSV para o seu contador, quando ele pedir.</li>
+        </ul>
+        <a href="/login" class="btn btn-primary plan-cta">Começar pelo Profissional</a>
+      </article>
+
+      <!-- · Plano Executive · destaque editorial -->
+      <article class="plan plan-featured">
+        <span class="plan-ribbon">★ recomendado</span>
+        <div class="plan-eyebrow">Plano Executive</div>
+        <h3 class="plan-name">Para acabar com a<br/>planilha de verdade.</h3>
+        <p class="plan-tagline">Para a empresária que não quer "experimentar". Quer começar a reorganização hoje, com mão dada nos primeiros 60 dias.</p>
+        <div class="plan-price">
+          <span class="currency">R$</span>
+          <span class="amount">129</span>
+          <span class="cents">,80</span>
+          <span class="period">/mês</span>
+        </div>
+        <p class="plan-trial">Sem trial · com mentora 1:1 desde o dia 1</p>
+        <p class="plan-includes">Inclui tudo do Profissional, mais</p>
+        <ul class="plan-features">
+          <li><b>Multi-organização ilimitada</b>: quantas unidades você tiver, separadas e consolidadas no mesmo app.</li>
+          <li><b>Mentoria 1:1</b> com especialista financeiro KEYRA: 4 sessões de 50 min nos primeiros 60 dias.</li>
+          <li><b>Setup financeiro guiado</b>: categorias, centros de custo, regime tributário e conciliação histórica.</li>
+          <li><b>Acesso prioritário</b> a novidades do produto antes do lançamento público (precificação, projeções, what-if).</li>
+          <li><b>WhatsApp estendido</b> das 08h às 22h, de segunda a sábado, com tempo de resposta abaixo de 30 min.</li>
+          <li><b>Garantia incondicional de 30 dias</b> com devolução integral, sem ligação de retenção.</li>
+        </ul>
+        <a href="/login" class="btn btn-premium plan-cta">★ Entrar no Executive</a>
+      </article>
+
+    </div>
+
+    <div class="pricing-note reveal">
+      <p><b>Por que o Plano Executive não tem trial.</b> O Executive entrega mentoria 1:1. A primeira sessão acontece na sua primeira semana. A segunda em 21 dias. A terceira aos 45. A quarta aos 60. <em>Trial de 7 dias não cabe nesse formato, e a gente não vende mentoria pela metade.</em> No lugar do trial, o Executive tem <b>garantia incondicional de 30 dias.</b> Não funcionou? Manda um email. Devolvemos 100%. Sem ligação de retenção, sem formulário.</p>
+      <p style="margin-top:16px"><b>A diferença entre o Essencial e o Executive é R$ 69,90 por mês.</b> Equivalente a um único atendimento de limpeza facial. A diferença real é entre <em>tentar sozinha</em> e <em>ter mentora ao lado nos primeiros 60 dias.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Bloco 10 · Garantia ─── -->
+<section id="garantia">
+  <div class="shell">
+    <div class="eyebrow reveal">Capítulo 08 · Sua tranquilidade está protegida</div>
+
+    <div class="guarantee reveal">
+      <div class="guarantee-seal">
+        <div>
+          <span class="num">30</span>
+          <span class="label">dias</span>
+        </div>
+      </div>
+      <span class="guarantee-meta">Garantia incondicional</span>
+      <h3>Risco zero. <strong>Por escrito.</strong></h3>
+      <p><b>Para Essencial e Profissional:</b> 7 dias de teste grátis. Cancelamento direto do app, em três cliques. Sem cobrança no período.</p>
+      <p><b>Para Mentora:</b> garantia incondicional de 30 dias. Não funcionou? Manda um email. Devolvemos 100%. Sem formulário, sem ligação de retenção, sem "vamos tentar mais uma semana".</p>
+      <p style="margin-top:24px"><em>Os dados são seus.</em> Você leva embora todos os relatórios, DREs e dados em CSV. Para o seu contador, para sua planilha, para onde quiser.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA final ─── -->
+<section class="cta-final" id="cta-final">
+  <div class="shell">
+    <h2>Comece a usar <em>agora</em><span style="color:var(--gold-500)">.</span></h2>
+    <p>Você escolhe um dos três caminhos. Importa sua agenda atual. Em menos de uma hora, está vendo o primeiro DRE.</p>
+
+    <div class="cta-final-row">
+      <a href="/login" class="btn btn-secondary btn-large">Essencial · R$ 59,90/mês · 7 dias grátis</a>
+      <a href="/login" class="btn btn-primary btn-large">Profissional · R$ 99,70/mês · 7 dias grátis</a>
+      <a href="/login" class="btn btn-premium btn-large">★ Executive · R$ 129,80/mês · com mentora 1:1</a>
+    </div>
+
+    <p class="cta-meta">Não é projeto de implantação. Não é consultoria. É um app. Você entra. Você usa.</p>
+
+    <div class="ps-block reveal" style="margin-top:96px">
+      <div class="label">PS</div>
+      <p>A KEYRA não vai te ensinar a "entender finanças". Vai te dar o número certo, na hora certa, do jeito que a planilha tentou e nunca conseguiu.</p>
+      <p>Quando você termina o último atendimento da semana e olha pro app, vai ver uma linha curta. Algo como <strong>"Esta semana sobrou R$ 6.482."</strong> Não é gráfico. Não é dashboard. <em>É uma frase. Em reais.</em></p>
+      <p>Esse número (sozinho, exato, na hora certa) é o que separa quem decide pelo extrato do mês passado de quem decide pelo extrato de agora. E é o que separa <strong>a clínica que você tem hoje</strong> da clínica que já está te esperando na próxima segunda.</p>
+      <blockquote class="ps-quote">Sua clínica rendendo mais. Sem planilha. Sem virar madrugada. Sem achismo<span style="color:var(--gold-500)">.</span></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Footer ─── -->
+<footer>
+  <span class="brand">KEYRA<span class="dot">.</span></span>
+  <p>O software financeiro-operacional para clínicas de estética.</p>
+  <p>Sediada em São Paulo · dados hospedados no Brasil · LGPD-compliant.</p>
+  <p style="margin-top:16px">
+    <a href="mailto:contato@usekeyra.com">contato@usekeyra.com</a>
+    &nbsp;·&nbsp;
+    <a href="https://usekeyra.com">usekeyra.com</a>
+  </p>
+  <p style="margin-top:24px;font-size:11px;color:var(--bronze-400);letter-spacing:0.08em;text-transform:uppercase">Sales page · v1 · maio 2026</p>
+</footer>
+
+<script>
+// ─── Reveal-on-scroll (motion: out-soft 480ms, fade-up 8px) ───
+(function(){
+  if (typeof IntersectionObserver === 'undefined') {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -64px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+</script>
+
+</body>
+</html>

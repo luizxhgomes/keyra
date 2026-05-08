@@ -2,5 +2,5 @@
   <title>KEYRA</title>
   <rect width="64" height="64" rx="12" fill="#181210"/>
   <text x="10" y="50" font-family="'Times New Roman', Georgia, serif" font-size="52" font-weight="700" letter-spacing="-1" fill="#F0D8A8">K</text>
-  <circle cx="46" cy="46" r="5" fill="#B8923A"/>
+  <circle cx="46" cy="50" r="4" fill="#B8923A"/>
 </svg>

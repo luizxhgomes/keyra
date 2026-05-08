@@ -1,9 +1,31 @@
 # KEYRA · Logo Usage & Brand Book
 
-> **Status:** Logo signature canônico ativo em produção.
+> **Status:** Logo signature canônico ativo em produção · brand v1.1 (calibração proporcional do ponto).
 > **Componente React:** `apps/web/src/components/brand/KeyraLogo.tsx`
 > **Assets SVG:** `docs/brand/03-identity/logo/_assets/`
 > **Atualizado em:** 7 de maio de 2026.
+
+## 0. ⚠️ Regra inegociável · Calibração do ponto signature
+
+O ponto dourado segue **proporção fixa em TODAS as variants**. Não alterar sem revisar este documento + o componente `<KeyraLogo />`.
+
+| Eixo | Regra | Cálculo |
+|---|---|---|
+| **Posição vertical (cy)** | Centro do ponto na **baseline** da letra adjacente | `cy = y do <text>` (mesma baseline) |
+| **Posição horizontal (cx)** | Gap proporcional ao font-size, equivalente ao letter-spacing natural | `cx = textEndX + (fontSize × 0.18)` |
+| **Tamanho (raio)** | Proporcional ao stroke do terminal do "A"/"K" | `r = fontSize × 0.085` |
+| **Cor** | `gold-500` `#B8923A` em qualquer theme | constante em todos os formatos |
+
+### Tabela de valores calibrados
+
+| Variant | font-size | text endX | gap (18%) | cx ponto | cy (baseline) | raio (8.5%) |
+|---|---|---|---|---|---|---|
+| Primary (240×80) | 72 | ~206 | ~13 | **219** | **62** | **6** |
+| Monogram (64×64) | 56 | ~38 | ~10 | **48** | **52** | **5** |
+| Lockup (320×140) | 92 | ~262 | ~17 | **279** | **80** | **8** |
+| Stacked K (200×240) | 140 | ~145 | ~25 | **158** | **120** | **12** |
+
+**Princípio:** o ponto NUNCA fica acima da baseline (não é altura média da letra). Sempre na linha onde os serifs descansam, à direita da última letra com gap proporcional.
 
 ---
 

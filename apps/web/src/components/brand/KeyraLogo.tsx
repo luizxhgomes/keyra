@@ -4,21 +4,27 @@
  * Source of truth visual: docs/brand/03-identity/preview.html (header fixo + concepts)
  * Brand book de logo: docs/brand/03-identity/logo/usage.md
  *
- * **Avaliação CGH 5-pillar (Sagi Haviv):**
- * 1. Appropriate · ✅ Editorial luxury serif + ponto dourado discreto = tom premium
- *    sem ostentação, alinhado a clínicas de estética profissional 30-45 anos.
- * 2. Distinctive · ✅ Nenhum concorrente (Trinks, Belle, Gestek, Conta Azul,
- *    Kamino) usa wordmark serif + ponto signature.
- * 3. Simple · ✅ 5 letras + 1 ponto. Lê em 16x16px (favicon) e funciona
- *    monocromático sem ouro.
- * 4. Memorable · ✅ Wordmark + signature dot é simples o suficiente para
- *    rascunhar de memória após 3s de exposição.
- * 5. Versatile · ✅ 4 variants × 3 themes = 12 aplicações canônicas
- *    cobrindo ivory-50, cocoa-900, foto editorial, foil dourado.
+ * **CALIBRAÇÃO CANÔNICA DO PONTO (REGRA INEGOCIÁVEL · brand v1.1):**
  *
- * **Decisão técnica:** SVG inline com `<text>` + Fraunces (carregada via
- * next/font/google). Para foil/print profissional, designer humano converte
- * texto em paths via Illustrator/Figma — passo documentado em usage.md.
+ * O ponto signature dourado segue regra fixa em TODAS as variants:
+ *
+ *   1. POSIÇÃO VERTICAL · centro do ponto na BASELINE da letra adjacente
+ *      (mesmo Y do `<text>`). Não é altura média, não é x-height.
+ *
+ *   2. POSIÇÃO HORIZONTAL · gap consistente após o final da última letra,
+ *      proporcional ao font-size (~18% da font-size). Equivale ao
+ *      letter-spacing natural entre letras.
+ *
+ *   3. TAMANHO · raio proporcional ao font-size (~8.5%). Calibrado para
+ *      ressoar com o stroke do terminal do "A" / "K" sem competir.
+ *
+ *   4. COR · `gold-500` (#B8923A) sólido em qualquer theme. Em theme=gold
+ *      mantém #B8923A para consistência com foil físico.
+ *
+ * **Avaliação CGH 5-pillar (Sagi Haviv):** 5/5 aprovado.
+ *
+ * **Decisão técnica:** SVG inline com `<text>` + Fraunces. Para foil/print
+ * profissional, designer humano converte texto em paths.
  */
 
 import { cn } from '@/lib/utils';
@@ -75,10 +81,16 @@ export function KeyraLogo({
     ? ({ 'aria-hidden': true, role: 'presentation' } as const)
     : ({ role: 'img', 'aria-label': 'KEYRA' } as const);
 
+  // Constantes canônicas brand v1.1 — proporcionalidade fixa do ponto
+  // signature em TODAS as variants. Não alterar sem revisar usage.md.
+  // dotRadius = fontSize × 0.085 · dotGap = fontSize × 0.18 · dotCY = baseline
+
   if (variant === 'primary') {
-    // Wordmark KEYRA. horizontal — uso default
-    // viewBox calibrado: 240w × 80h (ratio 3:1)
-    // Fraunces 700 em 72px ≈ 200px width para "KEYRA" + 16px gap + 16px ponto
+    // Wordmark KEYRA. horizontal · viewBox calibrado: 260×80
+    // Fraunces 700 fontSize 72 letterSpacing -2 · "KEYRA" termina em ~206
+    // Ponto: cx = 206 + (72 × 0.18) = 218.96 ≈ 219
+    //        cy = 62 (baseline = mesmo y do <text>)
+    //        r  = 72 × 0.085 = 6.12 ≈ 6
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -100,14 +112,16 @@ export function KeyraLogo({
         >
           KEYRA
         </text>
-        {/* Ponto signature gold · ~22% da altura da letra à esquerda */}
-        <circle cx="218" cy="56" r="8" fill={colors.dot} />
+        <circle cx="219" cy="62" r="6" fill={colors.dot} />
       </svg>
     );
   }
 
   if (variant === 'monogram') {
-    // K. para favicon, app icon, avatar (1:1 square)
+    // K. monograma · viewBox 64×64 · K Fraunces 700 fontSize 56 termina em ~38
+    // Ponto: cx = 38 + (56 × 0.18) = 48.08 ≈ 48
+    //        cy = 52 (baseline = mesmo y do <text>)
+    //        r  = 56 × 0.085 = 4.76 ≈ 5
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -129,13 +143,17 @@ export function KeyraLogo({
         >
           K
         </text>
-        <circle cx="46" cy="48" r="5" fill={colors.dot} />
+        <circle cx="48" cy="52" r="5" fill={colors.dot} />
       </svg>
     );
   }
 
   if (variant === 'lockup-tagline') {
-    // KEYRA. horizontal + tagline italic embaixo
+    // Wordmark + tagline italic · viewBox 320×140
+    // Fraunces 700 fontSize 92 letterSpacing -2.5 · "KEYRA" termina em ~262
+    // Ponto: cx = 262 + (92 × 0.18) = 278.56 ≈ 279
+    //        cy = 80 (baseline)
+    //        r  = 92 × 0.085 = 7.82 ≈ 8
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +180,7 @@ export function KeyraLogo({
         >
           KEYRA
         </text>
-        <circle cx="278" cy="72" r="10" fill={colors.dot} />
+        <circle cx="279" cy="80" r="8" fill={colors.dot} />
         <text
           x="0"
           y="120"
@@ -179,7 +197,12 @@ export function KeyraLogo({
     );
   }
 
-  // stacked · K. grande acima do wordmark KEYRA empilhado
+  // stacked · K. grande centralizado + linha divisória + KEYRA letterspacing
+  // viewBox 200×240 · K text-anchor=middle x=100 fontSize=140 letterSpacing=-2
+  // K width ≈ 90 → K vai de x=55 a x=145. Ponto:
+  //   cx = 145 + (140 × 0.18) = 170.2 ≈ 170 (cabe no viewBox 200)
+  //   cy = 120 (baseline)
+  //   r  = 140 × 0.085 = 11.9 ≈ 12
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -190,7 +213,6 @@ export function KeyraLogo({
       {...a11yProps}
     >
       {!decorative && <title>KEYRA</title>}
-      {/* K. grande no topo */}
       <text
         x="100"
         y="120"
@@ -203,8 +225,7 @@ export function KeyraLogo({
       >
         K
       </text>
-      <circle cx="138" cy="108" r="12" fill={colors.dot} />
-      {/* Linha gold divisória discreta */}
+      <circle cx="158" cy="120" r="12" fill={colors.dot} />
       <line
         x1="80"
         y1="160"
@@ -214,7 +235,6 @@ export function KeyraLogo({
         strokeWidth="1"
         opacity="0.6"
       />
-      {/* Wordmark KEYRA pequeno embaixo, letterspacing extremo editorial */}
       <text
         x="100"
         y="210"

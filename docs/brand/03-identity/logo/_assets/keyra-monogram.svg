@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="KEYRA">
   <title>KEYRA · Monograma</title>
-  <desc>Monograma K. para favicon, app icon e avatares. Cocoa-900 com ponto signature gold-500.</desc>
+  <desc>Monograma K. para favicon, app icon e avatares. Calibração canônica brand v1.1: ponto com centro na baseline, gap 18%, raio 8.5%.</desc>
   <text x="6" y="52" font-family="Fraunces, 'Times New Roman', Georgia, serif" font-size="56" font-weight="700" letter-spacing="-1" fill="#2B1810">K</text>
-  <circle cx="46" cy="48" r="5" fill="#B8923A"/>
+  <circle cx="48" cy="52" r="5" fill="#B8923A"/>
 </svg>

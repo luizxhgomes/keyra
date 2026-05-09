@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   Calendar,
-  ChevronLeft,
-  ChevronRight,
   LayoutDashboard,
   Package,
+  PanelLeftClose,
+  PanelLeftOpen,
   Receipt,
   Settings,
   Sparkles,
@@ -20,7 +20,15 @@ import {
 import { cn } from '@/lib/utils';
 
 /**
- * Desktop sidebar (≥ lg) — Story 6.5 + HOTFIX 2026-05-02.
+ * Desktop sidebar (≥ lg) — Story 6.5 + HOTFIX 2026-05-02 + refinamento 2026-05-09.
+ *
+ * Refinamento 2026-05-09 (UX badge flutuante):
+ * - Badge quadrado warm na borda direita (centro vertical) substitui o antigo
+ *   botão "Recolher" do rodapé. Ação fica visualmente acoplada à divisória
+ *   entre sidebar e conteúdo, reforçando o gesto de "abrir/fechar painel".
+ * - Animação editorial em transition-[width,box-shadow] com
+ *   ease-in-out-editorial (320ms) e warm-shadow sutil sustentando a
+ *   sensação de elevação durante o gesto.
  *
  * Mudanças 2026-05-02:
  * - **Sticky top-0 h-screen** — não some mais ao fazer scroll do conteúdo.
@@ -109,11 +117,15 @@ export function Sidebar() {
     );
   }
 
+  const ToggleIcon = collapsed ? PanelLeftOpen : PanelLeftClose;
+
   return (
     <aside
       aria-label="Navegação principal"
       className={cn(
-        'sticky top-0 hidden h-screen shrink-0 border-r border-border bg-background lg:flex lg:flex-col',
+        'sticky top-0 z-30 hidden h-screen shrink-0 border-r border-border bg-background',
+        'transition-[width,box-shadow] duration-base ease-in-out-editorial',
+        'lg:flex lg:flex-col',
         collapsed ? 'w-16' : 'w-60',
       )}
     >
@@ -150,26 +162,34 @@ export function Sidebar() {
 
       <div className="flex flex-col gap-1 border-t border-border p-3">
         {NAV_SECONDARY.map(renderItem)}
-        <button
-          type="button"
-          onClick={toggleCollapsed}
-          aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
-          aria-pressed={collapsed}
-          className={cn(
-            'mt-1 flex items-center gap-3 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
-            collapsed ? 'justify-center px-2 py-3' : 'px-4 py-3',
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-5 w-5 shrink-0" aria-hidden="true" />
-          ) : (
-            <>
-              <ChevronLeft className="h-5 w-5 shrink-0" aria-hidden="true" />
-              <span>Recolher</span>
-            </>
-          )}
-        </button>
       </div>
+
+      {/* Refinamento 2026-05-09 — badge flutuante de toggle ancorado na
+          divisória vertical (centro). Substitui o antigo botão "Recolher"
+          do rodapé. Quadrado warm com sombra editorial; alterna ícone
+          PanelLeftClose ↔ PanelLeftOpen para affordance imediata da ação
+          que vai ocorrer. */}
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+        aria-pressed={collapsed}
+        title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+        className={cn(
+          'group absolute top-1/2 right-0 z-40 flex h-9 w-9 -translate-y-1/2 translate-x-1/2',
+          'items-center justify-center rounded-xl border border-border/60 bg-ivory-50',
+          'text-muted-foreground shadow-warm-sm',
+          'transition-[transform,box-shadow,background-color,color] duration-fast ease-out-soft',
+          'hover:bg-ivory-100 hover:text-foreground hover:shadow-warm-md hover:-translate-y-1/2 hover:scale-105',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        )}
+      >
+        <ToggleIcon
+          className="h-4 w-4 transition-transform duration-fast ease-out-soft group-hover:scale-110"
+          aria-hidden="true"
+          strokeWidth={2}
+        />
+      </button>
     </aside>
   );
 }

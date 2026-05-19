@@ -840,6 +840,59 @@ CREATE INDEX audit_log_resource_idx ON audit_log(resource_type, resource_id);
 
 ---
 
+## 11.3 Comprovantes Inteligentes — captura de documentos com leitura por IA (ADR-023)
+
+### ADR-023 — Comprovantes Inteligentes
+
+**Status:** ACCEPTED — 2026-05-18 (rev. 2 — incorpora pareceres de `@architect` e `@document-processor`; ver `docs/architecture/reviews/`)
+
+**Contexto.** A tese da KEYRA é "o financeiro nasce da operação" (comanda → pagamento → transação). Mas há lançamentos que entram **por fora da comanda** — receitas avulsas (Pix recebido, venda de produto), despesas (taxa de cartão, conta de luz, NF de fornecedor, boleto). Hoje a única forma de registrá-los é digitar manualmente em `/financeiro/receitas` ou `/financeiro/despesas`. É o atrito mais visível pós-MVP: a usuária gasta minutos por dia digitando dados que já estão na foto/PDF do comprovante.
+
+**Decisão.** Criar a feature **Comprovantes Inteligentes**: a usuária anexa um documento em qualquer formato; uma LLM lê e extrai os dados financeiros; a usuária revisa; o sistema cria uma `transactions`. Seis decisões arquiteturais travadas:
+
+| # | Decisão | Razão |
+|---|---------|-------|
+| 1 | **Direção-agnóstico** — o pipeline trata receita (`credit`) e despesa (`debit`) com a mesma infra; a direção é um campo extraído/revisado | Mesma jornada, mesmo custo de build; cobre os dois atritos |
+| 2 | **Provider lock: `openai/gpt-4o-mini` via Vercel AI Gateway** com `disallowPromptTraining: true` | Modelo *vision* barato e suficiente para extração estruturada; AI Gateway dá observabilidade, fallback e troca de modelo sem rebuild |
+| 3 | **Revisão humana SEMPRE obrigatória no MVP** | OCR/LLM é falível; nenhuma `transactions` é criada sem confirmação humana — sem auto-aprovação, sem reconciliação automática |
+| 4 | **Processamento assíncrono via `next/after`** (Next 16) | Upload não bloqueia a UI; Inngest segue deferido (ADR-009) até o volume passar ~100 comprovantes simultâneos |
+| 5 | **Supabase Storage bucket privado** com RLS por `org_id`; acesso só via signed URL de curta duração | Documento financeiro contém PII; isolamento multitenant é invariante #1/#2 do projeto |
+| 6 | **Nova tabela `receipts`** como estágio entre o arquivo e o ledger | `transactions` permanece o source-of-truth puro; `receipts` guarda arquivo, extração, revisão e o `transaction_id` resultante |
+
+**Sem ZDR.** OpenAI **não** consta na lista oficial de provedores ZDR (Zero Data Retention) do Vercel AI Gateway — apenas em "disallow prompt training". Vercel Pro segue deferido (sem gatilho comercial atual — ver memória do projeto). **Mitigação obrigatória:** Política de Privacidade v1.1.0 com transparência total sobre o uso de IA + **re-aceite forçado** antes da feature ir a produção. Caminho de upgrade documentado: migrar para `anthropic/claude-haiku` (ZDR) quando Vercel Pro for assinado — story `comprovantes.6+` futura.
+
+**Multi-formato — normalização em camadas.** O banco e o Storage aceitam **qualquer binário**, mas a LLM não lê todos os formatos nativamente. Camada de normalização com 3 tiers:
+
+| Tier | Formatos | Tratamento |
+|------|----------|------------|
+| **Visão direta** | JPG, PNG, WEBP, HEIC, foto, print | Auto-rotação EXIF (`sharp`) → enviado como *image part* ao modelo vision |
+| **Rasterização** | PDF | `gpt-4o-mini` **não** aceita PDF nativo — toda página é rasterizada para imagem antes de ir ao modelo (biblioteca a definir em spike — TD-CMP-008) |
+| **Texto puro** | TXT, MD, HTML | Texto extraído e enviado como prompt |
+| **Conversão necessária** | DOCX, ODT, RTF, EPUB | Extração de texto via parser JS puro (`mammoth` p/ DOCX; unzip+XML p/ ODT/EPUB); RTF/ODT raros caem para *best effort* → se falhar, revisão manual sem extração |
+
+**Schema.** Tabela `receipts (id, org_id, uploaded_by, file_path, original_filename, mime_type, file_size_bytes, file_hash, normalized_kind, status, extraction_data jsonb, extraction_raw_text, extraction_confidence, extraction_model, extraction_error, reviewed_data jsonb, reviewed_by, reviewed_at, transaction_id, created_at, updated_at, deleted_at)`. `UNIQUE (org_id, file_hash)` garante idempotência — reenviar o mesmo arquivo não duplica. RLS por `org_id` + **trigger de auditoria dedicado** `audit_receipts` (`receipts` não entra no `audit_log` universal, que capturaria jsonb sensível e violaria minimização da LGPD Art. 6º III). `transactions` é reutilizada para o registro final — mas exige **micro-migration aditiva** em `comprovantes.1`: o CHECK de `transactions.source_type` não aceita `'document'` hoje (só `command/payment/invoice/manual/import`), e precisa do novo valor.
+
+**Trade-offs.**
+
+| Vantagem | Custo |
+|----------|-------|
+| Elimina o atrito #1 pós-MVP (digitação manual) | +47 pts em 6 stories |
+| Pipeline único cobre receita e despesa | Normalização multi-formato tem casos *best effort* (ODT/RTF) |
+| AI Gateway permite trocar de modelo sem rebuild | Dependência de provider externo → exige nova base legal LGPD |
+| Revisão humana sempre → zero risco de transação fantasma | Não há ganho de "lançamento 100% automático" no MVP |
+| `next/after` evita custo de infra de fila | Reprocessamento de falhas é manual até Inngest entrar |
+
+**Riscos.** Vazamento de PII via logs (mitigado: scrubbing Sentry estendido para `extraction_data`, `extraction_raw_text`, `reviewed_data`, `file_path`, `signed_url`); documento malicioso (mitigado: validação de MIME por magic bytes, limite de tamanho, arquivo nunca executado — AV scan catalogado como débito técnico); extração incorreta (mitigado: revisão humana obrigatória + score de confiança).
+
+**Traceability.** ADR-023 é referenciado por:
+- `docs/architecture/EPIC-COMPROVANTES-SPEC.md` (spec arquitetural completa)
+- `docs/stories/EPIC-COMPROVANTES.md` (epic com 6 stories `comprovantes.0`–`comprovantes.5`)
+- `docs/architecture/COMPLIANCE-AUDIT-EPIC-COMPROVANTES.md` (auditoria preventiva LGPD)
+- `docs/legal/privacy-v1.1.0-DRAFT.md` (nova Política — base legal do tratamento por IA)
+- Estende ADR-009 (Inngest deferido) e ADR-017 (criptografia de PII)
+
+---
+
 ## 12. Architectural Patterns Aplicados
 
 | Pattern | Onde | Razão |

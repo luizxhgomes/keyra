@@ -109,7 +109,7 @@ const STATUS: Record<
   saida: {
     label: 'Saída',
     icon: ArrowDownCircle,
-    className: 'bg-stone-200 text-stone-700 border-transparent',
+    className: 'bg-sand-200 text-bronze-500 border-transparent',
   },
   ajuste: {
     label: 'Ajuste',
@@ -145,17 +145,17 @@ const STATUS: Record<
   despesa: {
     label: 'Despesa operacional',
     icon: Receipt,
-    className: 'bg-stone-200 text-stone-700 border-transparent',
+    className: 'bg-sand-200 text-bronze-500 border-transparent',
   },
   imposto: {
     label: 'Imposto',
     icon: Receipt,
-    className: 'bg-rose-100 text-rose-900 border-transparent',
+    className: 'bg-amber-300/25 text-cocoa-800 border-transparent',
   },
   outros: {
     label: 'Outros',
     icon: Layers,
-    className: 'bg-stone-100 text-stone-700 border-transparent',
+    className: 'bg-ivory-100 text-bronze-400 border-transparent',
   },
   // Severidade de alerta (Story 4.9)
   info: {

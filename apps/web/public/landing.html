@@ -237,6 +237,9 @@ section:first-of-type{border-top:none}
   border-left:3px solid var(--rust-800);
   border-radius:8px;
   padding:24px 28px;
+  /* Proporção espacial: cards de mesma fileira têm altura igual (grid stretch);
+     o conteúdo centraliza para não deixar buraco embaixo quando o card é esticado. */
+  display:flex;flex-direction:column;justify-content:center;
   font-size:15px;color:var(--cocoa-800);line-height:1.55;
   transition:transform var(--d-base) var(--e-out-soft),
              box-shadow var(--d-base) var(--e-out-soft);
@@ -256,6 +259,7 @@ section:first-of-type{border-top:none}
   border-radius:12px;
   padding:32px 28px;
   position:relative;
+  display:flex;flex-direction:column;
 }
 .timeline-step .step-no{
   font-family:var(--font-serif);font-style:italic;font-weight:300;
@@ -328,6 +332,8 @@ section:first-of-type{border-top:none}
   border:1px solid var(--border-subtle);
   border-radius:12px;
   padding:24px 28px;
+  /* Proporção espacial: conteúdo centralizado no card esticado pelo grid. */
+  display:flex;flex-direction:column;justify-content:center;
   font-size:15px;color:var(--cocoa-800);line-height:1.55;
   box-shadow:var(--sh-xs);
 }
@@ -367,6 +373,8 @@ section:first-of-type{border-top:none}
 .plan-name{
   font-family:var(--font-serif);font-weight:600;font-size:32px;
   color:var(--cocoa-900);line-height:1.1;letter-spacing:-0.02em;
+  /* Piso de 2 linhas: alinha o nome dos 3 planos sem <br> manual. */
+  min-height:2.2em;
 }
 .plan-tagline{
   font-family:var(--font-serif);font-style:italic;font-weight:300;
@@ -627,7 +635,7 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Para a empresária que decidiu, hoje, parar de adiar</div>
     <h1 class="reveal">
-      Sua clínica <em>atendendo bem</em>, há meses<span class="dot">.</span><br>
+      Sua clínica <em>atendendo bem</em>, há meses<span class="dot">.</span>
       <span class="thin">Sua planilha,</span> parada no mesmo lugar<span class="dot">.</span>
     </h1>
     <p class="hero-sub reveal">
@@ -665,7 +673,7 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 02 · O que cada mês adiado custa</div>
     <h2 class="title reveal">
-      <strong>Cada mês</strong> que você adia,<br/>sua clínica paga em silêncio<span style="color:var(--gold-500)">.</span>
+      <strong>Cada mês</strong> que você adia, sua clínica paga em silêncio<span style="color:var(--gold-500)">.</span>
     </h2>
     <p class="lead reveal">A diferença entre uma clínica que cresce com folga e uma que cresce no sufoco quase nunca é o número de clientes. É <strong>o tempo entre o evento operacional e a decisão financeira que ele exige.</strong> Hoje, na sua clínica, esse tempo é de 30 a 45 dias. Na KEYRA, é zero.</p>
 
@@ -691,7 +699,7 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 03 · Como você começa do zero</div>
     <h2 class="title reveal">
-      A reorganização da sua clínica<br/>
+      A reorganização da sua clínica
       <em>não é projeto.</em> É <strong>uma decisão tomada hoje.</strong>
     </h2>
     <p class="lead reveal">Você não precisa "primeiro arrumar a planilha". Não precisa esperar fechar o mês. Não precisa estudar finanças. Você precisa de uma chave que ligue tudo: o atendimento à comanda, a comanda ao pagamento, o pagamento ao DRE, o DRE à decisão. Essa chave existe.</p>
@@ -721,7 +729,7 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 04 · Por que ninguém fez isso antes</div>
     <h2 class="title reveal">
-      Os outros sistemas resolveram <em>agenda</em>.<br/>
+      Os outros sistemas resolveram <em>agenda</em>.
       A KEYRA resolve a <strong>linha contínua.</strong>
     </h2>
     <p class="lead reveal">Quando o cliente paga num sistema comum, o atendimento é marcado como "feito". Ponto. O dado financeiro fica numa segunda camada (em outra tela, em outro relatório, em outro fornecedor) e cabe a você cruzar manualmente. <strong>A KEYRA inverte essa lógica.</strong></p>
@@ -797,7 +805,7 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 07 · Como você entra</div>
     <h2 class="title reveal">
-      Três caminhos para começar<span style="color:var(--gold-500)">.</span><br/>
+      Três caminhos para começar<span style="color:var(--gold-500)">.</span>
       <em>Um destino.</em>
     </h2>
     <p class="lead reveal">A diferença entre os três planos não é "quanto software você ganha". Todos têm a Cadeia Viva, todos têm DRE em tempo real, todos rodam sua agenda. <strong>A diferença é quanto da reorganização vem com você sozinha, e quanto vem com mentora ao lado.</strong></p>
@@ -807,7 +815,7 @@ footer a:hover{color:var(--ivory-50)}
       <!-- · Plano A -->
       <article class="plan">
         <div class="plan-eyebrow">Plano Essencial</div>
-        <h3 class="plan-name">Para começar<br/>sozinha.</h3>
+        <h3 class="plan-name">Para começar sozinha.</h3>
         <p class="plan-tagline">Para a clínica solo, com agenda em caderno hoje, que quer testar antes de assumir.</p>
         <div class="plan-price">
           <span class="currency">R$</span>
@@ -831,7 +839,7 @@ footer a:hover{color:var(--ivory-50)}
       <!-- · Plano B -->
       <article class="plan">
         <div class="plan-eyebrow">Plano Profissional</div>
-        <h3 class="plan-name">Para a clínica<br/>com time.</h3>
+        <h3 class="plan-name">Para a clínica com time.</h3>
         <p class="plan-tagline">Para clínicas com 2 ou 3 atendentes, recepção, e financeiro que já não cabe numa pessoa só.</p>
         <div class="plan-price">
           <span class="currency">R$</span>
@@ -856,7 +864,7 @@ footer a:hover{color:var(--ivory-50)}
       <article class="plan plan-featured">
         <span class="plan-ribbon">★ recomendado</span>
         <div class="plan-eyebrow">Plano Executive</div>
-        <h3 class="plan-name">Para acabar com a<br/>planilha de verdade.</h3>
+        <h3 class="plan-name">Para acabar com a planilha de verdade.</h3>
         <p class="plan-tagline">Para a empresária que não quer "experimentar". Quer começar a reorganização hoje, com mão dada nos primeiros 60 dias.</p>
         <div class="plan-price">
           <span class="currency">R$</span>

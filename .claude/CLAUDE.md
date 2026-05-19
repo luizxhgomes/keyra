@@ -243,6 +243,7 @@ O AIOX carrega regras contextuais de `.claude/rules/` automaticamente. Regras co
 | `agent-handoff.md` | Agent switch compaction protocol for context optimization |
 | `agent-memory-imports.md` | Agent memory lifecycle and CLAUDE.md ownership |
 | `coderabbit-integration.md` | Automated code review integration rules |
+| `design-system.md` | KEYRA design system law — tokens, paleta quente, proporção espacial |
 | `ids-principles.md` | Incremental Development System principles |
 | `mcp-usage.md` | MCP server usage rules and tool selection priority |
 | `story-lifecycle.md` | Story status transitions and quality gates |
@@ -268,6 +269,27 @@ Origem: 2026-05-02. Dashboard ficou completamente quebrado em produção por mai
 **Aplicabilidade:** qualquer agente AIOX que toque `apps/web/src/app/(app)/**`, `'use client'` boundary, `components/keyra/**`, `lib/hooks/**`, `lib/motion/**`, ou Server Action consumida por Client.
 
 Antes de marcar story Done: ler `docs/dev/rsc-boundary-rules.md` (4 regras + checklist de PR + histórico de violações). Sem essa validação, story volta com NO-GO retroativo.
+
+## Design System — Regra Inegociável — LEITURA OBRIGATÓRIA antes de Done
+
+**Documento:** [`.claude/rules/design-system.md`](rules/design-system.md)
+
+Regra-mãe do design system da KEYRA. Carregada automaticamente por qualquer agente que toque arquivos de UI (`apps/web/src/**/*.{tsx,css}`, `apps/web/public/*.html`, `apps/web/tailwind.config.ts`, `docs/brand/**`).
+
+**8 princípios inegociáveis** (conteúdo completo e editável vive na rule):
+
+1. **Tokens são lei** — tudo de `docs/brand/03-identity/tokens.json`; zero valor mágico.
+2. **Quente sempre, frio nunca** — paleta KEYRA; proibida a paleta default do Tailwind (`blue`, `rose`, `slate`, `gray`, `stone`, ...).
+3. **Duas fontes** — Fraunces + Inter, nada mais.
+4. **Consultar a referência antes de inventar** — `preview.html` / `PREVIEW-REFERENCE.md` primeiro.
+5. **Duas camadas, mesma paleta** — brand vs product, muda só a dose.
+6. **Lei da Proporção Espacial** — sem órfãos tipográficos (zero `<br>` manual em heading; `text-wrap:balance`), cards de mesma fileira com altura igual e conteúdo distribuído, espaço vazio proporcional — mobile **e** desktop.
+7. **UX inegociável** — números absolutos, comparativos textuais, tela única.
+8. **Motion calmo** — motion tokens; default `base 320ms` + `out-soft`.
+
+**Auditoria automatizada:** `scripts/check-design-system.sh` roda em CI (workflow `rls-tests.yml`, job `design-system-audit`). PR não faz merge se falhar.
+
+**Aplicabilidade:** qualquer agente AIOX que produza ou altere peça visual — tela, componente, e-mail, landing, post, slide. Antes de marcar story Done: rodar o script + smoke visual mobile (375px) e desktop. Build verde não comprova layout correto.
 <!-- AIOX-MANAGED-END: rules-system -->
 
 <!-- AIOX-MANAGED-START: code-intelligence -->

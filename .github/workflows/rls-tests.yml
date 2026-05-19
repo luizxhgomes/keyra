@@ -1,4 +1,4 @@
-name: RLS Tests + RSC Audit
+name: RLS Tests + RSC + Design System Audit
 
 on:
   push:
@@ -140,6 +140,21 @@ jobs:
         run: |
           chmod +x scripts/check-rsc-boundaries.sh
           ./scripts/check-rsc-boundaries.sh
+
+  design-system-audit:
+    name: Design System Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run design system audit
+        # Verifica conformidade com .claude/rules/design-system.md:
+        # paleta KEYRA (sem cores default do Tailwind) e espaçamento por token.
+        run: |
+          chmod +x scripts/check-design-system.sh
+          ./scripts/check-design-system.sh
 
   auth-recovery-template-drift:
     name: Auth recovery template drift check

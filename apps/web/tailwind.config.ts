@@ -11,11 +11,7 @@ import typography from '@tailwindcss/typography';
  */
 const config: Config = {
   darkMode: ['class'],
-  content: [
-    './src/app/**/*.{ts,tsx}',
-    './src/components/**/*.{ts,tsx}',
-    './src/lib/**/*.{ts,tsx}',
-  ],
+  content: ['./src/app/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}', './src/lib/**/*.{ts,tsx}'],
   theme: {
     container: {
       center: true,
@@ -46,30 +42,30 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
-          50: '#FAF6EE',   // ivory-50
-          100: '#F4EDE2',  // ivory-100
-          200: '#E5B473',  // amber-300 (soft warm)
-          300: '#D89A4D',  // amber-400
-          400: '#C8843A',  // amber-500
-          500: '#B8612B',  // terracotta-600 (canonical CTA)
-          600: '#A05525',  // terracotta-700 (hover)
-          700: '#843E1A',  // rust-800 (active/intense)
-          800: '#5A3E26',  // cocoa-700
-          900: '#3F2A1B',  // cocoa-800
+          50: '#FAF6EE', // ivory-50
+          100: '#F4EDE2', // ivory-100
+          200: '#E5B473', // amber-300 (soft warm)
+          300: '#D89A4D', // amber-400
+          400: '#C8843A', // amber-500
+          500: '#B8612B', // terracotta-600 (canonical CTA)
+          600: '#A05525', // terracotta-700 (hover)
+          700: '#843E1A', // rust-800 (active/intense)
+          800: '#5A3E26', // cocoa-700
+          900: '#3F2A1B', // cocoa-800
         },
         // Secondary scale = bronze canônico (KEYRA brand)
         // 400 = bronze-500 = neutro warm (matches CSS var --secondary)
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
-          50: '#F4EDE2',   // ivory-100
-          100: '#EAE0CF',  // sand-200
-          200: '#C8B49A',  // mocha-300
-          300: '#946640',  // bronze-400
-          400: '#7E5A40',  // bronze-500 (canonical)
-          500: '#5A3E26',  // cocoa-700
-          600: '#3F2A1B',  // cocoa-800
-          700: '#2B1810',  // cocoa-900
+          50: '#F4EDE2', // ivory-100
+          100: '#EAE0CF', // sand-200
+          200: '#C8B49A', // mocha-300
+          300: '#946640', // bronze-400
+          400: '#7E5A40', // bronze-500 (canonical)
+          500: '#5A3E26', // cocoa-700
+          600: '#3F2A1B', // cocoa-800
+          700: '#2B1810', // cocoa-900
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
@@ -90,6 +86,17 @@ const config: Config = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+        },
+        // Sidebar (primitivo shadcn) — vars mapeadas à paleta KEYRA em globals.css
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
         },
 
         // ──────────────────────────────────────────────────────────
@@ -112,11 +119,11 @@ const config: Config = {
         'success-deep': '#4F6840',
 
         // Semantic financial states (atualizados para palette KEYRA)
-        lucro: '#6E8C5A',         // success-leaf (era #457A50 sálvia)
-        prejuizo: '#843E1A',      // rust-800 (era #B23A3A vermelho terra)
-        neutro: '#7E5A40',        // bronze-500 (era #6B6560 cinza)
-        alerta: '#C8843A',        // amber-500 (era #D4A341)
-        info: '#5A6C7E',          // info quente (era #8A7A6B)
+        lucro: '#6E8C5A', // success-leaf (era #457A50 sálvia)
+        prejuizo: '#843E1A', // rust-800 (era #B23A3A vermelho terra)
+        neutro: '#7E5A40', // bronze-500 (era #6B6560 cinza)
+        alerta: '#C8843A', // amber-500 (era #D4A341)
+        info: '#5A6C7E', // info quente (era #8A7A6B)
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -144,18 +151,21 @@ const config: Config = {
         // Sintaxe Tailwind 3.4+: [size, { lineHeight, letterSpacing, fontWeight }]
         // — fontWeight aqui é o DEFAULT quando a classe é aplicada sozinha.
         // Classes utility (font-bold, font-medium) sobrepõem se aplicadas junto.
-        'display-hero': ['56px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '200' }],
-        'display': ['40px', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '200' }],
-        'h1': ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'h2': ['24px', { lineHeight: '1.25', letterSpacing: '0', fontWeight: '600' }],
-        'h3': ['20px', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }],
+        'display-hero': [
+          '56px',
+          { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '200' },
+        ],
+        display: ['40px', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '200' }],
+        h1: ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
+        h2: ['24px', { lineHeight: '1.25', letterSpacing: '0', fontWeight: '600' }],
+        h3: ['20px', { lineHeight: '1.3', letterSpacing: '0', fontWeight: '600' }],
         // 2026-05-02: KPI tokens reduzidos (era 56/40, agora 36/28)
         // após feedback de desproporcionalidade no Dashboard.
         'kpi-hero': ['36px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '600' }],
-        'kpi': ['28px', { lineHeight: '1.1', letterSpacing: '-0.015em', fontWeight: '600' }],
-        'body': ['16px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
+        kpi: ['28px', { lineHeight: '1.1', letterSpacing: '-0.015em', fontWeight: '600' }],
+        body: ['16px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
         'body-sm': ['14px', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }],
-        'label': ['12px', { lineHeight: '1.2', letterSpacing: '0.05em', fontWeight: '600' }],
+        label: ['12px', { lineHeight: '1.2', letterSpacing: '0.05em', fontWeight: '600' }],
       },
       // ────────────────────────────────────────────────────────────
       // KEYRA Motion System — durations, easings, distances canônicas

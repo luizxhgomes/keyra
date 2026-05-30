@@ -27,63 +27,63 @@
        ────────────────────────────────────────────────────────────── */
 
     /* Ivory & Sand — backgrounds, surfaces, divisores */
-    --keyra-ivory-50:  #FAF6EE;
-    --keyra-ivory-100: #F4EDE2;
-    --keyra-sand-200:  #EAE0CF;
-    --keyra-mocha-300: #C8B49A;
+    --keyra-ivory-50: #faf6ee;
+    --keyra-ivory-100: #f4ede2;
+    --keyra-sand-200: #eae0cf;
+    --keyra-mocha-300: #c8b49a;
 
     /* Bronze & Cocoa — texto, foreground, fundo brand premium */
     --keyra-bronze-400: #946640;
-    --keyra-bronze-500: #7E5A40;
-    --keyra-cocoa-700:  #5A3E26;
-    --keyra-cocoa-800:  #3F2A1B;
-    --keyra-cocoa-900:  #2B1810;
-    --keyra-ink-950:    #181210;
+    --keyra-bronze-500: #7e5a40;
+    --keyra-cocoa-700: #5a3e26;
+    --keyra-cocoa-800: #3f2a1b;
+    --keyra-cocoa-900: #2b1810;
+    --keyra-ink-950: #181210;
 
     /* Terracota & Âmbar — calor expressivo, CTAs */
-    --keyra-amber-300:      #E5B473;
-    --keyra-amber-400:      #D89A4D;
-    --keyra-amber-500:      #C8843A;
-    --keyra-terracotta-500: #C26832;
-    --keyra-terracotta-600: #B8612B;
-    --keyra-terracotta-700: #A05525;
-    --keyra-rust-800:       #843E1A;
+    --keyra-amber-300: #e5b473;
+    --keyra-amber-400: #d89a4d;
+    --keyra-amber-500: #c8843a;
+    --keyra-terracotta-500: #c26832;
+    --keyra-terracotta-600: #b8612b;
+    --keyra-terracotta-700: #a05525;
+    --keyra-rust-800: #843e1a;
 
     /* Gold & Champagne — acento precioso (uso raríssimo) */
-    --keyra-champagne-200: #F0D8A8;
-    --keyra-gold-300:      #E5C690;
-    --keyra-gold-400:      #D4A752;
-    --keyra-gold-500:      #B8923A;
-    --keyra-gold-600:      #9A7A2C;
+    --keyra-champagne-200: #f0d8a8;
+    --keyra-gold-300: #e5c690;
+    --keyra-gold-400: #d4a752;
+    --keyra-gold-500: #b8923a;
+    --keyra-gold-600: #9a7a2c;
 
     /* Status (Product layer) */
-    --keyra-success-leaf: #6E8C5A;
-    --keyra-success-deep: #4F6840;
-    --keyra-info:         #5A6C7E;
+    --keyra-success-leaf: #6e8c5a;
+    --keyra-success-deep: #4f6840;
+    --keyra-info: #5a6c7e;
 
     /* ──────────────────────────────────────────────────────────────
        Motion Tokens (Brand motion-system)
        ────────────────────────────────────────────────────────────── */
-    --motion-duration-instant:   100ms;
-    --motion-duration-fast:      200ms;
-    --motion-duration-base:      320ms;
-    --motion-duration-slow:      480ms;
+    --motion-duration-instant: 100ms;
+    --motion-duration-fast: 200ms;
+    --motion-duration-base: 320ms;
+    --motion-duration-slow: 480ms;
     --motion-duration-cinematic: 720ms;
 
-    --motion-easing-out-soft:         cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-easing-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
     --motion-easing-in-out-editorial: cubic-bezier(0.65, 0, 0.35, 1);
-    --motion-easing-in-quiet:         cubic-bezier(0.7, 0, 0.84, 0);
+    --motion-easing-in-quiet: cubic-bezier(0.7, 0, 0.84, 0);
     --motion-easing-out-bounce-subtle: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    --motion-distance-whisper:   4px;
-    --motion-distance-small:     8px;
-    --motion-distance-medium:    16px;
-    --motion-distance-large:     32px;
+    --motion-distance-whisper: 4px;
+    --motion-distance-small: 8px;
+    --motion-distance-medium: 16px;
+    --motion-distance-large: 32px;
 
-    --motion-stagger-tight:  40ms;
-    --motion-stagger-small:  80ms;
+    --motion-stagger-tight: 40ms;
+    --motion-stagger-small: 80ms;
     --motion-stagger-medium: 120ms;
-    --motion-stagger-large:  160ms;
+    --motion-stagger-large: 160ms;
 
     /* ──────────────────────────────────────────────────────────────
        Warm Shadows (cocoa-based, não slate)
@@ -101,8 +101,8 @@
        ────────────────────────────────────────────────────────────── */
 
     /* Backgrounds & surfaces */
-    --background: 36 47% 96%;        /* ivory-50  #FAF6EE */
-    --foreground: 21 47% 12%;        /* cocoa-900 #2B1810 */
+    --background: 36 47% 96%; /* ivory-50  #FAF6EE */
+    --foreground: 21 47% 12%; /* cocoa-900 #2B1810 */
 
     --card: 0 0% 100%;
     --card-foreground: 21 47% 12%;
@@ -118,8 +118,8 @@
     --secondary: 27 32% 32%;
     --secondary-foreground: 36 47% 96%;
 
-    --muted: 36 32% 92%;             /* ivory-100 #F4EDE2 */
-    --muted-foreground: 27 39% 45%;  /* bronze-500 — passa WCAG AA */
+    --muted: 36 32% 92%; /* ivory-100 #F4EDE2 */
+    --muted-foreground: 27 39% 45%; /* bronze-500 — passa WCAG AA */
 
     --accent: 36 32% 92%;
     --accent-foreground: 21 47% 12%;
@@ -128,24 +128,34 @@
     --destructive: 18 67% 31%;
     --destructive-foreground: 36 47% 96%;
 
-    --border: 33 51% 86%;            /* sand-200 #EAE0CF */
+    --border: 33 51% 86%; /* sand-200 #EAE0CF */
     --input: 33 51% 86%;
-    --ring: 23 62% 44%;              /* terracotta-600 */
+    --ring: 23 62% 44%; /* terracotta-600 */
 
     --radius: 0.5rem;
+
+    /* Sidebar (primitivo shadcn) — mapeado à paleta KEYRA quente (não slate) */
+    --sidebar-background: 36 32% 92%; /* ivory-100 */
+    --sidebar-foreground: 21 47% 12%; /* cocoa-900 */
+    --sidebar-primary: 23 62% 44%; /* terracotta-600 */
+    --sidebar-primary-foreground: 36 47% 96%; /* ivory-50 */
+    --sidebar-accent: 33 51% 86%; /* sand-200 */
+    --sidebar-accent-foreground: 21 47% 12%; /* cocoa-900 */
+    --sidebar-border: 33 51% 86%; /* sand-200 */
+    --sidebar-ring: 23 62% 44%; /* terracotta-600 */
   }
 
   .dark {
     /* Dark mode editorial premium · cocoa-900 + champagne-200 + gold-500 detail */
-    --background: 21 47% 12%;        /* cocoa-900 */
-    --foreground: 38 73% 80%;        /* champagne-200 #F0D8A8 */
+    --background: 21 47% 12%; /* cocoa-900 */
+    --foreground: 38 73% 80%; /* champagne-200 #F0D8A8 */
     --card: 21 47% 12%;
     --card-foreground: 38 73% 80%;
     --popover: 21 47% 12%;
     --popover-foreground: 38 73% 80%;
     --primary: 23 62% 44%;
     --primary-foreground: 36 47% 96%;
-    --secondary: 38 49% 71%;         /* gold-300 */
+    --secondary: 38 49% 71%; /* gold-300 */
     --secondary-foreground: 21 47% 12%;
     --muted: 21 35% 18%;
     --muted-foreground: 38 39% 65%;
@@ -155,7 +165,17 @@
     --destructive-foreground: 36 47% 96%;
     --border: 21 30% 22%;
     --input: 21 30% 22%;
-    --ring: 41 53% 47%;              /* gold-500 */
+    --ring: 41 53% 47%; /* gold-500 */
+
+    /* Sidebar (primitivo shadcn) — mapeado à paleta KEYRA quente (não slate) */
+    --sidebar-background: 21 47% 12%; /* cocoa-900 */
+    --sidebar-foreground: 38 73% 80%; /* champagne-200 */
+    --sidebar-primary: 23 62% 44%; /* terracotta-600 */
+    --sidebar-primary-foreground: 36 47% 96%; /* ivory-50 */
+    --sidebar-accent: 21 35% 18%; /* cocoa + luz */
+    --sidebar-accent-foreground: 38 73% 80%; /* champagne-200 */
+    --sidebar-border: 21 30% 22%; /* cocoa border */
+    --sidebar-ring: 41 53% 47%; /* gold-500 */
   }
 }
 
@@ -229,17 +249,39 @@
 .stagger-list > * {
   animation: keyra-fade-up var(--motion-duration-base) var(--motion-easing-out-soft) backwards;
 }
-.stagger-list > *:nth-child(1)  { animation-delay: 0ms }
-.stagger-list > *:nth-child(2)  { animation-delay: 80ms }
-.stagger-list > *:nth-child(3)  { animation-delay: 160ms }
-.stagger-list > *:nth-child(4)  { animation-delay: 240ms }
-.stagger-list > *:nth-child(5)  { animation-delay: 320ms }
-.stagger-list > *:nth-child(6)  { animation-delay: 400ms }
-.stagger-list > *:nth-child(7)  { animation-delay: 480ms }
-.stagger-list > *:nth-child(8)  { animation-delay: 560ms }
-.stagger-list > *:nth-child(9)  { animation-delay: 640ms }
-.stagger-list > *:nth-child(10) { animation-delay: 720ms }
-.stagger-list > *:nth-child(n+11) { animation-delay: 800ms }
+.stagger-list > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-list > *:nth-child(2) {
+  animation-delay: 80ms;
+}
+.stagger-list > *:nth-child(3) {
+  animation-delay: 160ms;
+}
+.stagger-list > *:nth-child(4) {
+  animation-delay: 240ms;
+}
+.stagger-list > *:nth-child(5) {
+  animation-delay: 320ms;
+}
+.stagger-list > *:nth-child(6) {
+  animation-delay: 400ms;
+}
+.stagger-list > *:nth-child(7) {
+  animation-delay: 480ms;
+}
+.stagger-list > *:nth-child(8) {
+  animation-delay: 560ms;
+}
+.stagger-list > *:nth-child(9) {
+  animation-delay: 640ms;
+}
+.stagger-list > *:nth-child(10) {
+  animation-delay: 720ms;
+}
+.stagger-list > *:nth-child(n + 11) {
+  animation-delay: 800ms;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .stagger-list > * {
@@ -272,7 +314,9 @@
   letter-spacing: -0.01em;
   padding: 2px 6px;
   border-width: 1px;
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
 }
 .fc .keyra-event:hover {
   opacity: 0.92;
@@ -293,24 +337,24 @@
   text-decoration-color: rgba(43, 24, 16, 0.4);
 }
 .fc .keyra-event-no_show {
-  background-color: #843E1A !important; /* rust-800 */
-  border-color: #843E1A !important;
-  color: #FAF6EE !important;
+  background-color: #843e1a !important; /* rust-800 */
+  border-color: #843e1a !important;
+  color: #faf6ee !important;
 }
 .fc .keyra-event-done {
-  background-color: #6E8C5A !important; /* success-leaf */
-  border-color: #6E8C5A !important;
-  color: #FAF6EE !important;
+  background-color: #6e8c5a !important; /* success-leaf */
+  border-color: #6e8c5a !important;
+  color: #faf6ee !important;
 }
 
 /* Now indicator: linha terracota */
 .fc .fc-timegrid-now-indicator-line {
-  border-color: #C26832 !important; /* terracotta-500 */
+  border-color: #c26832 !important; /* terracotta-500 */
   border-width: 2px;
 }
 .fc .fc-timegrid-now-indicator-arrow {
-  border-color: #C26832 !important;
-  background-color: #C26832 !important;
+  border-color: #c26832 !important;
+  background-color: #c26832 !important;
 }
 
 /* Today highlight: tom warm ivory ao invés de azul-cinza default */

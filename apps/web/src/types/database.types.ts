@@ -856,6 +856,21 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_attempts: {
+        Row: {
+          email_lower: string
+          last_attempt_at: string
+        }
+        Insert: {
+          email_lower: string
+          last_attempt_at?: string
+        }
+        Update: {
+          email_lower?: string
+          last_attempt_at?: string
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           active: boolean
@@ -1127,6 +1142,103 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      receipts: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          extraction_confidence: number | null
+          extraction_data: Json | null
+          extraction_error: string | null
+          extraction_model: string | null
+          extraction_raw_text: string | null
+          file_hash: string
+          file_path: string
+          file_size_bytes: number
+          id: string
+          mime_type: string
+          normalized_kind: string | null
+          org_id: string
+          original_filename: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewed_data: Json | null
+          status: string
+          transaction_id: string | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          extraction_confidence?: number | null
+          extraction_data?: Json | null
+          extraction_error?: string | null
+          extraction_model?: string | null
+          extraction_raw_text?: string | null
+          file_hash: string
+          file_path: string
+          file_size_bytes: number
+          id?: string
+          mime_type: string
+          normalized_kind?: string | null
+          org_id: string
+          original_filename: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewed_data?: Json | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          extraction_confidence?: number | null
+          extraction_data?: Json | null
+          extraction_error?: string | null
+          extraction_model?: string | null
+          extraction_raw_text?: string | null
+          file_hash?: string
+          file_path?: string
+          file_size_bytes?: number
+          id?: string
+          mime_type?: string
+          normalized_kind?: string | null
+          org_id?: string
+          original_filename?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewed_data?: Json | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "v_dashboard_kpis"
+            referencedColumns: ["org_id"]
+          },
+          {
+            foreignKeyName: "receipts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_categories: {
         Row: {

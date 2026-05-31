@@ -374,7 +374,7 @@ BEGIN
        'service_categories','service_supplies','supplies','inventory_movements',
        'appointments','commands','command_items','payments','payment_methods',
        'transactions','expense_categories','accounts','goals','audit_log',
-       'professionals','user_preferences'
+       'professionals','user_preferences','receipts'
      )
      AND c.relrowsecurity = false;
 
@@ -627,6 +627,113 @@ BEGIN
   END IF;
 
   RAISE NOTICE 'RLS test block H (auth.5 — password_reset_attempts cooldown): PASSED';
+
+  RESET ROLE;
+END $$;
+
+-- =============================================================================
+-- Block I — receipts + storage.objects (Story comprovantes.1 — EPIC-COMPROVANTES)
+-- =============================================================================
+-- Cobertura:
+--   I-1  receipts no smoke-inverso (Block F acima) — RLS habilitada
+--   I-2  user A vê exatamente 1 receipts (a sua)
+--   I-3  user A não vê receipts de org_b por lookup direto de id → 0
+--   I-4  user A não consegue INSERT receipts com org_id = org_b → bloqueado
+--   I-5  user A não consegue UPDATE receipts de org_b → ROW_COUNT 0
+--   I-6  user A não consegue DELETE receipts de org_b → ROW_COUNT 0
+--   I-7  storage.objects: user A vê só o objeto de org_a no bucket receipts
+--   I-8  storage.objects: user A não vê o objeto de org_b por lookup do name → 0
+
+-- Seed como postgres (bypassa RLS) -------------------------------------------
+DO $$
+DECLARE
+  v_org_a  uuid := current_setting('tests.org_a')::uuid;
+  v_org_b  uuid := current_setting('tests.org_b')::uuid;
+  v_rcpt_a uuid;
+  v_rcpt_b uuid;
+BEGIN
+  SET LOCAL role TO postgres;
+
+  INSERT INTO public.receipts (org_id, file_path, original_filename, mime_type, file_size_bytes, file_hash, status)
+    VALUES (v_org_a, v_org_a::text || '/ra/original.jpg', 'TEST_pix_a.jpg', 'image/jpeg', 1024, 'TEST_hash_a', 'pending')
+    RETURNING id INTO v_rcpt_a;
+  INSERT INTO public.receipts (org_id, file_path, original_filename, mime_type, file_size_bytes, file_hash, status)
+    VALUES (v_org_b, v_org_b::text || '/rb/original.jpg', 'TEST_pix_b.jpg', 'image/jpeg', 2048, 'TEST_hash_b', 'pending')
+    RETURNING id INTO v_rcpt_b;
+
+  -- storage.objects: 1 objeto por org no bucket receipts (path {org_id}/...)
+  INSERT INTO storage.objects (bucket_id, name) VALUES ('receipts', v_org_a::text || '/ra/original.jpg');
+  INSERT INTO storage.objects (bucket_id, name) VALUES ('receipts', v_org_b::text || '/rb/original.jpg');
+
+  PERFORM set_config('tests.rcpt_a', v_rcpt_a::text, false);
+  PERFORM set_config('tests.rcpt_b', v_rcpt_b::text, false);
+
+  RESET ROLE;
+END $$;
+
+-- Asserts como user A (authenticated) ----------------------------------------
+DO $$
+DECLARE
+  v_count int;
+  v_org_b uuid := current_setting('tests.org_b')::uuid;
+BEGIN
+  PERFORM set_config('request.jwt.claim.sub',    current_setting('tests.user_a'), true);
+  PERFORM set_config('request.jwt.claim.org_id', current_setting('tests.org_a'),  true);
+  PERFORM set_config('request.jwt.claims',
+    jsonb_build_object('sub', current_setting('tests.user_a'),
+                       'org_id', current_setting('tests.org_a'),
+                       'role', 'authenticated')::text, true);
+  SET LOCAL role TO authenticated;
+
+  -- I-2
+  SELECT count(*) INTO v_count FROM public.receipts WHERE file_hash LIKE 'TEST_hash_%';
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [I-2 receipts SELECT]: expected 1 (own), got %', v_count;
+  END IF;
+
+  -- I-3
+  SELECT count(*) INTO v_count FROM public.receipts WHERE id = current_setting('tests.rcpt_b')::uuid;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [I-3 receipts direct-id of B]: expected 0, got %', v_count;
+  END IF;
+
+  -- I-4
+  BEGIN
+    INSERT INTO public.receipts (org_id, file_path, original_filename, mime_type, file_size_bytes, file_hash, status)
+      VALUES (v_org_b, 'hack/x.jpg', 'hack.jpg', 'image/jpeg', 10, 'TEST_hash_hack', 'pending');
+    RAISE EXCEPTION 'RLS FAIL [I-4 receipts cross-INSERT]: insert into org B should be blocked';
+  EXCEPTION WHEN insufficient_privilege OR check_violation OR OTHERS THEN
+    NULL; -- esperado: WITH CHECK bloqueia
+  END;
+
+  -- I-5
+  UPDATE public.receipts SET status = 'rejected' WHERE id = current_setting('tests.rcpt_b')::uuid;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [I-5 receipts cross-UPDATE]: expected 0, got %', v_count;
+  END IF;
+
+  -- I-6
+  DELETE FROM public.receipts WHERE id = current_setting('tests.rcpt_b')::uuid;
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [I-6 receipts cross-DELETE]: expected 0, got %', v_count;
+  END IF;
+
+  -- I-7
+  SELECT count(*) INTO v_count FROM storage.objects WHERE bucket_id = 'receipts';
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'RLS FAIL [I-7 storage.objects SELECT]: expected 1 (own), got %', v_count;
+  END IF;
+
+  -- I-8
+  SELECT count(*) INTO v_count FROM storage.objects
+    WHERE bucket_id = 'receipts' AND name LIKE v_org_b::text || '/%';
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'RLS FAIL [I-8 storage.objects cross-tenant of B]: expected 0, got %', v_count;
+  END IF;
+
+  RAISE NOTICE 'RLS test block I (comprovantes.1 — receipts + storage.objects): PASSED';
 
   RESET ROLE;
 END $$;

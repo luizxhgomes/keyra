@@ -376,13 +376,30 @@ Função interna (não Server Action, roda em `after`): `processReceipt(receiptI
 |----|--------|------------|------------|
 | TD-CMP-001 | Sem antivírus no upload (Supabase Storage não tem AV nativo) | Média | Aceito no MVP (arquivo nunca executado); avaliar ClamAV/edge function pós-MVP |
 | TD-CMP-002 | EXIF de fotos de smartphone não é removido (geolocalização) | Média | Strip de EXIF na normalização — pós-MVP |
-| TD-CMP-003 | `purgeOrgStorage` na exclusão de org ainda não implementado | Alta | Bloqueia critério de retenção; ligar ao toolkit LGPD (`h8.x`) |
+| TD-CMP-003 | `purgeOrgStorage` na exclusão de org ainda não implementado | Alta / **rastreado** | **Contrato cravado em `comprovantes.1` (AC7) — ver §12.1.** Implementação obrigatória antes do go-live do EPIC; não é mais "aceito tácito" |
 | TD-CMP-004 | Tiers ODT/RTF/EPUB são best effort — taxa de falha alta | Baixa | Documentado; fallback de registro manual cobre |
 | TD-CMP-005 | Sem dashboard de governança/custo do AI Gateway | Baixa | Observabilidade pós-MVP |
 | TD-CMP-006 | Reprocessamento de `failed` é manual (sem fila) | Baixa | Inngest resolve quando entrar (ADR-009) |
 | TD-CMP-007 | Se últimos 4 dígitos de cartão forem extraídos, avaliar PCI-DSS | Baixa | Instruir o prompt a NÃO extrair número de cartão |
 | TD-CMP-008 | Rasterização de PDF em runtime serverless (sem binários de sistema) é o ponto mais frágil — `node-canvas` inviável (Cairo nativo); `@napi-rs/canvas` e `mupdf`/`pdfium` WASM precisam de validação no Fluid Compute | **Alta** | **Spike obrigatório no início de `comprovantes.2`** — sem ele a story não é estimável |
 | TD-CMP-009 | Pré-processamento de imagem além da auto-rotação EXIF (desinclinação/deskew, contraste, recorte de bordas) | Média | Pós-MVP — auto-rotação via `sharp().rotate()` é o mínimo obrigatório no MVP |
+
+### 12.1 Contrato de `purgeOrgStorage(org_id)` (cravado em `comprovantes.1`, AC7)
+
+`ON DELETE CASCADE` em `receipts.org_id` apaga as **linhas** da tabela quando a organização é excluída, mas **não** alcança os binários em `storage.objects` — o cascade de banco não cruza para o schema `storage`. Sem uma rotina de purga, os arquivos ficam órfãos no bucket, violando o critério de retenção (LGPD: dado pessoal não persiste além da finalidade).
+
+**Contrato:**
+
+```
+purgeOrgStorage(org_id uuid) → void
+```
+
+- Lista todos os objetos sob o prefixo `{org_id}/` no bucket `receipts` (Supabase Storage API `list`, paginado).
+- Remove-os em lote (`remove`).
+- **Idempotente** (reexecutar sobre prefixo já vazio é no-op) e **acoplado ao fluxo de exclusão de organização** (mesma operação que apaga a org).
+- Executa server-side com `service_role` — precisa enxergar todos os objetos da org, fora do contexto de um usuário autenticado.
+
+**Status:** contrato definido aqui; **implementação é `TD-CMP-003` rastreado**, obrigatória antes do go-live do EPIC (não vai a prod com comprovantes reais sem a purga funcionando).
 
 ---
 

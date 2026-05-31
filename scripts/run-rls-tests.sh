@@ -95,6 +95,37 @@ psql -v ON_ERROR_STOP=1 <<'SQL' >/dev/null
 
   GRANT USAGE ON SCHEMA auth TO authenticated, anon, service_role;
   GRANT USAGE ON SCHEMA extensions TO authenticated, anon, service_role, public;
+
+  -- Stubs do schema `storage` (Supabase real já os traz). Replicamos aqui para
+  -- que a migration de bucket (comprovantes.1 AC6) e os asserts I-7/I-8 da suíte
+  -- rodem em Postgres vanilla. storage.objects no Supabase real já vem com RLS;
+  -- habilitamos no stub para o teste exercer o isolamento.
+  CREATE SCHEMA IF NOT EXISTS storage;
+  CREATE TABLE IF NOT EXISTS storage.buckets (
+    id text PRIMARY KEY,
+    name text NOT NULL,
+    public boolean NOT NULL DEFAULT false,
+    created_at timestamptz DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS storage.objects (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    bucket_id text NOT NULL REFERENCES storage.buckets(id),
+    name text NOT NULL,
+    owner uuid NULL,
+    created_at timestamptz DEFAULT now()
+  );
+  CREATE OR REPLACE FUNCTION storage.foldername(name text)
+    RETURNS text[] LANGUAGE plpgsql IMMUTABLE AS $fn$
+  DECLARE _parts text[];
+  BEGIN
+    SELECT string_to_array(name, '/') INTO _parts;
+    RETURN _parts[1 : array_length(_parts, 1) - 1];
+  END $fn$;
+  ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+  ALTER TABLE storage.objects FORCE ROW LEVEL SECURITY;
+  GRANT USAGE ON SCHEMA storage TO authenticated, anon, service_role;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON storage.objects TO authenticated;
+  GRANT SELECT ON storage.buckets TO authenticated;
 SQL
 
 echo "==> Aplicando migrations em ordem"

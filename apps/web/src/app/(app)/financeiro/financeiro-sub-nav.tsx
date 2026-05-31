@@ -10,6 +10,7 @@ const ITEMS = [
   { href: '/financeiro/dre-por-servico', label: 'DRE / serviço' },
   { href: '/financeiro/dre-por-profissional', label: 'DRE / profissional' },
   { href: '/financeiro/transacoes', label: 'Transações' },
+  { href: '/financeiro/comprovantes', label: 'Comprovantes' },
   { href: '/financeiro/receitas', label: 'Receitas' },
   { href: '/financeiro/despesas', label: 'Despesas' },
   { href: '/financeiro/custos-fixos', label: 'Custos fixos' },

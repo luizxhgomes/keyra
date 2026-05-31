@@ -53,6 +53,18 @@ const serverSchema = z.object({
   // usekeyra.com em dev local.
   NEXT_PUBLIC_SITE_URL: z.string().url().default('https://usekeyra.com'),
 
+  // EPIC-COMPROVANTES (comprovantes.3) — leitura de comprovantes por IA.
+  // Provider OpenAI direto (chave de projeto da OpenAI). O ADR-023 previa Vercel AI Gateway
+  // (`AI_GATEWAY_API_KEY`); a chave direta foi autorizada pelo idealizador como
+  // caminho mais curto — o Gateway agrega observability/fallback numa evolução
+  // futura. Server-only (igual ao service role); nunca vai pro bundle do cliente.
+  OPENAI_API_KEY: z.string().min(20).optional(),
+
+  // EPIC-COMPROVANTES (comprovantes.2) — limites de ingestão de comprovantes.
+  // Env é string → exige z.coerce. Ambas têm default (boot não aborta sem elas).
+  RECEIPT_MAX_BYTES: z.coerce.number().int().positive().default(10485760), // 10 MB
+  RECEIPT_MAX_PAGES: z.coerce.number().int().positive().default(5),
+
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
@@ -70,6 +82,9 @@ const parsed = serverSchema.safeParse({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  RECEIPT_MAX_BYTES: process.env.RECEIPT_MAX_BYTES,
+  RECEIPT_MAX_PAGES: process.env.RECEIPT_MAX_PAGES,
   NODE_ENV: process.env.NODE_ENV,
 });
 

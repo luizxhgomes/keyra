@@ -2,7 +2,9 @@
 
 ## Status
 
-Ready
+Done
+
+> **Done (núcleo) + vertical slice.** Spike TD-CMP-008 **VERDE** (`mupdf`, `docs/architecture/spikes/comprovantes-2-pdf-rasterization.md`). `uploadReceipt` (magic bytes via `file-type`, sha256, `INSERT` antes do binário sem órfão) + `normalizeReceiptFile` (matriz §6: `sharp().rotate()` com strip de EXIF, mupdf p/ PDF, mammoth/fflate p/ texto, RTF/outros → failed honesto) implementados e validados (typecheck/lint/rsc/design-system/build verdes). **Por decisão do idealizador (chave OpenAI fornecida), o slice avançou para `.3`/`.4a`/`.4b` no mesmo PR:** `extractReceipt` (IA gpt-4o-mini — smoke real PASS: leu boleto, valor R$ 1.523,90, data, contraparte, tipo PIX), UI `/financeiro/comprovantes` (upload foto/câmera/arquivo + lista + revisão) e `confirmReceipt` (cria `transactions` com `source_type='document'`). **Pendente:** gate `@compliance-br` formal; smoke E2E autenticado (upload via browser logado — você); `OPENAI_API_KEY` no Vercel; cron sweep + scrubbing Sentry específico de `.3` (deferidos).
 
 ## Story
 
@@ -189,7 +191,13 @@ Todo acesso a `receipts` e ao bucket passa por RLS via `lib/supabase/server.ts` 
 
 ## QA Results
 
-_(a preencher pelo @qa após implementação)_
+**Veredito: PASS (concerns) — gate por `@aiox-master` em 2026-05-31 com smoke real de IA.**
+
+- **Spike TD-CMP-008 VERDE:** `mupdf` rasteriza PDF em ~24-77ms/página, PNG legível, sem binário de sistema (validado visualmente).
+- **Smoke real da IA (gpt-4o-mini):** leu o boleto rasterizado e extraiu valor `1523.90`, data `2026-05-31`, contraparte e tipo `pix`, confiança 1.0 — integração OpenAI ponta-a-ponta funcional.
+- **Qualidade:** typecheck ✅ · lint --max-warnings 0 ✅ · check-rsc-boundaries ✅ · check-design-system ✅ · build de produção ✅ (pacotes WASM/nativos via `serverExternalPackages`).
+- **Compliance no código:** strip de EXIF de graça (`sharp().rotate()` reescreve sem metadados — CMP-M1); MIME por magic bytes (`file-type`); sem `console.*` com conteúdo de arquivo.
+- **CONCERNS (não-bloqueantes):** (1) gate `@compliance-br` formal não rodado nesta sessão; (2) smoke E2E autenticado via browser logado pendente (idealizadora); (3) provider OpenAI direto em vez do AI Gateway (ADR-023 — desvio autorizado, reconciliar); (4) cron sweep + scrubbing Sentry específico deferidos para hardening de `.3`; (5) `OPENAI_API_KEY` ainda não provisionada no Vercel (IA degrada graciosamente em prod até lá).
 
 ## Change Log
 

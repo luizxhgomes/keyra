@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Next 16 promoted `typedRoutes` out of `experimental`.
   typedRoutes: true,
+  // EPIC-COMPROVANTES (comprovantes.2): libs nativas/WASM da normalização não
+  // devem passar pelo bundler — carregadas via require em runtime, com seus
+  // assets (.wasm do mupdf, binários do sharp) incluídos pelo file tracing.
+  serverExternalPackages: ['sharp', 'mupdf', 'heic-convert', 'mammoth'],
   // Sentry / instrumentation hooks are auto-detected via instrumentation.ts.
   // Allow loading Lucide icons without bundle bloat.
   modularizeImports: {

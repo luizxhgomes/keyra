@@ -5,12 +5,15 @@
 # `.claude/rules/design-system.md`. Roda em CI (workflow rls-tests, job
 # design-system-audit) e pode rodar local antes de push.
 #
-# Cobre `apps/web/src/**/*.tsx` — a camada de produto (React + Tailwind).
+# Cobre `apps/web/src/**/*.tsx` (produto) + peças HTML do brand (preview.html,
+# landing.html) para a regra de headline.
 #
 # HARD FAIL (barra o build):
 #  C1) Classe de cor da paleta DEFAULT do Tailwind (princípio 2 — quente sempre,
 #      frio nunca). Só tokens KEYRA são permitidos.
 #  C2) Valor de espaçamento ARBITRÁRIO (princípio 1 — tokens são lei / princípio 6).
+#  C4) <br> dentro de heading/headline (princípio 6 — quebra por sentença, nunca
+#      <br>). Cobre .tsx e as peças HTML do brand.
 #
 # WARN (reporta, não barra):
 #  C3) HEX literal em .tsx que deveria ser constante de token (princípio 1).
@@ -74,6 +77,34 @@ if [[ -n "${C2_HITS}" ]]; then
   HARD_FAIL=1
 else
   echo "✅ Nenhum valor de espaçamento arbitrário."
+fi
+echo ""
+
+# ---------------------------------------------------------------------------
+# C4 — <br> dentro de heading/headline (HARD FAIL)
+# Princípio 6: a quebra de headline é estrutura (.hl-s/.hl-line), nunca <br>.
+# Heurística estática: <br> na MESMA linha que um marcador de heading
+# (<h1..3> ou class com title/hero/headline/combo-headline/display).
+# Cobre .tsx (produto) + peças HTML do brand. Comentários caem por DROP_COMMENTS
+# e por não conterem marcador de heading.
+# ---------------------------------------------------------------------------
+HEADING_LINE='(<h[1-3][ >/]|class="[^"]*(title|hero|headline|combo-headline|display)[^"]*")'
+echo "── C4 · <br> em heading/headline ────────────────────────────────"
+BRAND_HTML="$(find "${ROOT_DIR}/docs/brand" "${ROOT_DIR}/apps/web/public" -name '*.html' 2>/dev/null || true)"
+C4_RAW="$(grep -rnE "<br" "${SRC_DIR}" --include="*.tsx" 2>/dev/null || true)"
+for f in ${BRAND_HTML}; do
+  C4_RAW="${C4_RAW}"$'\n'"$(grep -nE "<br" "$f" 2>/dev/null | sed "s#^#${f}:#" || true)"
+done
+C4_HITS="$(printf '%s\n' "${C4_RAW}" | grep -E "${HEADING_LINE}" | grep -vE "${DROP_COMMENTS}" || true)"
+if [[ -n "${C4_HITS}" ]]; then
+  echo "🔴 HARD FAIL — <br> dentro de heading/headline encontrado:"
+  echo "${C4_HITS}" | sed 's/^/   /'
+  echo "   → Quebra de headline é estrutura: uma sentença por <span class=\"hl-s\">"
+  echo "     (frase) ou <span class=\"hl-line\"> (verso de hero). text-wrap:balance"
+  echo "     equilibra dentro da sentença. Nunca <br>. Ver DESIGN.md §9.ter."
+  HARD_FAIL=1
+else
+  echo "✅ Nenhum <br> em heading/headline."
 fi
 echo ""
 

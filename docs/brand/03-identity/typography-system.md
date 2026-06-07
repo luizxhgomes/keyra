@@ -155,6 +155,23 @@ Em qualquer tela que mostre coluna de número (DRE, lista de transações, KPI g
 
 Acima desse range = quebra de hierarquia editorial. Abaixo = ficção visual.
 
+### 3.7. Alinhamento e quebra por sentença (canônico)
+
+Regra-mãe em [`.claude/rules/design-system.md` princípio 6](../../../.claude/rules/design-system.md).
+
+**Alinhamento.** Todo heading de brand é **centralizado** — display, h1/h2, eyebrow/overline, lead curto de hero (≤2 linhas), blockquote de fechamento e o bloco do CTA. Permanecem **à esquerda**: lead/subtítulo longo (>2 linhas), body corrido, listas, números/KPI/DRE e tabelas. Limiar prático: acima de 2 linhas → esquerda.
+
+**Quebra por sentença.** Numa headline com mais de uma frase, cada **sentença completa** ocupa a própria linha — um nó próprio, nunca `<br>`. Dentro de cada sentença, `text-wrap: balance` equilibra quando ela precisa quebrar em tela estreita. Nenhuma frase vaza parte de si para a linha de outra (sem órfão entre sentenças, como o "Você" que sobrava em "…sozinha. Você").
+
+**Três salvaguardas da centralização** (sem as três, escorrega para o genérico):
+1. **Nenhum heading centralizado é monopeso** — sempre há contraste (thin/bold, roman/italic) no bloco. É o salto de peso, não o eixo, que carrega o drama editorial que o left-align dava de graça.
+2. **Measure curta:** ~14-18ch para display/hero, ~28-34ch para h2 de seção. O vazio lateral generoso é o material caro do Quiet Luxury.
+3. **Centralizar nunca o parágrafo/body corrido** — destrói o retorno de linha.
+
+**Exceção retórica:** enumeração em rajada ("Sem planilha. Sem domingo perdido. Sem achismo.") fica **junta** por cadência — `balance` cuida da quebra se a viewport estreitar. "Sentença por linha" governa headings, não enumerações no sub.
+
+Modelo mental: **"sentença quebra por estrutura; linha quebra por `balance`; `<br>` não existe."**
+
 ---
 
 ## 4. Anti-padrões tipográficos
@@ -165,7 +182,9 @@ Acima desse range = quebra de hierarquia editorial. Abaixo = ficção visual.
 | Serif em **body de produto** | Reduz legibilidade em UI densa | Body de produto sempre Inter |
 | Sans em **título de capa brand** | Perde tom editorial | Título brand sempre Fraunces |
 | Weight muito **médio** (400/500 em display) | Pasteurizado, sem caráter | Use 200/300 ou 600/700 — extremos |
-| **Texto centralizado** em parágrafo longo | Cansativo | Centro só em hero/título; corpo alinhado à esquerda |
+| **Texto centralizado** em parágrafo longo | Cansativo, quebra o retorno de linha | Centro em todo heading (e lead curto ≤2 linhas); body, lista, número e tabela à esquerda |
+| **Heading de brand left-aligned** | Quebra a regra de centralização canônica (§3.7) | Todo heading é `text-align: center` |
+| **`<br>` cego em heading** | Quebra errado no próximo breakpoint e gera órfão | Sentença = nó próprio (`.hl-s`); `text-wrap: balance` equilibra dentro dela |
 | **All caps em parágrafo** | Berra | All caps só em overline/label/badge ≤14px |
 | Letterspacing em itálico | Quebra fluidez | Itálico vai com letterspacing 0 ou negativo |
 | **Texto sobre foto sem véu** | Ilegível | Sempre overlay sutil (ver [colors-manual](./colors-manual.md) seção 4) |
@@ -256,13 +275,15 @@ A inspeção do código atual deve revelar uso de fontes default (provavelmente 
 
 ## 7. Exemplos visuais (descritivos)
 
-### Hero de sales page
+### Hero de sales page (bloco centralizado · verso por linha)
 ```
-[Fraunces 200 italic, 96px]    Sua clínica
-[Fraunces 700, 96px]           rendendo mais.
-[Inter 400, 18px]              Sem planilha. Sem contador no domingo. Sem achismo.
-[Terracotta-600 button, 17px]  Quero conhecer →
+            Sua clínica           [Fraunces 200 italic, 96px · verso .hl-line]
+          rendendo mais.          [Fraunces 700, 96px · verso .hl-line]
+
+  Sem planilha. Sem domingo perdido. Sem achismo.   [Inter 400, 18px · tríade junta]
+           Quero conhecer →        [Terracotta-600 button · bloco centralizado]
 ```
+Bloco inteiro centralizado. Os dois versos do título quebram por **estrutura** (`.hl-line`), não por `<br>`. A tríade do sub fica **junta** (rajada/cadência); `balance` quebra se a viewport estreitar.
 
 ### Capa de proposta comercial
 ```

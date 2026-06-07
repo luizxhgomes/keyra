@@ -78,15 +78,62 @@ section:first-of-type{border-top:none}
   font-size:12px;font-weight:600;
   letter-spacing:0.12em;text-transform:uppercase;
   color:var(--gold-500);margin-bottom:16px;
+  /* Eyebrow/overline centralizado — acompanha o h2 de seção (regra de marca). */
+  text-align:center;
 }
 .title{
   font-family:var(--font-serif);font-weight:300;
   font-size:clamp(40px,5vw,72px);
   line-height:1.05;letter-spacing:-0.02em;
   color:var(--cocoa-900);margin-bottom:32px;
+  /* Regra canônica de headline — h2 de seção centralizado.
+     measure curta (~30ch) força o vazio lateral generoso que dá o ar de luxo;
+     text-wrap:balance equilibra a quebra interna e elimina órfão. Salvaguarda:
+     todo h2 tem contraste de peso (300 vs em 200 / strong 700) — nunca monopeso. */
+  text-align:center;
+  text-wrap:balance;
+  max-inline-size:30ch;
+  margin-inline:auto;
 }
 .title strong{font-weight:700}
 .title em{font-weight:200;font-style:italic}
+
+/* ─── Headline canônica · "sentença por linha" ──────────────────────────────
+   Modelo mental: "sentença quebra por estrutura; linha quebra por balance;
+   <br> não existe."
+
+   .headline       = container do título. Centraliza e dá a measure curta.
+   .hl-s           = uma SENTENÇA completa (display:block + text-wrap:balance)
+                     → equilibra internamente quando quebra em tela estreita.
+                     Resolve órfão ENTRE sentenças (cada uma é nó próprio) e
+                     DENTRO da sentença (balance).
+   .hl-line        = um VERSO autoral do hero (display:block, SEM balance)
+                     → quebra deliberada/semântica, não cega.
+   .center-block   = helper para centralizar o BLOCO de um lead CURTO sem
+                     centralizar texto corrido longo (margin-inline:auto +
+                     max-inline-size; o text-align interno permanece natural).
+
+   Salvaguardas (decisão de marca): heading centralizado nunca é monopeso
+   (sempre há contraste thin/bold ou roman/italic no bloco); measure curta
+   obrigatória; o body corrido NUNCA é centralizado. */
+.headline{
+  text-align:center;
+  text-wrap:balance;
+  margin-inline:auto;
+}
+.hl-s{
+  display:block;
+  text-wrap:balance;
+}
+.hl-line{
+  display:block;
+  text-wrap:nowrap; /* verso autoral: a quebra é onde o autor decidiu */
+}
+.center-block{
+  margin-inline:auto;
+  /* o texto interno mantém seu text-align natural — não centraliza corpo. */
+}
+
 .subtitle{
   font-family:var(--font-serif);font-style:italic;font-weight:300;
   font-size:24px;color:var(--bronze-500);margin-bottom:48px;max-width:680px;
@@ -221,7 +268,8 @@ section:first-of-type{border-top:none}
   font-family:var(--font-sans);font-size:13px;font-weight:600;
   letter-spacing:0.16em;text-transform:uppercase;
   color:var(--gold-500);margin-bottom:32px;
-  display:flex;align-items:center;gap:12px;
+  /* Tag/overline do hero centralizada — o ::before (traço dourado) acompanha. */
+  display:flex;align-items:center;justify-content:center;gap:12px;
 }
 .hero-tag::before{content:"";width:32px;height:1px;background:var(--gold-500)}
 .hero h1{
@@ -230,16 +278,30 @@ section:first-of-type{border-top:none}
   line-height:0.95;letter-spacing:-0.03em;
   color:var(--cocoa-900);margin-bottom:24px;
   font-weight:700;
+  /* Headline display centralizado · measure curtíssima (~14ch) para o vazio
+     lateral generoso do hero. Salvaguarda de contraste: .thin (200 itálico)
+     vs corpo 700 — nunca monopeso. */
+  text-align:center;
+  max-inline-size:14ch;
+  margin-inline:auto;
 }
 .hero h1 .thin{font-weight:200;font-style:italic;color:var(--bronze-500)}
 .hero p{
   font-family:var(--font-serif);font-style:italic;font-weight:200;
   font-size:28px;color:var(--cocoa-700);max-width:680px;line-height:1.4;
   margin-bottom:48px;
+  /* Lead CURTO do hero (≤2 linhas) — centraliza o BLOCO via margin-inline:auto,
+     mantendo a tríade retórica "Sem planilha. Sem domingo perdido. Sem achismo."
+     JUNTA (rajada/cadência). text-wrap:balance cuida se a viewport estreitar.
+     Enumeração retórica no sub NÃO vira sentença-por-linha. */
+  text-align:center;
+  text-wrap:balance;
+  margin-inline:auto;
 }
 .hero-meta{
   display:flex;gap:48px;font-size:13px;color:var(--bronze-500);
   letter-spacing:0.04em;text-transform:uppercase;font-weight:500;
+  justify-content:center;
 }
 .hero-meta b{color:var(--cocoa-900);font-weight:600}
 
@@ -613,16 +675,20 @@ section:first-of-type{border-top:none}
 .combo-tag{
   font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
   color:var(--gold-500);margin-bottom:12px;
+  text-align:center;
 }
 .combo-B .combo-tag,.combo-C .combo-tag{color:var(--gold-300)}
 .combo-headline{
   font-family:var(--font-serif);font-weight:600;font-size:36px;line-height:1.05;letter-spacing:-0.01em;
   margin-bottom:8px;
+  /* Headline de aplicação da marca — centralizada. Os versos viram .hl-line
+     (quebra autoral deliberada, sem balance); a measure herda a largura do card. */
+  text-align:center;
 }
 .combo-B .combo-headline{color:var(--champagne-200)}
 .combo-C .combo-headline{color:var(--ivory-50);font-weight:300}
 .combo-C .combo-headline strong{font-weight:700}
-.combo-sub{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:18px;color:var(--bronze-500);margin-bottom:24px}
+.combo-sub{font-family:var(--font-serif);font-style:italic;font-weight:300;font-size:18px;color:var(--bronze-500);margin-bottom:24px;text-align:center;text-wrap:balance}
 .combo-B .combo-sub{color:var(--gold-300)}
 .combo-C .combo-sub{color:var(--champagne-200)}
 .combo-cta{display:inline-block;margin-top:8px}
@@ -648,12 +714,15 @@ section:first-of-type{border-top:none}
 .mockup-5{background:var(--cocoa-900)}
 .mockup-6{background:var(--ink-950)}
 
-/* Headline base — fonte em cqw (% da largura do card), não da viewport */
+/* Headline base — fonte em cqw (% da largura do card), não da viewport.
+   .mock-line já é display:block (verso por linha) — só garantimos a
+   centralização coerente com a regra de headline. */
 .mock-headline{
   font-family:var(--font-serif);
   font-weight:300;line-height:0.92;letter-spacing:-0.02em;
   hyphens:none;word-break:keep-all;
   margin-bottom:auto;
+  text-align:center;
 }
 .mock-line{display:block}
 .mock-line.thin{font-weight:200}
@@ -956,10 +1025,11 @@ section.in-view::before{width:120px}
   section{padding:64px 0}
   .shell{padding:0 20px}
   .hero{padding:80px 0 60px}
-  .hero h1{font-size:clamp(56px,12vw,88px)}
+  /* measure aperta junto com a fonte — mantém o vazio lateral proporcional */
+  .hero h1{font-size:clamp(56px,12vw,88px);max-inline-size:13ch}
   .hero p{font-size:22px}
-  .hero-meta{flex-wrap:wrap;gap:24px}
-  .title{font-size:clamp(32px,6vw,56px)}
+  .hero-meta{flex-wrap:wrap;gap:24px;justify-content:center}
+  .title{font-size:clamp(32px,6vw,56px);max-inline-size:26ch}
   .lead{font-size:16px}
   .subtitle{font-size:20px}
   .swatches{grid-template-columns:repeat(2,1fr)}
@@ -990,11 +1060,13 @@ section.in-view::before{width:120px}
 /* Mobile (640px) */
 @media (max-width:640px){
   .hero{padding:64px 0 48px}
-  .hero h1{font-size:clamp(48px,14vw,72px)}
+  /* mobile: a measure relaxa para evitar quebras agressivas em telas estreitas;
+     balance/versos continuam governando a quebra. */
+  .hero h1{font-size:clamp(48px,14vw,72px);max-inline-size:12ch}
   .hero-tag{font-size:11px}
   .hero p{font-size:18px;margin-bottom:32px}
   .hero-meta{flex-direction:column;gap:8px;font-size:12px}
-  .title{font-size:clamp(28px,8vw,44px);margin-bottom:24px}
+  .title{font-size:clamp(28px,8vw,44px);margin-bottom:24px;max-inline-size:22ch}
   .lead{font-size:15px}
   .palette-name{font-size:16px}
   .palette-name small{font-size:12px}
@@ -1021,7 +1093,9 @@ section.in-view::before{width:120px}
   .shell{padding:0 16px}
   .mockup-grid,.logo-grid,.anti-grid{grid-template-columns:1fr;gap:12px}
   .swatches{grid-template-columns:repeat(2,1fr)}
-  .hero h1{font-size:48px}
+  /* measure mínima — abaixo disso a quebra fica a cargo de balance/versos */
+  .hero h1{font-size:48px;max-inline-size:11ch}
+  .title{max-inline-size:20ch}
   .btn-row{flex-direction:column}
   .btn-row .btn{width:100%;justify-content:center}
   .hero-meta{font-size:11px}
@@ -1070,7 +1144,15 @@ section.in-view::before{width:120px}
 <header class="hero">
   <div class="shell">
     <div class="hero-tag">Brand Identity · Documento de Apresentação</div>
-    <h1>Sua clínica<br/><span class="thin">rendendo</span> mais.</h1>
+    <!-- Hero: versos autorais (.hl-line) substituem o <br/>. A quebra é
+         deliberada/semântica — "Sua clínica" / "rendendo mais." — não cega.
+         O ponto signature fica preso a "mais". -->
+    <h1 class="headline">
+      <span class="hl-line">Sua clínica</span>
+      <span class="hl-line"><span class="thin">rendendo</span> mais.</span>
+    </h1>
+    <!-- Sub do hero: tríade retórica em rajada, JUNTA (cadência) — exceção
+         deliberada à regra "sentença por linha". balance cuida da quebra. -->
     <p>Sem planilha. Sem domingo perdido. Sem achismo.</p>
     <div class="hero-meta">
       <div>Categoria visual · <b>Editorial Beauty Luxury</b></div>
@@ -1121,7 +1203,13 @@ section.in-view::before{width:120px}
 <section id="vision">
   <div class="shell">
     <div class="eyebrow">01 · Visão da marca</div>
-    <h2 class="title">A clínica vira financeiro <em>sozinha</em>. Você decide com <strong>clareza</strong>.</h2>
+    <!-- Sentença por linha: cada frase é um nó (.hl-s) próprio. "Você decide…"
+         nunca fica órfã no fim da linha anterior; balance equilibra cada
+         sentença internamente em telas estreitas. Zero <br/>. -->
+    <h2 class="title headline">
+      <span class="hl-s">A clínica vira financeiro <em>sozinha</em>.</span>
+      <span class="hl-s">Você decide com <strong>clareza</strong>.</span>
+    </h2>
     <p class="lead">KEYRA é a primeira plataforma financeira de clínica de estética construída sobre um mecanismo proprietário chamado <strong>Cadeia Viva</strong>: cada atendimento concluído gera comanda, cada pagamento gera transação, cada transação alimenta o DRE, cada DRE informa a próxima decisão. <em>Serviço → Agenda → Comanda → Pagamento → Transação → DRE → Decisão.</em> Tudo conectado, tudo em movimento, tudo verdade.</p>
     <p class="lead muted">Construída para mulheres empreendedoras que cansaram da maratona de domingo com planilha. Onde o ERP genérico exige lançamento manual e a agenda de mercado para na comanda, KEYRA fecha a cadeia inteira: do horário marcado ao lucro real, em uma linha contínua que não pede esforço humano para existir.</p>
 
@@ -1177,7 +1265,9 @@ section.in-view::before{width:120px}
         <div class="logo-lockup">
           <span class="logo-mark editorial" style="font-size:40px">KEYRA<span class="dot">.</span></span>
           <span class="lockup-divider"></span>
-          <span class="lockup-tagline">sua clínica<br/>rendendo mais</span>
+          <!-- tagline do lockup: versos autorais (.hl-line) no lugar do <br/>.
+               Permanece à esquerda (alinha ao divisor) — não é heading de seção. -->
+          <span class="lockup-tagline"><span class="hl-line">sua clínica</span><span class="hl-line">rendendo mais</span></span>
         </div>
         <div class="logo-caption">Lockup horizontal · Wordmark + tagline</div>
       </div>
@@ -1338,16 +1428,16 @@ section.in-view::before{width:120px}
       <div class="motion-demo">
         <div class="demo-title">Drama tipográfico · exemplo aplicado</div>
         <div style="font-family:var(--font-serif);font-size:64px;line-height:0.95;letter-spacing:-0.02em">
-          <span style="font-weight:200">BENEFÍCIOS</span><br/>
-          <span style="font-weight:700">DO BOTOX</span>
+          <span class="hl-line" style="font-weight:200">BENEFÍCIOS</span>
+          <span class="hl-line" style="font-weight:700">DO BOTOX</span>
         </div>
       </div>
       <div class="motion-demo">
         <div class="demo-title">Itálico como sussurro</div>
         <div style="font-family:var(--font-serif);font-size:36px;line-height:1.2;font-weight:400">
-          <em style="font-weight:200">Sua</em> clínica.<br/>
-          <em style="font-weight:200">Esse</em> mês.<br/>
-          <em style="font-weight:200">O</em> seu lucro real.
+          <span class="hl-line"><em style="font-weight:200">Sua</em> clínica.</span>
+          <span class="hl-line"><em style="font-weight:200">Esse</em> mês.</span>
+          <span class="hl-line"><em style="font-weight:200">O</em> seu lucro real.</span>
         </div>
       </div>
     </div>
@@ -1507,7 +1597,7 @@ section.in-view::before{width:120px}
 
       <div class="combo combo-A">
         <div class="combo-tag">Combinação A · Editorial light</div>
-        <div class="combo-headline editorial" style="color:var(--cocoa-900)">Sua clínica<br/>rendendo mais.</div>
+        <div class="combo-headline editorial" style="color:var(--cocoa-900)"><span class="hl-line">Sua clínica</span><span class="hl-line">rendendo mais.</span></div>
         <div class="combo-sub">para empresárias que cansaram da maratona de planilha</div>
         <div class="combo-cta"><button class="btn btn-primary">Quero conhecer</button></div>
         <div class="muted" style="margin-top:32px;font-size:12px">Hero institucional, capa de proposta clara, landing page de captura.</div>
@@ -1515,14 +1605,14 @@ section.in-view::before{width:120px}
 
       <div class="combo combo-B">
         <div class="combo-tag">Combinação B · Editorial dark premium</div>
-        <div class="combo-headline editorial">A importância<br/>do <em style="font-weight:300">colágeno.</em></div>
+        <div class="combo-headline editorial"><span class="hl-line">A importância</span><span class="hl-line">do <em style="font-weight:300">colágeno.</em></span></div>
         <div class="combo-sub">drama editorial · ouro como pingo precioso</div>
         <div style="margin-top:32px;display:inline-block;padding:8px 16px;border:1px solid var(--gold-500);color:var(--gold-500);border-radius:4px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600">@KEYRA · BLOG</div>
       </div>
 
       <div class="combo combo-C">
         <div class="combo-tag">Combinação C · Calor saturado</div>
-        <div class="combo-headline editorial">DICAS PARA<br/>VOCÊ <strong>CUIDAR</strong><br/>DA SUA PELE</div>
+        <div class="combo-headline editorial"><span class="hl-line">DICAS PARA</span><span class="hl-line">VOCÊ <strong>CUIDAR</strong></span><span class="hl-line">DA SUA PELE</span></div>
         <div class="combo-sub">post de campanha pronto para o feed Instagram</div>
       </div>
 

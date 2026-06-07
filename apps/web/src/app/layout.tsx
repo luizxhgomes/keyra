@@ -38,12 +38,12 @@ export const metadata: Metadata = {
     'O primeiro financeiro operacional para clínicas e profissionais de estética. A agenda dispara o financeiro automaticamente.',
   applicationName: 'KEYRA',
   authors: [{ name: 'KEYRA' }],
-  metadataBase: new URL('https://keyra.app'),
+  metadataBase: new URL('https://usekeyra.com'),
   openGraph: {
     title: 'KEYRA',
     description:
       'O primeiro financeiro operacional para estética. Agenda → Comanda → DRE, automático.',
-    url: 'https://keyra.app',
+    url: 'https://usekeyra.com',
     siteName: 'KEYRA',
     locale: 'pt_BR',
     type: 'website',

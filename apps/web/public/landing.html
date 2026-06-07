@@ -616,6 +616,93 @@ footer a:hover{color:var(--ivory-50)}
   .btn-row{flex-direction:column;align-items:stretch}
   .btn-row .btn{width:100%;justify-content:center}
 }
+
+/* ─── Imagery generativa (assets Higgsfield · paleta quente · sem texto na imagem) ─── */
+/* Regra-mãe: .claude/rules/design-system.md §9 (Imagery). Brand layer = generosa. */
+.hero-figure{
+  margin-top:56px;border-radius:20px;overflow:hidden;
+  aspect-ratio:16/9;box-shadow:var(--sh-xl);border:1px solid var(--border-subtle);
+}
+.hero-figure img,.chain-figure img,.app-figure img{
+  display:block;width:100%;height:100%;object-fit:cover;
+}
+.chain-figure{
+  margin:0 0 40px;border-radius:18px;overflow:hidden;
+  aspect-ratio:21/9;box-shadow:var(--sh-lg);border:1px solid var(--border-subtle);
+}
+.app-showcase{
+  display:grid;grid-template-columns:1.05fr 0.95fr;gap:40px;align-items:center;
+  margin-top:40px;max-width:1000px;
+}
+.app-showcase .app-preview{margin-top:0;max-width:none;grid-template-columns:1fr;gap:16px}
+.app-figure{
+  margin:0;border-radius:18px;overflow:hidden;
+  aspect-ratio:16/10;box-shadow:var(--sh-xl);border:1px solid var(--border-subtle);
+}
+@media (max-width:880px){
+  .app-showcase{grid-template-columns:1fr;gap:28px}
+  .hero-figure{aspect-ratio:4/3;margin-top:40px}
+  .chain-figure{aspect-ratio:16/9}
+}
+
+/* ─── UI card: interface real (device) sobre cena de clínica + título sobreposto ─── */
+.ui-card{
+  position:relative;border-radius:28px;overflow:hidden;margin-top:8px;
+  min-height:540px;box-shadow:var(--sh-xl);border:1px solid var(--border-subtle);
+}
+.ui-card-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.ui-card-veil{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(100deg,rgba(43,24,16,.82) 0%,rgba(43,24,16,.55) 38%,rgba(43,24,16,.12) 66%,rgba(43,24,16,0) 100%);
+}
+.ui-card-inner{
+  position:relative;z-index:2;display:grid;grid-template-columns:0.8fr 1.2fr;
+  gap:clamp(36px,4vw,60px);align-items:center;padding:clamp(40px,4.4vw,64px);
+}
+.ui-card-copy{color:var(--ivory-50);max-width:38ch}
+.ui-card-copy .eyebrow{color:var(--champagne-200);margin-bottom:18px}
+.ui-card-copy .eyebrow::before{background:var(--champagne-200)}
+.ui-card-title{
+  font-family:var(--font-serif);font-weight:300;font-size:clamp(28px,3.4vw,44px);
+  line-height:1.1;letter-spacing:-0.02em;color:var(--ivory-50);text-wrap:balance;margin-bottom:18px;
+}
+.ui-card-lead{font-size:16px;line-height:1.62;color:var(--ivory-100);margin-bottom:28px}
+.ui-card-stats{display:flex;gap:36px}
+.ui-card-stats b{display:block;font-family:var(--font-serif);font-size:26px;color:var(--ivory-50);font-feature-settings:"tnum"}
+.ui-card-stats span{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:var(--champagne-200)}
+.ui-device{
+  border-radius:14px;overflow:hidden;background:var(--cocoa-900);
+  box-shadow:0 28px 64px rgba(24,18,16,.5);border:1px solid rgba(250,246,238,.14);
+  transform:perspective(1800px) rotateY(-7deg) rotateX(2deg);transform-origin:left center;
+}
+.ui-device-bar{display:flex;align-items:center;gap:7px;padding:11px 16px;background:var(--cocoa-800)}
+.ui-device-bar span{width:9px;height:9px;border-radius:50%;background:rgba(250,246,238,.32)}
+.ui-device-bar em{margin-left:12px;font-style:normal;font-size:11px;color:rgba(250,246,238,.6);font-family:var(--font-sans);letter-spacing:0.02em}
+.ui-device-screen{position:relative;overflow:hidden;background:var(--ivory-50);line-height:0}
+.ui-device-screen img{display:block;width:100%;height:auto}
+@media (max-width:880px){
+  .ui-card{min-height:0}
+  .ui-card-inner{grid-template-columns:1fr;gap:clamp(28px,6vw,36px);padding:clamp(28px,7vw,40px)}
+  .ui-card-veil{background:linear-gradient(180deg,rgba(43,24,16,.86) 0%,rgba(43,24,16,.62) 52%,rgba(43,24,16,.44) 100%)}
+  .ui-device{transform:none;transform-origin:center}
+  .ui-card-copy{max-width:none}
+  .ui-card-title{font-size:clamp(26px,7.5vw,34px)}
+  .ui-card-stats{gap:28px}
+}
+
+/* ─── variante phone (mockup de celular com UI mobile real) ─── */
+.ui-card--phone .ui-card-inner{grid-template-columns:1.12fr 0.88fr}
+.ui-phone-wrap{display:flex;justify-content:center;align-items:center}
+.ui-phone{
+  width:clamp(208px,22vw,256px);background:var(--ink-950);border-radius:36px;padding:9px;
+  box-shadow:0 30px 68px rgba(24,18,16,.55);border:1px solid rgba(250,246,238,.12);
+}
+.ui-phone-screen{border-radius:28px;overflow:hidden;background:var(--ivory-50);line-height:0}
+.ui-phone-screen img{display:block;width:100%;height:auto}
+@media (max-width:880px){
+  .ui-card--phone .ui-card-inner{grid-template-columns:1fr;justify-items:start}
+  .ui-phone-wrap{justify-content:flex-start}
+  .ui-phone{width:clamp(200px,54vw,240px)}
+}
 </style>
 </head>
 <body>
@@ -644,6 +731,28 @@ footer a:hover{color:var(--ivory-50)}
     <div class="btn-row reveal">
       <a href="#planos" class="btn btn-primary btn-large">Ver o que muda já na primeira semana →</a>
     </div>
+    <article class="ui-card ui-card--phone reveal">
+      <img class="ui-card-bg" src="/brand/generated/cena-clinica-escura.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+      <div class="ui-card-veil"></div>
+      <div class="ui-card-inner">
+        <div class="ui-card-copy">
+          <div class="eyebrow">A agenda que já funciona</div>
+          <h2 class="ui-card-title">Sua semana inteira já vira dinheiro.</h2>
+          <p class="ui-card-lead">Cada atendimento marcado entra no fluxo na hora — hoje, esta semana, este mês. Você abre o app no intervalo e vê o que entrou, sem tocar em planilha.</p>
+          <div class="ui-card-stats">
+            <div><b>R$ 1.930</b><span>Agendado este mês</span></div>
+            <div><b>9</b><span>Atendimentos na semana</span></div>
+          </div>
+        </div>
+        <div class="ui-phone-wrap">
+          <div class="ui-phone"><div class="ui-phone-screen">
+            <img src="/brand/generated/ui-agenda-mobile.jpg"
+                 alt="Agenda real da KEYRA no celular: agendamentos de hoje R$ 550, da semana R$ 1.350 e do mês R$ 1.930, com o calendário de junho"
+                 loading="lazy" decoding="async" />
+          </div></div>
+        </div>
+      </div>
+    </article>
   </div>
 </header>
 
@@ -734,6 +843,29 @@ footer a:hover{color:var(--ivory-50)}
     </h2>
     <p class="lead reveal">Quando o cliente paga num sistema comum, o atendimento é marcado como "feito". Ponto. O dado financeiro fica numa segunda camada (em outra tela, em outro relatório, em outro fornecedor) e cabe a você cruzar manualmente. <strong>A KEYRA inverte essa lógica.</strong></p>
 
+    <article class="ui-card ui-card--phone reveal">
+      <img class="ui-card-bg" src="/brand/generated/cena-clinica-clara.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+      <div class="ui-card-veil"></div>
+      <div class="ui-card-inner">
+        <div class="ui-card-copy">
+          <div class="eyebrow">O financeiro que nasce sozinho</div>
+          <h2 class="ui-card-title">Do atendimento ao lucro, sem você lançar nada.</h2>
+          <p class="ui-card-lead">Receita, despesas e fluxo de caixa do mês se montam sozinhos a partir das comandas fechadas. Você só abre e lê — em reais, na hora.</p>
+          <div class="ui-card-stats">
+            <div><b>R$ 9.910</b><span>Receita do mês</span></div>
+            <div><b>▲ 100%</b><span>vs mês passado</span></div>
+          </div>
+        </div>
+        <div class="ui-phone-wrap">
+          <div class="ui-phone"><div class="ui-phone-screen">
+            <img src="/brand/generated/ui-financeiro-mobile.jpg"
+                 alt="Financeiro real da KEYRA no celular: receita do mês R$ 9.910 com gráfico de evolução, despesas R$ 4.669 e abas de DRE"
+                 loading="lazy" decoding="async" />
+          </div></div>
+        </div>
+      </div>
+    </article>
+
     <div class="chain reveal">
       <h3>Na KEYRA, o financeiro <strong>nasce</strong> da operação. Não é cadastro. Não é lançamento manual.</h3>
       <div class="chain-flow">
@@ -773,30 +905,29 @@ footer a:hover{color:var(--ivory-50)}
 <!-- ─── Bloco 8 · App preview ─── -->
 <section>
   <div class="shell">
-    <div class="eyebrow reveal">Capítulo 06 · Como você vai ver isso no app</div>
-    <h2 class="title reveal">
-      <em>Tudo em frases.</em> Em três segundos no celular<span style="color:var(--gold-500)">.</span>
-    </h2>
-    <p class="lead reveal">Não é gráfico. Não é dashboard com 14 indicadores. São frases que você lê na fila do café e decide na hora.</p>
-
-    <div class="app-preview reveal">
-      <div class="app-msg">
-        <b>Comanda fechada</b>
-        <span class="num pos">+R$ 850</span> entraram agora.
+    <article class="ui-card reveal">
+      <img class="ui-card-bg" src="/brand/generated/cena-clinica-clara.jpg" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+      <div class="ui-card-veil"></div>
+      <div class="ui-card-inner">
+        <div class="ui-card-copy">
+          <div class="eyebrow">Capítulo 06 · Como você vê no app</div>
+          <h2 class="ui-card-title">Sua controladoria inteira. Numa tela só.</h2>
+          <p class="ui-card-lead">Receita, despesa e lucro do mês em números absolutos — e o DRE proporcional mostrando, em segundos, quanto da sua receita virou lucro. Tudo nascendo sozinho da operação.</p>
+          <div class="ui-card-stats">
+            <div><b>R$ 9.910</b><span>Receita do mês</span></div>
+            <div><b>R$ 5.241</b><span>Lucro · margem 53%</span></div>
+          </div>
+        </div>
+        <div class="ui-device">
+          <div class="ui-device-bar"><span></span><span></span><span></span><em>usekeyra.com</em></div>
+          <div class="ui-device-screen">
+            <img src="/brand/generated/ui-dashboard-kpis.jpg"
+                 alt="Dashboard real da KEYRA: receita R$ 9.910, despesas R$ 4.669, lucro R$ 5.241 em linha, calendário de junho e o DRE proporcional do mês"
+                 loading="lazy" decoding="async" />
+          </div>
+        </div>
       </div>
-      <div class="app-msg">
-        <b>Sua semana fechou</b>
-        <span class="num pos">+R$ 18.420</span> a mais que a anterior.
-      </div>
-      <div class="app-msg">
-        <b>Margem do mês</b>
-        <span class="num">31%</span> · mês passado fechou em 27%.
-      </div>
-      <div class="app-msg">
-        <b>Decisão pendente</b>
-        Pacote de limpeza está com margem de <span class="num">R$ 17</span> por sessão. Veja onde ajustar →
-      </div>
-    </div>
+    </article>
   </div>
 </section>
 

@@ -41,7 +41,7 @@ um gate de CI que barra PR fora do padrão.
 
 <!-- ════════════ INÍCIO DO BLOCO EDITÁVEL ════════════ -->
 
-### Os 8 princípios inegociáveis
+### Os 9 princípios inegociáveis
 
 **1. Tokens são lei.**
 Toda cor, fonte, tamanho, espaçamento, raio, sombra e motion vem de
@@ -110,6 +110,27 @@ idealizadora.
 Durations / easings / distances dos motion tokens. Default = `base 320ms` + `out-soft`.
 Sem bounce gratuito, sem motion acima de `cinematic`.
 
+**9. Imagery on-brand — farta na marca, contida no produto.**
+Imagem enriquece o **brand layer** (landing, e-mail, social, proposta) com generosidade; o
+**product layer** (app) usa imagem com parcimônia — empty states, onboarding, ilustração
+funcional. Tela densa de número (dashboard, DRE, listas) **não se decora com foto**: vale o
+princípio 7 (número absoluto > enfeite).
+- **Eficácia: cena de uso > ambiente vazio > abstração.** Mostre o produto **sendo usado** —
+  mãos, dispositivo, o dado financeiro real, o contexto da clínica. Ambiente bonito porém vazio
+  e metáfora conceitual comunicam pouco e foram reprovados em produção (feedback 2026-06-07).
+- **Paleta quente também na imagem:** ivory/sand/cocoa/terracota/gold, luz dourada; zero tom
+  frio (sem azul/cinza). Geração fora da paleta é reprovada.
+- **Texto crítico nunca dentro da imagem** — gerador de imagem erra acento (regra pt-BR
+  inegociável). Wordmark, headline e tagline vêm do HTML com Fraunces/Inter reais; na imagem,
+  no máximo `KEYRA.` (sem acento, baixo risco) e ainda assim revisado.
+- **Pipeline Higgsfield:** modelos econômicos (Seedream/Z Image) para cenas sem texto; reservar
+  GPT Image 2 só quando texto na imagem for inevitável. Conferir `higgsfield generate cost`
+  antes de gerar — créditos são finitos.
+- **Registro e otimização:** todo asset versionado em `apps/web/public/brand/generated/` e
+  catalogado em `manifest.json` (prompt, modelo, custo, uso). Otimizar para web (≤200 KB,
+  JPG/WebP, `aspect-ratio` no container → zero CLS) antes de publicar. `alt` descritivo em
+  pt-BR sempre. A Lei da Proporção Espacial (princípio 6) vale para figuras.
+
 <!-- ════════════ FIM DO BLOCO EDITÁVEL ════════════ -->
 
 ---
@@ -155,11 +176,12 @@ para fins de enforcement; o conteúdo profundo (paletas, escalas, exemplos) é d
 [ ] Nenhum campo vazio desproporcional — em mobile E desktop
 [ ] Espaçamento vindo da escala de tokens (sem valores arbitrários)
 [ ] Motion dentro dos tokens (default base + out-soft)
+[ ] Imagery on-brand (paleta quente, sem texto crítico na imagem, alt pt-BR, no manifest, otimizada ≤200KB)
 [ ] ./scripts/check-design-system.sh passou
 [ ] Smoke visual mobile (375px) + desktop com a idealizadora
 ```
 
-Sem os 11 marcadores, a peça não está conforme.
+Sem os 12 marcadores, a peça não está conforme.
 
 ---
 

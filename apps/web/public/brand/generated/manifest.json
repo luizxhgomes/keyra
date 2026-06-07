@@ -1,0 +1,50 @@
+{
+  "description": "Assets visuais da landing KEYRA. Imagery on-brand (regra-mãe §9): paleta quente apenas; texto crítico nunca embutido por IA. Cenas de ambiente geradas via Higgsfield (Seedream/GPT Image 2); as telas do produto são CAPTURAS REAIS do app autenticado (não geração).",
+  "palette": "warm-only (ivory/sand/cocoa/bronze/terracotta/amber/gold)",
+  "updated_at": "2026-06-07",
+  "assets": [
+    {
+      "id": "og-keyra",
+      "file": "og-keyra-1200.jpg",
+      "use": "metadata openGraph + twitter card (layout.tsx)",
+      "dimensions": "1200x630",
+      "source": "higgsfield gpt_image_2",
+      "text_in_image": "KEYRA. (wordmark, revisado)"
+    },
+    {
+      "id": "cena-clinica-clara",
+      "file": "cena-clinica-clara.jpg",
+      "use": "fundo dos cards Cap 06 (dashboard) e Cadeia Viva (financeiro)",
+      "source": "higgsfield seedream_v4_5",
+      "text_in_image": "none"
+    },
+    {
+      "id": "cena-clinica-escura",
+      "file": "cena-clinica-escura.jpg",
+      "use": "fundo do card Hero (agenda)",
+      "source": "higgsfield seedream_v4_5",
+      "text_in_image": "none"
+    },
+    {
+      "id": "ui-dashboard-kpis",
+      "file": "ui-dashboard-kpis.jpg",
+      "use": "device notebook · card Cap 06 (Como você vê no app)",
+      "source": "captura real do app autenticado (desktop)",
+      "text_in_image": "UI real do produto"
+    },
+    {
+      "id": "ui-agenda-mobile",
+      "file": "ui-agenda-mobile.jpg",
+      "use": "device celular · card Hero (Agenda)",
+      "source": "captura real do app autenticado (mobile)",
+      "text_in_image": "UI real do produto"
+    },
+    {
+      "id": "ui-financeiro-mobile",
+      "file": "ui-financeiro-mobile.jpg",
+      "use": "device celular · card Cadeia Viva (Financeiro)",
+      "source": "captura real do app autenticado (mobile)",
+      "text_in_image": "UI real do produto"
+    }
+  ]
+}

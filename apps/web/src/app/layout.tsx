@@ -47,6 +47,21 @@ export const metadata: Metadata = {
     siteName: 'KEYRA',
     locale: 'pt_BR',
     type: 'website',
+    images: [
+      {
+        url: '/brand/generated/og-keyra-1200.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'KEYRA — financeiro operacional para estética',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KEYRA — Financeiro operacional para estética',
+    description:
+      'A agenda dispara o financeiro automaticamente. Controladoria completa para clínicas de estética.',
+    images: ['/brand/generated/og-keyra-1200.jpg'],
   },
   robots: {
     // Pre-launch: keep marketing surfaces out of search until product is live.

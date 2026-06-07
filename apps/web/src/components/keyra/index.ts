@@ -11,18 +11,17 @@ export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Headline, type HeadlineProps } from './Headline';
 export { ErrorMessage, type ErrorMessageProps } from './ErrorMessage';
 export { LegalDocument, type LegalDocumentProps } from './LegalDocument';
+export { StatusBadge, type StatusBadgeProps } from './StatusBadge';
 export {
-  StatusBadge,
   appointmentStatusToBadge,
   commandStatusToBadge,
   movementTypeToBadge,
   categoryKindToBadge,
   alertSeverityToBadge,
-  type StatusBadgeProps,
   type StatusKind,
   type AppointmentStatus,
   type CommandStatus,
   type MovementType,
   type CategoryKind,
   type AlertSeverity,
-} from './StatusBadge';
+} from './status-badge-mappers';

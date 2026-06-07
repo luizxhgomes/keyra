@@ -70,9 +70,27 @@ e as mesmas fontes — muda só a **dose**. O app (`apps/web`) é product layer.
 
 **6. Lei da Proporção Espacial.**
 Todo espaço vazio é proporcional e intencional, em **mobile e desktop**:
-- **Sem órfãos tipográficos.** Nenhum título termina com uma palavra sozinha na última
-  linha. **Proibido `<br>` manual dentro de heading** — usar `text-wrap: balance`, que
-  reconhece e equilibra as linhas sozinho. Texto corrido usa `text-wrap: pretty`.
+- **Quebra por sentença, nunca por palavra.** Numa headline com mais de uma frase, cada
+  sentença completa ocupa a própria linha. Nenhuma frase vaza parte de si para a linha de
+  outra. Errado: "…sozinha. Você" + "decide com clareza." (deixa "Você" órfão no fim da
+  linha 1). Certo: linha 1 = "A clínica vira financeiro *sozinha*." inteira; linha 2 =
+  "Você decide com **clareza**." inteira. A unidade de quebra é a sentença — ou o verso,
+  num hero composto — nunca a palavra solta.
+- **Dentro de uma sentença, quem equilibra é `text-wrap: balance`.** Quando uma única
+  sentença for longa e precisar quebrar em telas estreitas, o balance distribui as linhas
+  dela. `<br>` manual continua **proibido** em heading — nem para separar sentenças (isso é
+  estrutura semântica, um nó por sentença, não markup cego), nem dentro delas. Texto corrido
+  usa `text-wrap: pretty`. Modelo mental: **"sentença quebra por estrutura; linha quebra por
+  balance; `<br>` não existe."**
+- **Títulos centralizados.** Todo heading de brand (display, h1, h2, eyebrow/tag, lead curto
+  de hero ≤2 linhas, blockquote de fechamento, bloco de CTA) é `text-align: center`.
+  Permanecem à esquerda: lead/subtítulo longo (>2 linhas), body corrido, listas,
+  números/KPI/DRE, tabelas. Limiar prático: acima de 2 linhas → esquerda. Centralizar exige
+  as três salvaguardas juntas — sentença por linha + measure curta (~14-18ch display/hero,
+  ~28-34ch h2 de seção) + contraste de peso no bloco (nenhum heading monopeso) — sem as três,
+  escorrega para o genérico. Enumeração retórica em rajada (ex.: "Sem planilha. Sem domingo
+  perdido. Sem achismo.") é exceção deliberada: fica junta por cadência, `balance` cuida da
+  quebra.
 - **Cards da mesma fileira têm altura igual** e o conteúdo é distribuído — centralizado
   (`justify-content: center`) ou com rodapé empurrado (`margin-top: auto`). Nunca texto
   colado no topo deixando um buraco embaixo.
@@ -130,7 +148,9 @@ para fins de enforcement; o conteúdo profundo (paletas, escalas, exemplos) é d
 ```
 [ ] Nenhuma cor fora dos tokens KEYRA (sem paleta default do Tailwind, sem hex novo)
 [ ] Apenas Fraunces + Inter
+[ ] Headline multi-sentença com uma sentença por linha (cada frase é um nó próprio)
 [ ] Nenhum título com palavra órfã / nenhum <br> manual em heading
+[ ] Títulos centralizados (heading/eyebrow/lead curto); body/lista/número/tabela à esquerda
 [ ] Cards da mesma fileira com altura igual e conteúdo distribuído
 [ ] Nenhum campo vazio desproporcional — em mobile E desktop
 [ ] Espaçamento vindo da escala de tokens (sem valores arbitrários)
@@ -139,7 +159,7 @@ para fins de enforcement; o conteúdo profundo (paletas, escalas, exemplos) é d
 [ ] Smoke visual mobile (375px) + desktop com a idealizadora
 ```
 
-Sem os 9 marcadores, a peça não está conforme.
+Sem os 11 marcadores, a peça não está conforme.
 
 ---
 
@@ -151,6 +171,7 @@ Sem os 9 marcadores, a peça não está conforme.
 |-----------|----------|------|
 | 🔴 HARD FAIL | Classes de cor da paleta default do Tailwind em `apps/web/src/**/*.tsx` | Barra o build |
 | 🔴 HARD FAIL | Valores de espaçamento arbitrários (`p-[12px]`, `gap-[27px]`, ...) | Barra o build |
+| 🔴 HARD FAIL | `<br>` dentro de heading/headline (hero, `.title`, `.combo-headline`, `h1`/`h2`) em `*.html` e `*.tsx` | Barra o build |
 | 🟡 WARN | HEX literal em `.tsx` que deveria ser constante de token | Reporta (não barra) |
 
 **CI:** job `design-system-audit` no workflow `.github/workflows/rls-tests.yml`. PR não
@@ -170,6 +191,7 @@ checklist — não há substituto para olhar a tela renderizada.
 | 2026-05-18 | `landing.html` — `<br>` manuais em 6 títulos geravam palavras órfãs em desktop e mobile | Princípio 6 | ✅ Corrigido — removidos; `text-wrap:balance` assume |
 | 2026-05-18 | `landing.html` — `.cost-card` e `.app-msg` com texto colado no topo deixavam buraco embaixo em cards esticados | Princípio 6 | ✅ Corrigido — flex column + conteúdo centralizado |
 | 2026-05-18 | 43 HEX literais em `.tsx` (maioria valores KEYRA corretos, mas hard-coded em SVGs de gráfico do `/financeiro`) | Princípio 1 | 🟡 Tech-debt — migrar progressivamente para constantes de token |
+| 2026-06-07 | `preview.html` — headline de seção "A clínica vira financeiro *sozinha*. Você decide com **clareza**." deixava "Você" órfão no fim da linha 1 (o `text-wrap: balance` distribuía palavras entre as duas sentenças); títulos de brand eram left-aligned | Princípio 6 | ✅ Regra refinada — quebra por sentença + títulos centralizados canonizados; `preview.html` e app migrados |
 
-Quando aparecer uma 5ª entrada, é sinal de que o checklist de conformidade não foi seguido.
+Quando aparecer uma 6ª entrada, é sinal de que o checklist de conformidade não foi seguido.
 Revisar e endurecer.

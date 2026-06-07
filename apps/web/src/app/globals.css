@@ -248,6 +248,71 @@
 }
 
 /**
+ * ─── Headline canônica · "sentença por linha" ──────────────────────────────
+ *
+ * Padrão de marca KEYRA (decisão do arquiteto de identidade visual):
+ *   - Headlines com mais de uma frase: cada SENTENÇA é um bloco próprio,
+ *     nunca um `<br>` manual. Sentença longa quebra internamente com
+ *     `text-wrap: balance` (anti-órfã). Hero pode usar VERSO autoral fixo.
+ *   - Títulos de brand (display, h1/h2 de seção, eyebrow, lead curto de hero,
+ *     blockquote, bloco de CTA) são centralizados. Body corrido, listas,
+ *     números/KPI/DRE e tabelas permanecem à esquerda.
+ *   - Três salvaguardas: nenhum heading monopeso (sempre contraste de
+ *     peso/estilo), measure curta (em `ch` — medida tipográfica, não pixel
+ *     mágico), e jamais centralizar o parágrafo corrido.
+ *
+ * Modelo mental: "sentença quebra por estrutura; linha quebra por balance;
+ * <br> não existe."
+ *
+ * Espelha o bloco `.headline`/`.hl-s`/`.hl-line` do brandbook vivo
+ * (docs/brand/03-identity/preview.html). Consumido pelo componente Server
+ * `<Headline>` (components/keyra/Headline.tsx) — sem libs novas, RSC-safe.
+ *
+ * Reference: .claude/rules/design-system.md §Princípio 6 (Lei da Proporção
+ * Espacial) + docs/brand/03-identity/PREVIEW-REFERENCE.md.
+ */
+@layer components {
+  /* Container da headline: centraliza, equilibra e dá measure curta.
+     `--headline-measure` é a measure por nível (display/h1/h2), em `ch`. */
+  .headline-sentences {
+    text-align: center;
+    text-wrap: balance;
+    margin-inline: auto;
+    max-inline-size: var(--headline-measure, 30ch);
+  }
+
+  /* Uma SENTENÇA completa — equilibra a quebra interna, anti-órfã. */
+  .headline-sentences .hl-s {
+    display: block;
+    text-wrap: balance;
+  }
+
+  /* Um VERSO autoral (hero) — quebra deliberada, sem balance cego. */
+  .headline-sentences .hl-line {
+    display: block;
+    text-wrap: nowrap;
+  }
+
+  /* Measure por nível — `ch` acompanha o tamanho de fonte do heading.
+     display/hero ~14-16ch · h2 de seção ~30ch (afrouxa no mobile). */
+  .headline-display {
+    --headline-measure: 16ch;
+  }
+  .headline-title {
+    --headline-measure: 30ch;
+  }
+
+  @media (max-width: 640px) {
+    .headline-display {
+      --headline-measure: 12ch;
+    }
+    .headline-title {
+      --headline-measure: 22ch;
+    }
+  }
+}
+
+/**
  * Story brand.4 (Voice migration): Sonner agora consome `classNames` direto
  * via prop `toastOptions` em layout.tsx (border-left semântica + bg-ivory-100
  * + warm shadow). Override de CSS vars do sonner removido — substituído por

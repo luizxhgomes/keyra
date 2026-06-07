@@ -169,14 +169,18 @@ Sistema completo em [`typography-system.md`](typography-system.md).
 - **Weights extremos** dentro da mesma frase: 200 (thin) com 600/700 (bold) cria drama editorial.
 - **Itálico como sussurro** — *sua* clínica, *este* mês.
 - **`tnum` obrigatório** em qualquer coluna de número financeiro.
+- **Alinhamento centralizado, quebra por sentença.** Todo heading é centralizado; cada sentença completa ocupa a própria linha (nunca `<br>`); body, número e tabela permanecem à esquerda. Detalhe em [`typography-system.md §3.7`](typography-system.md) e na regra-mãe (princípio 6).
 
-### Exemplo canônico (hero)
+### Exemplo canônico (hero · bloco centralizado, verso por linha)
 
 ```
-[Fraunces 200 italic, 96px]    Sua clínica
-[Fraunces 700, 96px]           rendendo mais.
-[Inter 400, 18px]              Sem planilha. Sem domingo perdido. Sem achismo.
+          Sua clínica          ← Fraunces 200 italic, 96px (verso)
+        rendendo mais.         ← Fraunces 700, 96px (verso)
+
+ Sem planilha. Sem domingo perdido. Sem achismo.   ← Inter 400, 18px (tríade junta)
 ```
+
+Bloco inteiro centralizado. Os dois versos do título quebram por estrutura, não por `<br>`. A tríade do sub fica junta (rajada); `text-wrap: balance` cuida da quebra se a tela estreitar. Numa headline de **frases** (não versos), cada sentença vira uma linha: _"A clínica vira financeiro sozinha."_ / _"Você decide com clareza."_
 
 ---
 

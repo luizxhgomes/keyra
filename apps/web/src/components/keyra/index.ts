@@ -8,6 +8,7 @@ export {
   type SkeletonProps,
 } from './Skeleton';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
+export { Headline, type HeadlineProps } from './Headline';
 export { ErrorMessage, type ErrorMessageProps } from './ErrorMessage';
 export { LegalDocument, type LegalDocumentProps } from './LegalDocument';
 export {

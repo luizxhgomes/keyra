@@ -514,6 +514,79 @@ Origem documentada: 7 de maio de 2026, após auditoria do brandbook revelar grid
 
 ---
 
+## 9.ter Lei da Quebra por Sentença + Centralização (REGRA INEGOCIÁVEL)
+
+> **Estabelecida em 7 de junho de 2026.** Enunciado de marca na regra-mãe [`.claude/rules/design-system.md` princípio 6](../../../.claude/rules/design-system.md); racional editorial em [`typography-system.md §3.7`](typography-system.md).
+
+### Princípio macro
+
+Headline não quebra por palavra — quebra por **sentença** (estrutura) e centraliza. Numa headline com mais de uma frase, cada sentença completa é um nó próprio que ocupa a própria linha; dentro de cada nó, `text-wrap: balance` equilibra quando a sentença precisa quebrar em tela estreita. `<br>` manual em heading é proibido. Modelo mental: **"sentença quebra por estrutura; linha quebra por `balance`; `<br>` não existe."**
+
+### Padrão de markup canônico
+
+| Classe | Papel | `display` | `text-wrap` |
+|--------|-------|-----------|-------------|
+| `.headline` | wrapper do heading | `block`, centralizado, com `max-inline-size` (measure) | — |
+| `.hl-s` | uma **sentença** (frase com ponto final) | `block` | `balance` (equilibra dentro da sentença) |
+| `.hl-line` | um **verso** autoral (hero composto) | `block` | normal (quebra deliberada, sem balance) |
+
+`.hl-s` resolve órfão **entre** sentenças (cada uma é nó separado) **e dentro** da sentença (balance). `.hl-line` é só para o hero composto, onde a quebra é intencional (dois pesos diferentes), não uma frase sendo equilibrada.
+
+### CSS template (referência — aplicado em `preview.html` e espelhado no app)
+
+```css
+/* Heading centralizado com measure curta */
+.headline{
+  text-align:center;
+  margin-inline:auto;
+  text-wrap:balance;            /* fallback para sentença única */
+}
+.hl-s{ display:block; text-wrap:balance; }   /* uma sentença por linha */
+.hl-line{ display:block; }                    /* um verso por linha (hero) */
+
+/* Measure (max-inline-size) por nível tipográfico — o vazio lateral é o luxo */
+.headline.is-hero  { max-inline-size:16ch; }  /* display/hero */
+.headline.is-title { max-inline-size:32ch; }  /* h2 de seção */
+```
+
+Markup da headline-teste (era left-aligned + órfão "Você"):
+
+```html
+<h2 class="title headline is-title">
+  <span class="hl-s">A clínica vira financeiro <em>sozinha</em>.</span>
+  <span class="hl-s">Você decide com <strong>clareza</strong>.</span>
+</h2>
+```
+
+### Escopo de centralização (o que centraliza · o que não)
+
+**Centraliza:** display/hero, h1/h2, eyebrow/overline, lead curto de hero (≤2 linhas), blockquote de fechamento, bloco do CTA.
+**À esquerda:** lead/subtítulo longo (>2 linhas), body corrido, listas, números/KPI/DRE, tabelas. Limiar: acima de 2 linhas → esquerda. Lead longo centraliza o **bloco** (`margin-inline:auto` + `max-inline-size`), nunca o texto corrido interno.
+
+### Três salvaguardas (sem as três, vira genérico)
+
+1. Nenhum heading centralizado é **monopeso** — sempre contraste (thin/bold, roman/italic) no bloco.
+2. **Measure curta** obrigatória (~14-18ch hero, ~28-34ch h2) — o vazio lateral é o material caro.
+3. **Nunca** centralizar parágrafo/body corrido.
+
+**Exceção retórica:** enumeração em rajada ("Sem planilha. Sem domingo perdido. Sem achismo.") fica junta por cadência — `balance` quebra se necessário.
+
+### Checklist (rodar antes de aprovar qualquer headline nova)
+
+- [ ] Headline multi-sentença usa um `.hl-s` por frase (nenhum `<br>`)?
+- [ ] O heading está centralizado e com `max-inline-size` (measure) por nível?
+- [ ] Há contraste de peso no bloco (não é monopeso)?
+- [ ] Body/lista/número/tabela permanecem à esquerda?
+- [ ] Em mobile (375px), nenhuma sentença gera órfão (balance ativo)?
+
+**Se alguma resposta for NÃO, a headline não é aprovada para produção.**
+
+### Por que essa lei existe
+
+Origem: 7 de junho de 2026. A idealizadora abriu o brandbook e a headline de seção "A clínica vira financeiro *sozinha*. Você decide com **clareza**." deixava "Você" órfão no fim da primeira linha — o `text-wrap: balance` distribuía as palavras igualmente entre as duas sentenças, em vez de respeitar o limite de frase. Os títulos também eram left-aligned. Esta lei torna a quebra por sentença e a centralização canônicas, eliminando o retrabalho de reequilibrar headlines peça a peça.
+
+---
+
 ## 10. Validação cross-system
 
 Antes de marcar uma tela/peça como "pronta":

@@ -227,6 +227,10 @@ Inegociável. Documentação em [`DESIGN.md` §9.bis](DESIGN.md). Nenhum grid po
 | Direta | Erro, problema | "Sua margem caiu 8%. Veja onde ajustar." |
 | Editorial | Brand, hero, capa | "Sua clínica rendendo mais. Sem planilha. Sem domingo. Sem achismo." |
 
+### 5.7. Quebra por sentença + Centralização
+
+Inegociável. Enunciado de marca na regra-mãe ([`design-system.md` princípio 6](../../../.claude/rules/design-system.md)); técnica em [`DESIGN.md` §9.ter](DESIGN.md); racional editorial em [`typography-system.md §3.7`](typography-system.md). Headline quebra por **sentença** (um `.hl-s` por frase, nunca `<br>`); `text-wrap: balance` equilibra dentro de cada sentença. Todo heading é **centralizado** com measure curta; body/número/tabela ficam à esquerda. Três salvaguardas: não-monopeso · measure curta · nunca centralizar body. Modelo mental: **"sentença quebra por estrutura; linha quebra por `balance`; `<br>` não existe."**
+
 ---
 
 ## 6. Workflow de extensão (quando algo novo precisa existir)

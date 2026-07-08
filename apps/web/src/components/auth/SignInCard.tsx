@@ -103,7 +103,7 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
             Seu link de redefinição expirou.{' '}
             <Link
               href="/esqueci-senha"
-              className="font-semibold underline underline-offset-2 transition-colors hover:text-amber-950"
+              className="font-semibold underline underline-offset-2 transition-colors hover:text-cocoa-900"
             >
               Solicitar um novo
             </Link>
@@ -119,7 +119,7 @@ export function SignInCard({ next, passwordChanged = false, errorCode = null }: 
             Sua sessão de recuperação expirou.{' '}
             <Link
               href="/esqueci-senha"
-              className="font-semibold underline underline-offset-2 transition-colors hover:text-amber-950"
+              className="font-semibold underline underline-offset-2 transition-colors hover:text-cocoa-900"
             >
               Solicitar um novo link
             </Link>

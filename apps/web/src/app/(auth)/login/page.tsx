@@ -4,7 +4,7 @@ import { SignInCard } from '@/components/auth/SignInCard';
 import { getSafeNext } from '@/lib/auth/safe-next';
 
 export const metadata: Metadata = {
-  title: 'Entrar · KEYRA',
+  title: 'Entrar',
   description: 'Acesse sua conta KEYRA com email e senha.',
 };
 
@@ -17,9 +17,9 @@ type LoginPageProps = {
 };
 
 /**
- * Tela de login — visual dark glassmorphism estilo HextaUI adaptado à
- * identidade KEYRA. Story auth.4 visual revamp (Fase B incrementada
- * 2026-05-04).
+ * Tela de login — card claro cream/ivory com estrutura HextaUI adaptada à
+ * identidade KEYRA (paleta quente, Fraunces + dot gold). Story auth.4 visual
+ * revamp (Fase B incrementada 2026-05-04; docstring corrigida na reorg.9).
  *
  * `?next=` preservado pra fluxo de retorno pós-login (convite, etc.).
  * `?password_changed=1` exibe banner verde após reset bem-sucedido (Story auth.5).

@@ -11,11 +11,10 @@ export default async function FinanceiroLayout({ children }: { children: ReactNo
 
   return (
     <div className="space-y-6">
+      {/* O layout é o dono do h1 do módulo (Story reorg.3). A descrição
+          contextual é responsabilidade de cada sub-página. */}
       <header>
         <h1 className="font-serif text-display">Financeiro</h1>
-        <p className="text-sm text-muted-foreground">
-          Transações, receitas, despesas e fluxo de caixa.
-        </p>
       </header>
       <FinanceiroSubNav />
       {children}

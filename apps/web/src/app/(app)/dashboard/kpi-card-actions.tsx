@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Route } from 'next';
 import { ArrowUpRight } from 'lucide-react';
 
 import { KPICard, type KPICardProps } from '@/components/keyra';
@@ -6,7 +7,8 @@ import { cn } from '@/lib/utils';
 
 type Action = {
   label: string;
-  href: string;
+  /** `Route` (typedRoutes): href inexistente vira erro de build — ver Story reorg.1. */
+  href: Route;
   /** 'primary' = filled cocoa, 'secondary' = outline */
   variant?: 'primary' | 'secondary';
 };

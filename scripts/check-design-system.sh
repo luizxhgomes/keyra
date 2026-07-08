@@ -62,6 +62,27 @@ fi
 echo ""
 
 # ---------------------------------------------------------------------------
+# C1b — Shade inexistente em família PARCIALMENTE redefinida (HARD FAIL)
+# `amber` é família KEYRA mas só define 300/400/500 em tailwind.config.ts.
+# Qualquer outro shade (ex.: amber-950) resolve para o amber DEFAULT do
+# Tailwind — paleta proibida vazando em silêncio (Story reorg.9).
+# ---------------------------------------------------------------------------
+echo "── C1b · Shades de amber fora dos tokens (só 300/400/500) ───────"
+C1B_HITS="$(grep -rnE "(${COLOR_PREFIXES})-amber-(50|100|200|600|700|800|900|950)\b" "${SRC_DIR}" --include="*.tsx" 2>/dev/null \
+  | grep -vE "${DROP_COMMENTS}" || true)"
+if [[ -n "${C1B_HITS}" ]]; then
+  echo "🔴 HARD FAIL — shade de amber fora dos tokens KEYRA encontrado:"
+  echo "${C1B_HITS}" | sed 's/^/   /'
+  echo "   → tailwind.config.ts só define amber-300/400/500; outros shades"
+  echo "     resolvem para o amber default do Tailwind. Usar um token KEYRA"
+  echo "     (cocoa, amber-300/400/500, bronze, ...) ou criar o token antes."
+  HARD_FAIL=1
+else
+  echo "✅ Nenhum shade de amber fora dos tokens."
+fi
+echo ""
+
+# ---------------------------------------------------------------------------
 # C2 — Espaçamento arbitrário (HARD FAIL)
 # Tokens são lei: p-[13px], gap-[27px] etc. são proibidos.
 # ---------------------------------------------------------------------------

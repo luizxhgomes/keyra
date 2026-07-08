@@ -72,7 +72,7 @@ export default async function InsumosPage({ searchParams }: PageProps) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-serif text-display text-foreground">Insumos</h2>
+          <h2 className="font-serif text-h2 text-foreground">Insumos</h2>
           <p className="text-sm text-muted-foreground">
             {total} {total === 1 ? 'insumo' : 'insumos'}
             {showArchived ? ' (incluindo arquivados)' : ''}

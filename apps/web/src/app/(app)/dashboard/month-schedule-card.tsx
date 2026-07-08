@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ErrorMessage } from '@/components/keyra';
+import { capitalizarPrimeira } from '@/lib/date';
 import { cn } from '@/lib/utils';
 
 import { getMonthScheduleHeatmap } from './actions';
@@ -38,7 +39,7 @@ export async function MonthScheduleCard() {
     <Card className="@container flex h-full flex-col shadow-warm-sm">
       <CardHeader className="pb-3">
         <div className="flex items-baseline justify-between">
-          <CardTitle className="font-serif text-xl capitalize">{monthLabel}</CardTitle>
+          <CardTitle className="font-serif text-xl">{capitalizarPrimeira(monthLabel)}</CardTitle>
           <span className="text-xs text-muted-foreground">
             {totalAppointments}{' '}
             {totalAppointments === 1 ? 'agendamento' : 'agendamentos'}

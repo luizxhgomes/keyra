@@ -61,7 +61,9 @@ export function TurnstileWidget({ onToken }: { onToken: (token: string) => void 
         callback: (token: string) => onTokenRef.current(token),
         'error-callback': () => onTokenRef.current(''),
         'expired-callback': () => onTokenRef.current(''),
-        theme: 'auto',
+        // Card de auth é sempre claro/cream — 'auto' seguia o dark mode do SO
+        // e renderizava caixa escura destoando do card (Story reorg.9).
+        theme: 'light',
         size: 'flexible',
       });
       return true;

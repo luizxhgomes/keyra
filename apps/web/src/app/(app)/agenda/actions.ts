@@ -489,7 +489,10 @@ export async function createAppointment(
 // ---------------------------------------------------------------------------
 
 export type ChangeAppointmentStatusResult =
-  | { ok: true; data: { id: string; status: AppointmentStatusTo } }
+  | {
+      ok: true;
+      data: { id: string; status: AppointmentStatusTo; commandId?: string };
+    }
   | { ok: false; error: string };
 
 /**
@@ -576,8 +579,28 @@ export async function changeAppointmentStatus(
       return { ok: false, error: `Erro ao atualizar status: ${updateErr.message}` };
     }
 
+    // `to=done`: o trigger `trg_appointments_done_to_command` acabou de criar a
+    // comanda na mesma transação — buscamos o id para o toast oferecer o atalho.
+    let commandId: string | null = null;
+    if (to === 'done') {
+      const { data: cmd } = await supabase
+        .from('commands')
+        .select('id')
+        .eq('appointment_id', parsed.appointmentId)
+        .eq('org_id', orgId)
+        .maybeSingle();
+      commandId = cmd?.id ?? null;
+    }
+
     revalidatePath('/agenda');
-    return { ok: true, data: { id: parsed.appointmentId, status: to } };
+    return {
+      ok: true,
+      data: {
+        id: parsed.appointmentId,
+        status: to,
+        ...(commandId ? { commandId } : {}),
+      },
+    };
   } catch (err) {
     if (err instanceof z.ZodError) {
       const first = err.issues[0];

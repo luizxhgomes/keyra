@@ -95,7 +95,13 @@ export default async function ComandaDetailPage({ params }: PageProps) {
           <CardTitle>Pagamentos</CardTitle>
           <CardDescription>
             Cada pagamento registrado dispara automaticamente uma transação financeira
-            (FR-FI-01) e atualiza o status da comanda.
+            (FR-FI-01) e atualiza o status da comanda.{' '}
+            <Link
+              href="/financeiro/transacoes"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Ver transações →
+            </Link>
           </CardDescription>
         </CardHeader>
         <CardContent>

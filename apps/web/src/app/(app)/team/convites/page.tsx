@@ -110,7 +110,7 @@ export default async function ConvitesPage() {
 function labelForRole(role: MembershipRole): string {
   switch (role) {
     case 'owner':
-      return 'Proprietário';
+      return 'Proprietária';
     case 'admin':
       return 'Administrador';
     case 'professional':

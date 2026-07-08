@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -58,6 +59,7 @@ const STATUS_LABEL: Record<AgendaStatus, string> = {
  * rótulo explícito até a story de edição.
  */
 export function EventDetailSheet({ event, onOpenChange, onChanged }: Props) {
+  const router = useRouter();
   const isOpen = event !== null;
 
   const [confirmDoneOpen, setConfirmDoneOpen] = useState(false);
@@ -79,7 +81,17 @@ export function EventDetailSheet({ event, onOpenChange, onChanged }: Props) {
         to: 'done',
       });
       if (result.ok) {
-        toast.success('Atendimento concluído. Comanda gerada automaticamente.');
+        const commandId = result.data.commandId;
+        toast.success('Atendimento concluído. Comanda gerada automaticamente.', {
+          ...(commandId
+            ? {
+                action: {
+                  label: 'Abrir comanda',
+                  onClick: () => router.push(`/comandas/${commandId}`),
+                },
+              }
+            : {}),
+        });
         setConfirmDoneOpen(false);
         onChanged();
         onOpenChange(false);

@@ -5,7 +5,7 @@ import { NewPasswordCard } from '@/components/auth/NewPasswordCard';
 import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Redefinir senha · KEYRA',
+  title: 'Redefinir senha',
   description: 'Escolha uma senha nova para sua conta KEYRA.',
 };
 

@@ -82,7 +82,7 @@ export default async function ConfiguracoesPage() {
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="font-serif text-display-hero text-foreground">Configurações</h1>
+        <h1 className="font-serif text-display text-foreground">Configurações</h1>
         <p className="text-sm text-muted-foreground">Conta, organização e acesso.</p>
       </header>
 
@@ -106,6 +106,12 @@ export default async function ConfiguracoesPage() {
                     {statusLabel}
                   </Badge>
                 )}
+                <Link
+                  href="/configuracoes/plano"
+                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  Ver planos →
+                </Link>
               </span>
             }
           />

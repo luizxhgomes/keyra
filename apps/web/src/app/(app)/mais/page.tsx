@@ -36,9 +36,9 @@ import { requireAuth } from '@/lib/auth/require-auth';
 const ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, hint: 'Visão única do mês' },
   { href: '/agenda', label: 'Agenda', icon: Calendar, hint: 'Agendamentos do dia' },
-  { href: '/comandas', label: 'Comandas', icon: Receipt, hint: 'Registro de atendimentos' },
-  { href: '/pacientes', label: 'Pacientes', icon: Users, hint: 'Cadastro e histórico' },
-  { href: '/servicos', label: 'Serviços', icon: Sparkles, hint: 'Catálogo e preços' },
+  { href: '/comandas', label: 'Atendimentos', icon: Receipt, hint: 'Comandas e registros' },
+  { href: '/pacientes', label: 'Clientes', icon: Users, hint: 'Cadastro e histórico' },
+  { href: '/servicos', label: 'Catálogo', icon: Sparkles, hint: 'Serviços e preços' },
   { href: '/financeiro', label: 'Financeiro', icon: Wallet, hint: 'Receitas, despesas, DRE' },
   { href: '/estoque', label: 'Estoque', icon: Package, hint: 'Insumos e movimentação' },
   { href: '/team', label: 'Time', icon: UserCog, hint: 'Profissionais e convites' },
@@ -51,7 +51,7 @@ export default async function MaisPage() {
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="font-serif text-display-hero text-foreground">Mais</h1>
+        <h1 className="font-serif text-display text-foreground">Mais</h1>
         <p className="text-sm text-muted-foreground">
           Tudo que existe no KEYRA, num só lugar.
         </p>

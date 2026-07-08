@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ComparativoTexto, ErrorMessage } from '@/components/keyra';
+import { capitalizarPrimeira } from '@/lib/date';
 import { formatBRL } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -70,8 +71,8 @@ export default async function DrePage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h2 className="font-serif text-display text-foreground capitalize">
-          DRE · {periodLabel}
+        <h2 className="font-serif text-h2 text-foreground">
+          DRE · {capitalizarPrimeira(periodLabel)}
         </h2>
         <p className="text-sm text-muted-foreground">
           Demonstrativo do Resultado do Exercício. Compare absoluto com o mês

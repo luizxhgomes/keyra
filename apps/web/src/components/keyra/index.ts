@@ -7,6 +7,13 @@ export {
   TableSkeleton,
   type SkeletonProps,
 } from './Skeleton';
+export {
+  StatCard,
+  StatCardsSection,
+  type StatCardProps,
+  type StatIconKey,
+  type StatAccent,
+} from './StatCard';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Headline, type HeadlineProps } from './Headline';
 export { ErrorMessage, type ErrorMessageProps } from './ErrorMessage';

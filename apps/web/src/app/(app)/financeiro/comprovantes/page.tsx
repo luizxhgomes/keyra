@@ -16,7 +16,7 @@ export default async function ComprovantesPage() {
   return (
     <section className="space-y-6">
       <div>
-        <h2 className="font-serif text-2xl text-foreground">Comprovantes</h2>
+        <h2 className="font-serif text-h2 text-foreground">Comprovantes</h2>
         <p className="text-sm text-muted-foreground">
           Anexe um comprovante — uma foto, um print ou um PDF. A IA lê os dados e você confirma o
           lançamento. O arquivo fica guardado com segurança.

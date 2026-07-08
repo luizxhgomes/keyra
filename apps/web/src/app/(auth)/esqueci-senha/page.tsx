@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { RequestResetCard } from '@/components/auth/RequestResetCard';
 
 export const metadata: Metadata = {
-  title: 'Esqueci minha senha · KEYRA',
+  title: 'Esqueci minha senha',
   description: 'Receba um link no seu e-mail para redefinir a senha do KEYRA.',
 };
 

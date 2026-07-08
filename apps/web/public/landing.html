@@ -185,6 +185,14 @@ section:first-of-type{border-top:none}
   transition:background-color var(--d-fast) var(--e-out-soft);
 }
 .toc-cta:hover{background:var(--cta-primary-hover);color:var(--cta-primary-fg) !important}
+.toc-login{
+  font-family:var(--font-sans);font-weight:500;font-size:14px;
+  padding:10px 14px;border-radius:8px;
+  color:var(--cocoa-900) !important;border:1px solid var(--mocha-300);
+  transition:border-color var(--d-fast) var(--e-out-soft),
+             background-color var(--d-fast) var(--e-out-soft);
+}
+.toc-login:hover{background:var(--ivory-100);border-color:var(--cocoa-700)}
 
 /* ─── Hero ─── */
 .hero{
@@ -610,7 +618,7 @@ footer a:hover{color:var(--ivory-50)}
   section{padding:var(--space-16) 0}
   .shell{padding:0 var(--space-6)}
   .toc{padding:14px var(--space-6);gap:var(--space-4)} /* 14px: exceção editorial */
-  .toc a:not(.toc-brand):not(.toc-cta){display:none}
+  .toc a:not(.toc-brand):not(.toc-cta):not(.toc-login){display:none}
   .chain{padding:var(--space-10) var(--space-8)}
   .guarantee{padding:var(--space-12) var(--space-8)}
   .btn-row{flex-direction:column;align-items:stretch}
@@ -687,6 +695,7 @@ footer a:hover{color:var(--ivory-50)}
   <a href="#mecanismo">como funciona</a>
   <a href="#planos">planos</a>
   <a href="#garantia">garantia</a>
+  <a href="/login" class="toc-login">Entrar</a>
   <a href="#planos" class="toc-cta">Começar agora</a>
 </nav>
 
@@ -1016,7 +1025,7 @@ footer a:hover{color:var(--ivory-50)}
       <span class="guarantee-meta">Garantia incondicional</span>
       <h2>Risco zero. <strong>Por escrito.</strong></h2>
       <p><b>Para Essencial e Profissional:</b> 7 dias de teste grátis. Cancelamento direto do app, em três cliques. Sem cobrança no período.</p>
-      <p><b>Para Mentora:</b> garantia incondicional de 30 dias. Não funcionou? Manda um email. Devolvemos 100%. Sem formulário, sem ligação de retenção, sem "vamos tentar mais uma semana".</p>
+      <p><b>Para o Executive:</b> garantia incondicional de 30 dias. Não funcionou? Manda um email. Devolvemos 100%. Sem formulário, sem ligação de retenção, sem "vamos tentar mais uma semana".</p>
       <p style="margin-top:24px"><em>Os dados são seus.</em> Você leva embora todos os relatórios, DREs e dados em CSV. Para o seu contador, para sua planilha, para onde quiser.</p>
     </div>
   </div>
@@ -1056,7 +1065,6 @@ footer a:hover{color:var(--ivory-50)}
     &nbsp;·&nbsp;
     <a href="https://usekeyra.com">usekeyra.com</a>
   </p>
-  <p style="margin-top:24px;font-size:11px;color:var(--bronze-400);letter-spacing:0.08em;text-transform:uppercase">Sales page · v1 · maio 2026</p>
 </footer>
 
 <script>

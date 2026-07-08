@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { capitalizarPrimeira } from '@/lib/date';
 import { formatCentsBRL } from '@/lib/money';
 import { cn } from '@/lib/utils';
 
@@ -70,8 +71,8 @@ export function VarianceTable({ months }: Props) {
                       className="border-b border-mocha-300/20"
                     >
                       <Td>
-                        <span className="font-medium capitalize text-foreground">
-                          {m.monthLabel}
+                        <span className="font-medium text-foreground">
+                          {capitalizarPrimeira(m.monthLabel)}
                         </span>
                       </Td>
                       <Td align="right" mono>

@@ -80,6 +80,14 @@ export default async function TransacoesPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h2 className="font-serif text-h2 text-foreground">Transações</h2>
+        <p className="text-sm text-muted-foreground">
+          Histórico de tudo que entrou e saiu — cada pagamento de comanda vira
+          uma linha aqui, sozinho.
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SummaryCell label="Entradas (período)" value={formatBRL(totalCredit)} positive />
         <SummaryCell label="Saídas (período)" value={formatBRL(totalDebit)} />

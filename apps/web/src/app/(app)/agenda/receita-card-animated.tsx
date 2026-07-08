@@ -4,6 +4,7 @@ import { m } from 'framer-motion';
 import { CalendarDays, CalendarRange, Sun } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
+import { capitalizarPrimeira } from '@/lib/date';
 import { variants } from '@/lib/motion/tokens';
 import { formatBRL } from '@/lib/money';
 
@@ -105,8 +106,8 @@ function ReceitaCell({
           <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
             {bucket}
           </p>
-          <p className="truncate text-xs capitalize text-muted-foreground">
-            {contextLabel}
+          <p className="truncate text-xs text-muted-foreground">
+            {capitalizarPrimeira(contextLabel)}
           </p>
           <p className="mt-1 font-serif text-2xl font-light leading-none tracking-tight text-foreground tabular-nums">
             {formatBRL(value)}

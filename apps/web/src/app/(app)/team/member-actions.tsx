@@ -29,7 +29,7 @@ type Props = {
 };
 
 const ROLE_LABEL: Record<MembershipRole, string> = {
-  owner: 'Proprietário',
+  owner: 'Proprietária',
   admin: 'Administrador',
   professional: 'Profissional',
   viewer: 'Espectador',

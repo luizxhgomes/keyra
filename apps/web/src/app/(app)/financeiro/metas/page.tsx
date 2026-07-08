@@ -37,7 +37,7 @@ export default async function MetasPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="font-serif text-display text-foreground">Metas · {year}</h2>
+        <h2 className="font-serif text-h2 text-foreground">Metas · {year}</h2>
         <p className="text-sm text-muted-foreground">
           Defina metas mensais de receita, lucro e atendimentos. Compare com o
           realizado mês a mês.

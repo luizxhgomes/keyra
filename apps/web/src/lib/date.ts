@@ -28,3 +28,15 @@ export const formatMonthYear = (value: DateLike): string =>
 /** Useful for "há 5 minutos" / "ontem" copy in alert cards and logs. */
 export const formatRelative = (value: DateLike): string =>
   formatDistanceToNow(toDate(value), { addSuffix: true, locale: ptBR });
+
+/**
+ * Capitaliza APENAS o primeiro caractere alfabético da string, preservando o
+ * restante — "quarta, 8 de jul." → "Quarta, 8 de jul.".
+ *
+ * Substitui a classe CSS `capitalize` sobre datas do date-fns: em pt-BR as
+ * preposições ficam minúsculas ("8 de jul", nunca "8 De Jul") e o `capitalize`
+ * do Tailwind capitaliza toda palavra (Story reorg.3). Labels que começam por
+ * dígito ("6 – 12 de jul.") voltam intactos — comportamento correto para ranges.
+ */
+export const capitalizarPrimeira = (s: string): string =>
+  s.charAt(0).toUpperCase() + s.slice(1);

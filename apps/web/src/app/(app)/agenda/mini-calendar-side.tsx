@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { capitalizarPrimeira } from '@/lib/date';
 import { cn } from '@/lib/utils';
 
 import { getMonthCounts, type AgendaMonthCounts } from './actions';
@@ -115,8 +116,8 @@ export function MiniCalendarSide({
       <Card className="shadow-warm-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-serif text-base capitalize">
-              {monthLabel}
+            <CardTitle className="font-serif text-base">
+              {capitalizarPrimeira(monthLabel)}
             </CardTitle>
             <div className="flex items-center gap-1">
               <button

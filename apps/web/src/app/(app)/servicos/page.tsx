@@ -100,7 +100,6 @@ export default async function ServicosPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="font-serif text-display text-foreground">Catálogo</h1>
         <p className="text-sm text-muted-foreground">
           Serviços e produtos que você oferece. Acompanhe ativos, categorias e
           variações desde o mês passado.

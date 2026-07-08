@@ -133,7 +133,7 @@ export default async function PlanoPage() {
           Configurações
         </Link>
         <div>
-          <h1 className="font-serif text-display-hero text-foreground">Planos</h1>
+          <h1 className="font-serif text-display text-foreground">Planos</h1>
           <p className="text-sm text-muted-foreground">
             A trilha de evolução da KEYRA, do essencial ao crescimento com autoridade.
           </p>

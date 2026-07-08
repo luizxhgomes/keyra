@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { capitalizarPrimeira } from '@/lib/date';
 import { cn } from '@/lib/utils';
 
 import type { AgendaProfessional, AgendaStatus } from './actions';
@@ -99,8 +100,8 @@ export function AgendaToolbar({
           <Button type="button" variant="outline" onClick={onToday}>
             Hoje
           </Button>
-          <h2 className="ml-2 font-serif text-lg capitalize text-foreground sm:text-xl">
-            {title}
+          <h2 className="ml-2 font-serif text-lg text-foreground sm:text-xl">
+            {capitalizarPrimeira(title)}
           </h2>
         </div>
 

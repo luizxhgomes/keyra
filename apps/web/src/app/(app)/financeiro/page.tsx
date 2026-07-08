@@ -43,7 +43,6 @@ export default async function FinanceiroHubPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="font-serif text-display text-foreground">Financeiro</h1>
         <p className="text-sm text-muted-foreground">
           Visão consolidada do mês — receita, despesas, comandas em aberto e
           breakdown por categoria.

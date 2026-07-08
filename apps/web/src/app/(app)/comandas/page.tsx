@@ -86,13 +86,13 @@ export default async function ComandasPage({ searchParams }: PageProps) {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="font-serif text-display text-foreground">Comandas</h1>
+        <h1 className="font-serif text-display text-foreground">Atendimentos</h1>
         <p className="text-sm text-muted-foreground">
           {total} {total === 1 ? 'comanda' : 'comandas'}
           {statusParam !== 'all'
             ? ` no filtro "${STATUS_LABEL[statusParam]}"`
             : ''}
-          . As comandas nascem automaticamente ao concluir um atendimento na
+          . A comanda de cada atendimento nasce automaticamente ao concluir na
           agenda.
         </p>
       </header>
@@ -155,7 +155,7 @@ export default async function ComandasPage({ searchParams }: PageProps) {
               title={
                 statusParam !== 'all'
                   ? 'Nada nesse filtro'
-                  : 'Você ainda não tem comandas'
+                  : 'Você ainda não tem atendimentos registrados'
               }
               description={
                 statusParam !== 'all'

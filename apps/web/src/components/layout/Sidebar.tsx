@@ -34,9 +34,12 @@ import { cn } from '@/lib/utils';
  * - **Sticky top-0 h-screen** — não some mais ao fazer scroll do conteúdo.
  * - **Toggle minimizar** — usuária pode colapsar para barra estreita só com
  *   ícones. Estado persistido em localStorage (`keyra:sidebar-collapsed`).
- * - **Renames**: "Pacientes" → "Clientes", "Comandas" → "Serviços",
- *   "Serviços" → "Catálogo" (decisão da idealizadora; URLs mantidas para
- *   não quebrar links salvos).
+ *
+ * Taxonomia canônica 2026-07-08 (Story reorg.2): "Atendimentos" (/comandas) ·
+ * "Clientes" (/pacientes) · "Catálogo" (/servicos). Reverte o rename de
+ * 2026-05-02 que chamava /comandas de "Serviços" — a mesma palavra apontava
+ * para /servicos na tela /mais, colidindo. URLs mantidas para não quebrar
+ * links salvos; "comanda" segue como termo de domínio no corpo dos textos.
  *
  * Story 6.5 (AC1) — 7 itens primários + 2 secundários (Time, Configurações)
  * separados por `border-t border-border`.
@@ -44,7 +47,7 @@ import { cn } from '@/lib/utils';
 const NAV_PRIMARY = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agenda', label: 'Agenda', icon: Calendar },
-  { href: '/comandas', label: 'Serviços', icon: Receipt },
+  { href: '/comandas', label: 'Atendimentos', icon: Receipt },
   { href: '/pacientes', label: 'Clientes', icon: Users },
   { href: '/servicos', label: 'Catálogo', icon: Sparkles },
   { href: '/financeiro', label: 'Financeiro', icon: Wallet },

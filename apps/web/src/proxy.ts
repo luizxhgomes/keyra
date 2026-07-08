@@ -11,16 +11,19 @@ type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
 /**
  * Authenticated route prefixes. Anything matching these is blocked for
- * anonymous visitors and gets redirected to /login. Exact list mirrors the
- * Sidebar / BottomNav items (see `docs/ux/wireframes/05-navegacao.md`).
+ * anonymous visitors and gets redirected to /login. Cobre TODAS as rotas do
+ * grupo (app) — Sidebar, BottomNav e /mais (Story reorg.2 sincronizou a lista;
+ * o `requireAuth()` dos layouts segue como defesa definitiva).
  */
 const PROTECTED_PREFIXES = [
   '/dashboard',
   '/agenda',
+  '/comandas',
   '/pacientes',
   '/servicos',
   '/financeiro',
   '/estoque',
+  '/team',
   '/configuracoes',
   '/mais',
 ] as const;

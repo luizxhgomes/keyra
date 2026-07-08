@@ -70,17 +70,21 @@ body{
 h1, h2, h3, h4,
 .title, .subtitle,
 .plan-name, .plan-tagline,
-.timeline-step h4,
+.timeline-step h3,
 .chain h3,
-.guarantee h3,
+.guarantee h2,
 .cta-final h2,
 .cta-final p,
 .lead-quote,
 .ps-quote,
-.empty h4,
 .hero h1, .hero p.hero-sub{
   text-wrap:balance;
 }
+
+/* Quebra por sentença (regra-mãe §6): cada sentença de uma headline
+   multi-sentença é um nó próprio; o balance equilibra DENTRO da sentença.
+   Espelho de globals.css .headline-sentences/.hl-s (Story reorg.6). */
+.hl-s{display:block;text-wrap:balance}
 p, li, .lead, .app-msg, .pricing-note p, .ps-block p, .cost-card{
   text-wrap:pretty;
 }
@@ -101,13 +105,24 @@ section:first-of-type{border-top:none}
   display:inline-flex;align-items:center;gap:14px;
 }
 .eyebrow::before{content:"";width:32px;height:1px;background:var(--gold-500)}
+/* Eyebrow de seção (filho direto do .shell): centralizado com dashes
+   simétricos — padrão canônico do preview.html §5.7. Os eyebrows internos
+   aos ui-cards permanecem à esquerda (camada de componente). */
+.shell>.eyebrow{
+  display:flex;justify-content:center;
+  width:fit-content;margin-inline:auto;
+}
+.shell>.eyebrow::after{content:"";width:32px;height:1px;background:var(--gold-500)}
 
+/* Título de seção: centralizado, bloco com measure curta (regra-mãe §6 —
+   títulos centralizados + measure ~28-34ch em h2 de seção). */
 .title{
   font-family:var(--font-serif);font-weight:300;
   font-size:clamp(36px,4.4vw,60px);
   line-height:1.08;letter-spacing:-0.02em;
   color:var(--cocoa-900);margin-bottom:24px;
-  max-width:24ch;
+  max-width:28ch;
+  margin-inline:auto;text-align:center;
 }
 .title strong{font-weight:700}
 .title em{font-weight:200;font-style:italic;color:var(--bronze-500)}
@@ -118,9 +133,12 @@ section:first-of-type{border-top:none}
   line-height:1.4;
 }
 
+/* Texto corrido: BLOCO centralizado (margin-inline:auto), texto interno à
+   esquerda — distribui o vazio nas telas largas sem centralizar parágrafo. */
 .lead{
   font-size:17px;color:var(--cocoa-800);margin-bottom:20px;
   max-width:62ch;line-height:1.7;
+  margin-inline:auto;
 }
 .lead strong{color:var(--cocoa-900);font-weight:600}
 .lead em{font-style:italic;font-weight:300}
@@ -131,7 +149,7 @@ section:first-of-type{border-top:none}
   color:var(--cocoa-800);
   border-left:2px solid var(--gold-500);
   padding:8px 0 8px 28px;
-  margin:32px 0;max-width:34ch;
+  margin:32px auto;max-width:34ch;
 }
 
 /* ─── Header / TOC sticky ─── */
@@ -187,6 +205,7 @@ section:first-of-type{border-top:none}
   color:var(--cocoa-900);margin-bottom:28px;
   font-weight:700;max-width:30ch;
   text-wrap:balance;
+  margin-inline:auto;text-align:center;
 }
 .hero h1 .thin{font-weight:200;font-style:italic;color:var(--bronze-500)}
 .hero h1 .dot{color:var(--gold-500)}
@@ -195,7 +214,9 @@ section:first-of-type{border-top:none}
   font-size:clamp(17px,1.5vw,19px);
   color:var(--cocoa-700);max-width:58ch;line-height:1.6;
   margin-bottom:40px;
+  margin-inline:auto;
 }
+.hero .btn-row{justify-content:center}
 .hero p.hero-sub em{font-family:var(--font-serif);font-style:italic;font-weight:300;color:var(--cocoa-900)}
 /* ─── Botões (do brandbook) ─── */
 .btn{
@@ -266,7 +287,7 @@ section:first-of-type{border-top:none}
   font-size:64px;line-height:1;color:var(--gold-500);
   margin-bottom:16px;
 }
-.timeline-step h4{
+.timeline-step h3{
   font-family:var(--font-serif);font-weight:600;font-size:24px;
   color:var(--cocoa-900);margin-bottom:12px;
 }
@@ -307,6 +328,7 @@ section:first-of-type{border-top:none}
   list-style:none;padding:0;margin-top:32px;
   display:grid;grid-template-columns:1fr;gap:0;
   max-width:68ch;
+  margin-inline:auto;
 }
 .bullets li{
   font-size:17px;line-height:1.7;color:var(--cocoa-800);
@@ -473,6 +495,7 @@ section:first-of-type{border-top:none}
   border-radius:8px;
   font-size:15px;color:var(--cocoa-800);line-height:1.7;
   max-width:72ch;
+  margin-inline:auto;
 }
 .pricing-note b{color:var(--cocoa-900);font-weight:600}
 .pricing-note em{font-style:italic;color:var(--bronze-500)}
@@ -516,12 +539,12 @@ section:first-of-type{border-top:none}
   color:var(--bronze-500);
   margin-bottom:32px;
 }
-.guarantee h3{
+.guarantee h2{
   font-family:var(--font-serif);font-weight:300;
   font-size:clamp(28px,3.4vw,42px);
   color:var(--cocoa-900);margin-bottom:24px;line-height:1.15;letter-spacing:-0.02em;
 }
-.guarantee h3 strong{font-weight:700}
+.guarantee h2 strong{font-weight:700}
 .guarantee p{
   max-width:58ch;margin:0 auto 16px;
   font-size:16px;color:var(--cocoa-800);line-height:1.7;
@@ -722,8 +745,8 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Para a empresária que decidiu, hoje, parar de adiar</div>
     <h1 class="reveal">
-      Sua clínica <em>atendendo bem</em>, há meses<span class="dot">.</span>
-      <span class="thin">Sua planilha,</span> parada no mesmo lugar<span class="dot">.</span>
+      <span class="hl-s">Sua clínica <em>atendendo bem</em>, há meses<span class="dot">.</span></span>
+      <span class="hl-s"><span class="thin">Sua planilha,</span> parada no mesmo lugar<span class="dot">.</span></span>
     </h1>
     <p class="hero-sub reveal">
       A KEYRA é onde o financeiro da sua clínica <em>recomeça do zero</em>. Não na planilha. Não no caderno. Não na madrugada cruzando dado a mão. Recomeça aqui dentro, a partir da próxima comanda fechada. Sem você precisar lançar nada.
@@ -808,25 +831,25 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 03 · Como você começa do zero</div>
     <h2 class="title reveal">
-      A reorganização da sua clínica
-      <em>não é projeto.</em> É <strong>uma decisão tomada hoje.</strong>
+      <span class="hl-s">A reorganização da sua clínica <em>não é projeto.</em></span>
+      <span class="hl-s">É <strong>uma decisão tomada hoje.</strong></span>
     </h2>
     <p class="lead reveal">Você não precisa "primeiro arrumar a planilha". Não precisa esperar fechar o mês. Não precisa estudar finanças. Você precisa de uma chave que ligue tudo: o atendimento à comanda, a comanda ao pagamento, o pagamento ao DRE, o DRE à decisão. Essa chave existe.</p>
 
     <div class="timeline reveal">
       <div class="timeline-step">
         <div class="step-no">01.</div>
-        <h4>Hoje à noite</h4>
+        <h3>Hoje à noite</h3>
         <p>Sua agenda da semana já está dentro da KEYRA. As comandas começam a nascer sozinhas, sem cadastro manual.</p>
       </div>
       <div class="timeline-step">
         <div class="step-no">02.</div>
-        <h4>Em 7 dias</h4>
+        <h3>Em 7 dias</h3>
         <p>Você tem o primeiro DRE real da sua clínica. Não estimativa, não projeção. Real, com números absolutos.</p>
       </div>
       <div class="timeline-step">
         <div class="step-no">03.</div>
-        <h4>Em 30 dias</h4>
+        <h3>Em 30 dias</h3>
         <p>Você fecha o primeiro mês olhando uma tela de celular. Em reais. Sem planilha. Sem caderno. Sem pedir relatório pra ninguém.</p>
       </div>
     </div>
@@ -838,8 +861,8 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 04 · Por que ninguém fez isso antes</div>
     <h2 class="title reveal">
-      Os outros sistemas resolveram <em>agenda</em>.
-      A KEYRA resolve a <strong>linha contínua.</strong>
+      <span class="hl-s">Os outros sistemas resolveram <em>agenda</em>.</span>
+      <span class="hl-s">A KEYRA resolve a <strong>linha contínua.</strong></span>
     </h2>
     <p class="lead reveal">Quando o cliente paga num sistema comum, o atendimento é marcado como "feito". Ponto. O dado financeiro fica numa segunda camada (em outra tela, em outro relatório, em outro fornecedor) e cabe a você cruzar manualmente. <strong>A KEYRA inverte essa lógica.</strong></p>
 
@@ -849,7 +872,7 @@ footer a:hover{color:var(--ivory-50)}
       <div class="ui-card-inner">
         <div class="ui-card-copy">
           <div class="eyebrow">O financeiro que nasce sozinho</div>
-          <h2 class="ui-card-title">Do atendimento ao lucro, sem você lançar nada.</h2>
+          <h3 class="ui-card-title">Do atendimento ao lucro, sem você lançar nada.</h3>
           <p class="ui-card-lead">Receita, despesas e fluxo de caixa do mês se montam sozinhos a partir das comandas fechadas. Você só abre e lê — em reais, na hora.</p>
           <div class="ui-card-stats">
             <div><b>R$ 9.910</b><span>Receita do mês</span></div>
@@ -867,7 +890,10 @@ footer a:hover{color:var(--ivory-50)}
     </article>
 
     <div class="chain reveal">
-      <h3>Na KEYRA, o financeiro <strong>nasce</strong> da operação. Não é cadastro. Não é lançamento manual.</h3>
+      <h3>
+        <span class="hl-s">Na KEYRA, o financeiro <strong>nasce</strong> da operação.</span>
+        <span class="hl-s">Não é cadastro. Não é lançamento manual.</span>
+      </h3>
       <div class="chain-flow">
         <b>Atendimento</b><span class="arrow">→</span>
         <b>Comanda</b><span class="arrow">→</span>
@@ -911,7 +937,7 @@ footer a:hover{color:var(--ivory-50)}
       <div class="ui-card-inner">
         <div class="ui-card-copy">
           <div class="eyebrow">Capítulo 06 · Como você vê no app</div>
-          <h2 class="ui-card-title">Sua controladoria inteira. Numa tela só.</h2>
+          <h3 class="ui-card-title">Sua controladoria inteira. Numa tela só.</h3>
           <p class="ui-card-lead">Receita, despesa e lucro do mês em números absolutos — e o DRE proporcional mostrando, em segundos, quanto da sua receita virou lucro. Tudo nascendo sozinho da operação.</p>
           <div class="ui-card-stats">
             <div><b>R$ 9.910</b><span>Receita do mês</span></div>
@@ -936,8 +962,8 @@ footer a:hover{color:var(--ivory-50)}
   <div class="shell">
     <div class="eyebrow reveal">Capítulo 07 · Como você entra</div>
     <h2 class="title reveal">
-      Três caminhos para começar<span style="color:var(--gold-500)">.</span>
-      <em>Um destino.</em>
+      <span class="hl-s">Três caminhos para começar<span style="color:var(--gold-500)">.</span></span>
+      <span class="hl-s"><em>Um destino.</em></span>
     </h2>
     <p class="lead reveal">A diferença entre os três planos não é "quanto software você ganha". Todos têm a Cadeia Viva, todos têm DRE em tempo real, todos rodam sua agenda. <strong>A diferença é quanto da reorganização vem com você sozinha, e quanto vem com mentora ao lado.</strong></p>
 
@@ -1038,7 +1064,7 @@ footer a:hover{color:var(--ivory-50)}
         </div>
       </div>
       <span class="guarantee-meta">Garantia incondicional</span>
-      <h3>Risco zero. <strong>Por escrito.</strong></h3>
+      <h2>Risco zero. <strong>Por escrito.</strong></h2>
       <p><b>Para Essencial e Profissional:</b> 7 dias de teste grátis. Cancelamento direto do app, em três cliques. Sem cobrança no período.</p>
       <p><b>Para Mentora:</b> garantia incondicional de 30 dias. Não funcionou? Manda um email. Devolvemos 100%. Sem formulário, sem ligação de retenção, sem "vamos tentar mais uma semana".</p>
       <p style="margin-top:24px"><em>Os dados são seus.</em> Você leva embora todos os relatórios, DREs e dados em CSV. Para o seu contador, para sua planilha, para onde quiser.</p>

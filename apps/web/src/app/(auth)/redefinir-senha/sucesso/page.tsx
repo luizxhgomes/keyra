@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { JourneyProgress } from '@/components/auth/JourneyProgress';
 
 export const metadata: Metadata = {
-  title: 'Senha alterada · KEYRA',
+  title: 'Senha alterada',
   description: 'Sua nova senha foi salva. Faça login para continuar.',
 };
 

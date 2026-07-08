@@ -106,6 +106,12 @@ export default async function ConfiguracoesPage() {
                     {statusLabel}
                   </Badge>
                 )}
+                <Link
+                  href="/configuracoes/plano"
+                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  Ver planos →
+                </Link>
               </span>
             }
           />

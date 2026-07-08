@@ -4,7 +4,7 @@ import { SignInCard } from '@/components/auth/SignInCard';
 import { getSafeNext } from '@/lib/auth/safe-next';
 
 export const metadata: Metadata = {
-  title: 'Entrar · KEYRA',
+  title: 'Entrar',
   description: 'Acesse sua conta KEYRA com email e senha.',
 };
 

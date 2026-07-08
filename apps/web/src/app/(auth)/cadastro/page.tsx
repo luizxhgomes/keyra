@@ -4,7 +4,7 @@ import { SignUpCard } from '@/components/auth/SignUpCard';
 import { getCurrentUser } from '@/lib/auth/get-current-user';
 
 export const metadata = {
-  title: 'Criar conta · KEYRA',
+  title: 'Criar conta',
   description: 'Crie sua conta KEYRA — gestão financeira para clínicas de estética',
 };
 

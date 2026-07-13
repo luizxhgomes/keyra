@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
+import { KeyraLogo } from '@/components/brand/KeyraLogo';
 import { getActiveOrgId, getCurrentUser } from '@/lib/auth/get-current-user';
 
 import { OnboardingForm } from './onboarding-form';
@@ -38,11 +39,8 @@ export default async function OnboardingPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center gap-2 text-center">
-          <Link
-            href="/"
-            className="font-serif text-4xl font-bold tracking-tight text-cocoa-900"
-          >
-            KEYRA<span className="text-gold-500">.</span>
+          <Link href="/" aria-label="KEYRA — voltar ao início">
+            <KeyraLogo variant="primary" theme="light" height={48} />
           </Link>
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
             Onboarding · passo 1 de 1

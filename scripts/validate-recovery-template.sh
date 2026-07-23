@@ -4,12 +4,13 @@
 # =============================================================================
 # Smoke programático que valida em prod (idempotente, sem side-effect):
 #   - mailer_subjects_recovery == "Redefinir sua senha do KEYRA"
-#   - mailer_templates_recovery_content contém substrings críticas:
-#       - "Redefinir minha senha"  (botão CTA)
-#       - "#c66a38"                (cor primary KEYRA)
-#       - "{{ .ConfirmationURL }}" (placeholder Supabase)
-#       - "30 minutos"             (alinhado com mailer_otp_exp=1800)
-#       - "KEYRA"                  (wordmark)
+#   - mailer_templates_recovery_content contém substrings críticas (v3.0 brand-aligned):
+#       - "Criar nova senha"        (botão CTA — voz Mentora v3.0)
+#       - "#B8612B" ou "#b8612b"    (terracotta-600 — cor canônica brand v1.0)
+#       - "Fraunces"                (mistura tipográfica brand)
+#       - "token_hash="             (token hash flow para SSR)
+#       - "30 minutos"              (alinhado com mailer_otp_exp=1800)
+#       - "KEYRA"                   (wordmark)
 #
 # Cobre o smoke #6 da fiscalização ("Email de recovery chega com identidade
 # KEYRA" — AC7 da auth.5).
@@ -99,13 +100,14 @@ assert_contains() {
 log ""
 log "🧪 Validações:"
 assert_equals "Subject" "${EXPECTED_SUBJECT}" "${GOT_SUBJECT}"
-assert_contains "CTA do botão"               "Redefinir minha senha"                                   "${GOT_CONTENT}"
-assert_contains "Cor primary KEYRA"          "#c66a38"                                                 "${GOT_CONTENT}"
-assert_contains "Token hash flow (SSR)"      "token_hash={{ .TokenHash }}&type=recovery"               "${GOT_CONTENT}"
-assert_contains "URL custom KEYRA"           "https://usekeyra.com/auth/callback"                      "${GOT_CONTENT}"
-assert_contains "Disclaimer 30 min"          "30 minutos"                                              "${GOT_CONTENT}"
-assert_contains "Wordmark"                   "KEYRA"                                                   "${GOT_CONTENT}"
-assert_contains "Tamanho mínimo HTML"        "<!doctype html>"                                         "${GOT_CONTENT}"
+assert_contains "CTA do botão (v3.0 voz Mentora)" "Criar nova senha"                                  "${GOT_CONTENT}"
+assert_contains "Terracotta-600 canônica (brand)" "#B8612B"                                           "${GOT_CONTENT}"
+assert_contains "Tipografia brand (Fraunces)"     "Fraunces"                                          "${GOT_CONTENT}"
+assert_contains "Token hash flow (SSR)"           "token_hash={{ .TokenHash }}&type=recovery"         "${GOT_CONTENT}"
+assert_contains "URL custom KEYRA"                "https://usekeyra.com/auth/callback"                "${GOT_CONTENT}"
+assert_contains "Disclaimer 30 min"               "30 minutos"                                        "${GOT_CONTENT}"
+assert_contains "Wordmark"                        "KEYRA"                                             "${GOT_CONTENT}"
+assert_contains "Tamanho mínimo HTML"             "<!doctype html>"                                   "${GOT_CONTENT}"
 
 # Anti-regressão: garante que NÃO está mais usando ConfirmationURL (legacy implicit
 # grant flow — quebrado em SSR, foi a causa raiz do bug de fiscalização 2026-05-06).
@@ -118,7 +120,7 @@ fi
 
 log ""
 if [[ ${ASSERTS_FAILED} -eq 0 ]]; then
-  log "✅ Template recovery em prod com identidade KEYRA — 7/7 asserts PASS"
+  log "✅ Template recovery em prod com identidade KEYRA — 9/9 asserts PASS"
   exit 0
 else
   echo "❌ ${ASSERTS_FAILED} asserts FAIL — template em prod fora de spec"

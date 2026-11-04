@@ -14,6 +14,7 @@
     "start": "pnpm -F @keyra/web start",
     "lint": "pnpm -F @keyra/web lint",
     "typecheck": "pnpm -F @keyra/web typecheck",
+    "test": "pnpm -F @keyra/web test",
     "format": "pnpm -F @keyra/web format",
     "format:check": "pnpm -F @keyra/web format:check",
     "typegen": "supabase gen types typescript --project-id oapdfhivzojyahvphebs --schema public > apps/web/src/types/database.types.ts"

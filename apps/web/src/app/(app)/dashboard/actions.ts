@@ -7,6 +7,11 @@ import { requireAuth } from '@/lib/auth/require-auth';
 import { AuthorizationError, requireRole } from '@/lib/auth/roles';
 import { createServerClient } from '@/lib/supabase/server';
 import { formatBRL } from '@/lib/money';
+import {
+  formatPeriodoComparado,
+  taxaComparecimento,
+  ticketMedioCents,
+} from '@/lib/financeiro/periodo';
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
 
@@ -22,13 +27,13 @@ export type DashboardKpis = {
   expectedRevenueMtdCents: number;
   expensesMtdCents: number;
   profitMtdCents: number;
-  /** Mês passado (mesmo período-relativo) — base do comparativo. */
+  /** Mesmo período do mês anterior (dia 1 até o mesmo dia) — Story 4.10. */
   revenueLastMonthCents: number;
   expensesLastMonthCents: number;
   profitLastMonthCents: number;
   /** Contador de atendimentos hoje. */
   appointmentsToday: number;
-  /** Label do mês passado em pt-BR (ex: "março"). */
+  /** Período comparado em pt-BR (ex: "de 1 a 4 de outubro") — Story 4.10. */
   lastMonthLabel: string;
 };
 
@@ -38,14 +43,30 @@ const reaisToCents = (value: number | string | null | undefined): number => {
 };
 
 /**
- * Story 4.4 — KPIs do dashboard.
+ * Story 4.10 — totais do mês corrente e do mesmo período do mês anterior.
  *
- * Estratégia:
- * 1. View `v_dashboard_kpis` (já agrega current month em America/Sao_Paulo).
- * 2. Query simples de transactions do mês passado (mesmas colunas) para
- *    o comparativo textual (Story 4.7).
- * 3. Lucro = revenue − expenses (linha simplificada — DRE detalhada
- *    fica para Story 4.1).
+ * Toda a janela (dia 1 até hoje × dia 1 até o mesmo dia do mês anterior) e as
+ * somas ficam no banco, em America/Sao_Paulo, via RPC SECURITY INVOKER
+ * `dashboard_period_comparison` — sem `max_rows`, sem corte de data em UTC.
+ */
+async function getPeriodComparison(
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
+) {
+  const { data, error } = await supabase.rpc('dashboard_period_comparison').maybeSingle();
+  if (error) return { ok: false as const, error: error.message };
+  if (!data) return { ok: false as const, error: 'Comparativo do período indisponível.' };
+  return { ok: true as const, data };
+}
+
+/**
+ * Story 4.4 + 4.10 — KPIs do dashboard.
+ *
+ * 1. Receita, despesa e lucro do mês (dia 1 até hoje) e do mesmo período do
+ *    mês anterior vêm de `dashboard_period_comparison` (Story 4.10).
+ * 2. Receita prevista e atendimentos de hoje continuam na view
+ *    `v_dashboard_kpis`.
+ * 3. Lucro = receita líquida − despesas (linha simplificada; DRE detalhada na
+ *    Story 4.1).
  *
  * Tudo em centavos (integer) para casar com a API do `KPICard`.
  */
@@ -55,73 +76,37 @@ export async function getDashboardKpis(): Promise<ActionResult<DashboardKpis>> {
     await requireRole(orgId, 'viewer');
     const supabase = await createServerClient();
 
-    const now = new Date();
-    const lastMonth = subMonths(now, 1);
-    const lastMonthStart = startOfMonth(lastMonth);
-    const lastMonthEnd = endOfMonth(lastMonth);
-    const lastStart = lastMonthStart.toISOString().slice(0, 10);
-    const lastEnd = lastMonthEnd.toISOString().slice(0, 10);
-
-    const [kpisRes, lastMonthRevenueRes, lastMonthExpensesRes] = await Promise.all([
+    const [kpisRes, periodRes] = await Promise.all([
       supabase
         .from('v_dashboard_kpis')
-        .select(
-          'revenue_mtd, expected_revenue_mtd, expenses_mtd, appointments_today',
-        )
+        .select('expected_revenue_mtd, appointments_today')
         .eq('org_id', orgId)
         .maybeSingle(),
-      supabase
-        .from('transactions')
-        .select('net_amount')
-        .eq('org_id', orgId)
-        .eq('direction', 'credit')
-        .gte('reference_date', lastStart)
-        .lte('reference_date', lastEnd)
-        .is('deleted_at', null),
-      supabase
-        .from('transactions')
-        .select('gross_amount')
-        .eq('org_id', orgId)
-        .eq('direction', 'debit')
-        .gte('reference_date', lastStart)
-        .lte('reference_date', lastEnd)
-        .is('deleted_at', null),
+      getPeriodComparison(supabase),
     ]);
 
     if (kpisRes.error) return { ok: false, error: kpisRes.error.message };
-    if (lastMonthRevenueRes.error)
-      return { ok: false, error: lastMonthRevenueRes.error.message };
-    if (lastMonthExpensesRes.error)
-      return { ok: false, error: lastMonthExpensesRes.error.message };
+    if (!periodRes.ok) return { ok: false, error: periodRes.error };
 
     const k = kpisRes.data;
-    const revenueMtdCents = reaisToCents(k?.revenue_mtd);
-    const expectedRevenueMtdCents = reaisToCents(k?.expected_revenue_mtd);
-    const expensesMtdCents = reaisToCents(k?.expenses_mtd);
-    const profitMtdCents = revenueMtdCents - expensesMtdCents;
-
-    const revenueLastMonthCents = (lastMonthRevenueRes.data ?? []).reduce(
-      (acc, t) => acc + reaisToCents(t.net_amount),
-      0,
-    );
-    const expensesLastMonthCents = (lastMonthExpensesRes.data ?? []).reduce(
-      (acc, t) => acc + reaisToCents(t.gross_amount),
-      0,
-    );
-    const profitLastMonthCents = revenueLastMonthCents - expensesLastMonthCents;
+    const p = periodRes.data;
+    const revenueMtdCents = Number(p.revenue_current_cents);
+    const expensesMtdCents = Number(p.expenses_current_cents);
+    const revenueLastMonthCents = Number(p.revenue_previous_cents);
+    const expensesLastMonthCents = Number(p.expenses_previous_cents);
 
     return {
       ok: true,
       data: {
         revenueMtdCents,
-        expectedRevenueMtdCents,
+        expectedRevenueMtdCents: reaisToCents(k?.expected_revenue_mtd),
         expensesMtdCents,
-        profitMtdCents,
+        profitMtdCents: revenueMtdCents - expensesMtdCents,
         revenueLastMonthCents,
         expensesLastMonthCents,
-        profitLastMonthCents,
+        profitLastMonthCents: revenueLastMonthCents - expensesLastMonthCents,
         appointmentsToday: Number(k?.appointments_today ?? 0),
-        lastMonthLabel: format(lastMonth, 'MMMM', { locale: ptBR }),
+        lastMonthLabel: formatPeriodoComparado(p.previous_start, p.previous_end),
       },
     };
   } catch (err) {
@@ -212,6 +197,8 @@ export type Indicators = {
   topServiceByProfit: { name: string; profitCents: number } | null;
   attendanceRate: number;
   attendanceRateLastMonth: number;
+  /** Período comparado em pt-BR (ex: "de 1 a 4 de outubro") — Story 4.10. */
+  periodLabel: string;
   hasData: boolean;
 };
 
@@ -223,58 +210,30 @@ export async function getIndicators(): Promise<ActionResult<Indicators>> {
 
     const now = new Date();
     const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
-    const lastMonthStart = format(startOfMonth(subMonths(now, 1)), 'yyyy-MM-dd');
-    const lastMonthEnd = format(endOfMonth(subMonths(now, 1)), 'yyyy-MM-dd');
 
-    const [cmdsCurRes, cmdsLastRes, dreServiceCurRes, apptCurRes, apptLastRes] = await Promise.all([
-      supabase
-        .from('commands')
-        .select('total')
-        .eq('org_id', orgId)
-        .eq('status', 'paid')
-        .is('deleted_at', null)
-        .gte('paid_at', monthStart),
-      supabase
-        .from('commands')
-        .select('total')
-        .eq('org_id', orgId)
-        .eq('status', 'paid')
-        .is('deleted_at', null)
-        .gte('paid_at', lastMonthStart)
-        .lte('paid_at', lastMonthEnd + 'T23:59:59'),
+    // Story 4.10: ticket médio e comparecimento usam a mesma janela do
+    // comparativo (dia 1 até hoje × mesmo período do mês anterior).
+    const [periodRes, dreServiceCurRes] = await Promise.all([
+      getPeriodComparison(supabase),
       supabase
         .from('v_dre_by_service')
         .select('service_name, total_quantity, gross_profit')
         .eq('org_id', orgId)
         .eq('period_month', monthStart),
-      supabase
-        .from('appointments')
-        .select('status')
-        .eq('org_id', orgId)
-        .is('deleted_at', null)
-        .gte('starts_at', monthStart + 'T00:00:00'),
-      supabase
-        .from('appointments')
-        .select('status')
-        .eq('org_id', orgId)
-        .is('deleted_at', null)
-        .gte('starts_at', lastMonthStart + 'T00:00:00')
-        .lte('starts_at', lastMonthEnd + 'T23:59:59'),
     ]);
 
-    if (cmdsCurRes.error) return { ok: false, error: cmdsCurRes.error.message };
-    if (cmdsLastRes.error) return { ok: false, error: cmdsLastRes.error.message };
+    if (!periodRes.ok) return { ok: false, error: periodRes.error };
     if (dreServiceCurRes.error) return { ok: false, error: dreServiceCurRes.error.message };
-    if (apptCurRes.error) return { ok: false, error: apptCurRes.error.message };
-    if (apptLastRes.error) return { ok: false, error: apptLastRes.error.message };
 
-    const ticketMedio = (arr: Array<{ total: number | null }>): number => {
-      if (arr.length === 0) return 0;
-      const sum = arr.reduce((a, c) => a + Number(c.total ?? 0), 0);
-      return Math.round((sum / arr.length) * 100);
-    };
-    const ticketMedioCents = ticketMedio(cmdsCurRes.data ?? []);
-    const ticketMedioLastMonthCents = ticketMedio(cmdsLastRes.data ?? []);
+    const p = periodRes.data;
+    const ticketMedioCentsAtual = ticketMedioCents(
+      Number(p.paid_total_current_cents),
+      p.paid_commands_current,
+    );
+    const ticketMedioLastMonthCents = ticketMedioCents(
+      Number(p.paid_total_previous_cents),
+      p.paid_commands_previous,
+    );
 
     const dreRows = dreServiceCurRes.data ?? [];
     const topByQty =
@@ -290,22 +249,21 @@ export async function getIndicators(): Promise<ActionResult<Indicators>> {
             Number(c.gross_profit ?? 0) > Number(m.gross_profit ?? 0) ? c : m,
           );
 
-    function computeAttendance(rows: Array<{ status: string }>): number {
-      const total = rows.filter(
-        (r) => r.status === 'done' || r.status === 'no_show' || r.status === 'cancelled',
-      ).length;
-      if (total === 0) return 0;
-      const done = rows.filter((r) => r.status === 'done').length;
-      return (done / total) * 100;
-    }
-    const attendanceRate = computeAttendance(apptCurRes.data ?? []);
-    const attendanceRateLastMonth = computeAttendance(apptLastRes.data ?? []);
+    const attendanceRate = taxaComparecimento(
+      p.appointments_done_current,
+      p.appointments_closed_current,
+    );
+    const attendanceRateLastMonth = taxaComparecimento(
+      p.appointments_done_previous,
+      p.appointments_closed_previous,
+    );
 
     return {
       ok: true,
       data: {
-        ticketMedioCents,
+        ticketMedioCents: ticketMedioCentsAtual,
         ticketMedioLastMonthCents,
+        periodLabel: formatPeriodoComparado(p.previous_start, p.previous_end),
         topServiceByQuantity: topByQty
           ? { name: topByQty.service_name ?? '(sem nome)', quantity: Number(topByQty.total_quantity ?? 0) }
           : null,
@@ -317,7 +275,8 @@ export async function getIndicators(): Promise<ActionResult<Indicators>> {
           : null,
         attendanceRate,
         attendanceRateLastMonth,
-        hasData: (cmdsCurRes.data ?? []).length > 0 || (apptCurRes.data ?? []).length > 0,
+        hasData:
+          p.paid_commands_current > 0 || p.appointments_closed_current > 0 || dreRows.length > 0,
       },
     };
   } catch (err) {

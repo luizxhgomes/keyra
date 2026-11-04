@@ -9,6 +9,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { formatBRL } from '@/lib/money';
 import {
   formatPeriodoComparado,
+  mesCorrenteSaoPaulo,
   taxaComparecimento,
   ticketMedioCents,
 } from '@/lib/financeiro/periodo';
@@ -208,8 +209,9 @@ export async function getIndicators(): Promise<ActionResult<Indicators>> {
     await requireRole(orgId, 'viewer');
     const supabase = await createServerClient();
 
-    const now = new Date();
-    const monthStart = format(startOfMonth(now), 'yyyy-MM-dd');
+    // Story 4.10: mês de referência em America/Sao_Paulo, o mesmo da RPC
+    // (o servidor roda em UTC; perto da virada do mês os dois divergiriam).
+    const monthStart = mesCorrenteSaoPaulo(new Date());
 
     // Story 4.10: ticket médio e comparecimento usam a mesma janela do
     // comparativo (dia 1 até hoje × mesmo período do mês anterior).

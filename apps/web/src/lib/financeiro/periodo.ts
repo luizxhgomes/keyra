@@ -63,3 +63,14 @@ export function taxaComparecimento(realizados: number, fechados: number): number
   if (fechados <= 0) return 0;
   return new Decimal(realizados).dividedBy(fechados).times(100).toNumber();
 }
+
+/** Primeiro dia (`YYYY-MM-01`) do mês corrente em America/Sao_Paulo. */
+export function mesCorrenteSaoPaulo(agora: Date): string {
+  const hoje = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(agora);
+  return `${hoje.slice(0, 7)}-01`;
+}

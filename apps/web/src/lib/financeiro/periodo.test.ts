@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildComparativo } from './comparativo';
-import { formatPeriodoComparado, taxaComparecimento, ticketMedioCents } from './periodo';
+import {
+  formatPeriodoComparado,
+  mesCorrenteSaoPaulo,
+  taxaComparecimento,
+  ticketMedioCents,
+} from './periodo';
 
 describe('formatPeriodoComparado', () => {
   it('nomeia o intervalo do mês anterior', () => {
@@ -68,5 +73,13 @@ describe('buildComparativo com o mesmo período', () => {
 
   it('sem histórico nos dois lados não mostra comparativo', () => {
     expect(buildComparativo(0, 0, 'em 1º de outubro', 'revenue')).toBeNull();
+  });
+});
+
+describe('mesCorrenteSaoPaulo', () => {
+  it('usa o mês de São Paulo, não o de UTC, na virada', () => {
+    // 01/11 01:00 UTC = 31/10 22:00 em São Paulo
+    expect(mesCorrenteSaoPaulo(new Date('2026-11-01T01:00:00Z'))).toBe('2026-10-01');
+    expect(mesCorrenteSaoPaulo(new Date('2026-11-01T03:00:00Z'))).toBe('2026-11-01');
   });
 });

@@ -3,5 +3,6 @@
   "framework": "nextjs",
   "installCommand": "cd ../.. && npm install -g pnpm@9.12.0 && pnpm install --frozen-lockfile",
   "buildCommand": "cd ../.. && pnpm -F @keyra/web build",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [{ "path": "/api/health", "schedule": "0 12 * * *" }]
 }

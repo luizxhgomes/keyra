@@ -16,7 +16,7 @@
     "typecheck": "pnpm -F @keyra/web typecheck",
     "format": "pnpm -F @keyra/web format",
     "format:check": "pnpm -F @keyra/web format:check",
-    "typegen": "supabase gen types typescript --project-id oapdfhivzojyahvphebs --schema public > apps/web/src/types/database.types.ts"
+    "typegen": "supabase gen types typescript --project-id \"$SUPABASE_PROJECT_REF\" --schema public > apps/web/src/types/database.types.ts"
   },
   "workspaces": [
     "apps/*"

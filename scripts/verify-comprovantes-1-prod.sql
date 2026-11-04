@@ -7,7 +7,7 @@
 --   (b) via psql:
 --       export PGPASSWORD=$(tr -d '\n' < .keyra-secrets/supabase-db-password.txt)
 --       psql "host=aws-1-sa-east-1.pooler.supabase.com port=5432 \
---             user=postgres.oapdfhivzojyahvphebs dbname=postgres sslmode=require" \
+--             user=postgres.lmqubirhzgywtlesymvc dbname=postgres sslmode=require" \
 --             -f scripts/verify-comprovantes-1-prod.sql
 --
 -- Os smokes B e C são transacionais (BEGIN/ROLLBACK) — NÃO deixam dado em prod.

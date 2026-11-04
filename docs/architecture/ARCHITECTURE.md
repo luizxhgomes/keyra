@@ -998,7 +998,7 @@ apps/web/src/
 |-------------|-----|--------|----|--------|
 | Local | http://localhost:3000 | working branch | Supabase local (Docker) ou projeto remoto via env | Pendente Story 1.1 |
 | Preview | auto Vercel preview (`keyra-*.vercel.app`) | every PR | **Phase 1-4: usa o mesmo projeto remoto Supabase**; Branches dedicados na Phase 5 | ✅ provisionado, deploy disparará no 1º push de código Next.js |
-| Production | `keyra.app` | `main` | Supabase project `keyra-br` (`oapdfhivzojyahvphebs`, sa-east-1) | ✅ provisionado |
+| Production | `keyra.app` | `main` | Supabase project `keyra-br` (`lmqubirhzgywtlesymvc`, sa-east-1) | ✅ provisionado |
 | Staging | `staging.keyra.app` | `main` (futuro) | Supabase Project `keyra-staging` (criar Phase 5) | ⏸️ não provisionado |
 
 **Pipeline (GitHub Actions):**

@@ -54,11 +54,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Organization** | `SealDigital` (`yitrkgqigdwkldinjyxu`) |
+| **Organization** | `pavelisque` (`kusoxalxlqwjxxftufhq`) |
 | **Project name** | `keyra-br` |
-| **Project ref** | `oapdfhivzojyahvphebs` |
-| **URL** | https://oapdfhivzojyahvphebs.supabase.co |
-| **Studio** | https://supabase.com/dashboard/project/oapdfhivzojyahvphebs |
+| **Project ref** | `lmqubirhzgywtlesymvc` |
+| **URL** | https://lmqubirhzgywtlesymvc.supabase.co |
+| **Studio** | https://supabase.com/dashboard/project/lmqubirhzgywtlesymvc |
 | **Região** | **`sa-east-1` (São Paulo)** |
 | **Postgres** | 17 |
 | **Plano** | Free (500 MB DB, 1 GB storage, 2 GB bandwidth/mês, 50K MAU, **pausa após 1 semana sem requests**) |
@@ -84,6 +84,10 @@
 | 1 | Ativar Auth Hook `public.custom_access_token_hook` | ✅ ENABLED 2026-04-16 |
 | 2 | Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel | ✅ encrypted, 3 targets, 2026-04-16 |
 | 3 | Confirmar JWT contém `org_id` após login real | ⏸️ validar quando 1º user logar (Story 1.2) |
+
+### Migração de conta (2026-11-04)
+
+O `keyra-br` foi recriado na conta `pavelisque`, em São Paulo, com as migrations do repositório e os dados do backup `db_cluster-07-10-2026`. O projeto anterior `oapdfhivzojyahvphebs` (org `SealDigital`) está `INACTIVE` e preservado: guarda os 2 arquivos do bucket `receipts`, que o backup não inclui. Não apagar.
 
 ### Projeto antigo (descomissionado)
 
@@ -112,7 +116,6 @@
 | `.keyra-secrets/` | tokens isolados (Vercel, Supabase PAT, chaves projeto, senha DB) | dir 700, files 600 |
 | `.env.local` | gerado por `./scripts/sync-env.sh` a partir de `.keyra-secrets/` | 600, gitignored |
 | `.env.local.example` | template público (sem valores) | versionado |
-| `scripts/keyra-shell.sh` | source para carregar envs no shell atual sem afetar global | versionado |
 | `scripts/with-env.sh` | wrapper para rodar 1 comando com envs isoladas | versionado |
 | `scripts/check-tokens.sh` | validador de credenciais contra APIs | versionado |
 

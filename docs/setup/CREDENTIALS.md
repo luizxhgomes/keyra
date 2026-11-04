@@ -17,7 +17,6 @@ Tokens de Vercel/Supabase/GitHub vivem em `.keyra-secrets/` e **só** são carre
 └── supabase-secret.key          # sb_secret_*
 
 scripts/
-├── keyra-shell.sh   # source para carregar envs no shell atual
 ├── with-env.sh      # roda UM comando com envs (sem poluir shell)
 ├── sync-env.sh      # regenera .env.local a partir de .keyra-secrets/
 └── check-tokens.sh  # valida cada token contra a API do provider
@@ -28,18 +27,17 @@ scripts/
 
 ## Uso
 
-### Shell isolado (mais comum no dia a dia)
+### Comando único, sem carregar nada no shell
+As chaves da Keyra são exclusivas desta pasta: nada de `source`, perfil do shell ou login global de CLI.
 ```bash
-source ./scripts/keyra-shell.sh
-gh repo view luizxhgomes/keyra
-vercel projects ls
-supabase projects list
+./scripts/with-env.sh gh repo view luizxhgomes/keyra
+./scripts/with-env.sh vercel projects ls
+./scripts/with-env.sh supabase projects list
 ```
 
-### Comando único sem alterar shell
+De outra pasta, use o caminho absoluto. O comando roda dentro da pasta keyra:
 ```bash
-./scripts/with-env.sh gh auth status
-./scripts/with-env.sh vercel deploy
+/Users/luizhenrique/Projetos/keyra/scripts/with-env.sh supabase projects list
 ```
 
 ### Regerar `.env.local` após mudar tokens

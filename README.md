@@ -79,7 +79,7 @@ Serviço → Agenda → Comanda → Transação → DRE → Decisão
 
 ## Próximos bloqueadores manuais (antes da Phase 1)
 
-1. **Ativar Auth Hook** `public.custom_access_token_hook` no [Supabase Dashboard](https://supabase.com/dashboard/project/oapdfhivzojyahvphebs/auth/hooks)
+1. **Ativar Auth Hook** `public.custom_access_token_hook` no [Supabase Dashboard](https://supabase.com/dashboard/project/lmqubirhzgywtlesymvc/auth/hooks)
 2. Provisionar `COLUMN_ENCRYPTION_KEY` no Vercel (encrypt CPF)
 3. Validar 3 perguntas UX com a idealizadora (paleta terracota, split de pagamento, formato de comparativo)
 

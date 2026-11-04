@@ -136,6 +136,7 @@ done
 
 echo "==> Rodando suíte RLS"
 psql -v ON_ERROR_STOP=1 -f supabase/tests/rls_isolation.test.sql
+psql -v ON_ERROR_STOP=1 -f supabase/tests/signup_atomic.test.sql
 
 echo
 echo "✓ TODOS OS TESTES RLS PASSARAM"

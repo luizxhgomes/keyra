@@ -65,7 +65,7 @@
 5. **Authorized JavaScript origins** (não obrigatório mas recomendado):
    - `https://usekeyra.com`
 6. **Authorized redirect URIs** (este é CRÍTICO — copiar exato):
-   - `https://oapdfhivzojyahvphebs.supabase.co/auth/v1/callback`
+   - `https://lmqubirhzgywtlesymvc.supabase.co/auth/v1/callback`
 7. Click Create
 8. Modal aparece com **Client ID** + **Client Secret** — copia ambos AGORA (o secret só aparece nesta tela)
 
@@ -97,7 +97,7 @@ Ou, se preferir, me passa as 2 strings no chat e eu salvo pra você.
 - [ ] OAuth consent screen criado em modo "In production"
 - [ ] Scopes: apenas `email` + `profile` + `openid`
 - [ ] OAuth Client ID criado tipo "Web application"
-- [ ] Authorized redirect URI configurada: `https://oapdfhivzojyahvphebs.supabase.co/auth/v1/callback`
+- [ ] Authorized redirect URI configurada: `https://lmqubirhzgywtlesymvc.supabase.co/auth/v1/callback`
 - [ ] Client ID copiado
 - [ ] Client Secret copiado
 - [ ] (Recomendado) Salvo em `.keyra-secrets/google-oauth-{client-id,client-secret}.{txt,key}` com chmod 600

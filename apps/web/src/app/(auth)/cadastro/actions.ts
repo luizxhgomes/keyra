@@ -145,9 +145,11 @@ export async function signUpAction(input: unknown): Promise<SignUpResult> {
     return { success: false, error: 'Configuração de segurança ausente. Contate o suporte.' };
   }
 
-  const { data: orgId, error: rpcError } = await supabase.rpc(
+  // Sem sessão até o e-mail ser confirmado: a RPC roda como service_role.
+  const { data: orgId, error: rpcError } = await createAdminClient().rpc(
     'signup_create_account_atomic' as never,
     {
+      p_user_id: newUserId,
       p_full_name: parsed.data.fullName,
       p_phone_e164: phoneE164,
       p_encryption_key: env.COLUMN_ENCRYPTION_KEY,
@@ -161,6 +163,7 @@ export async function signUpAction(input: unknown): Promise<SignUpResult> {
   );
 
   if (rpcError || !orgId) {
+    console.error('[cadastro] RPC falhou', rpcError?.code);
     await rollbackUser(newUserId);
     return {
       success: false,

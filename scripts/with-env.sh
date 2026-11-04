@@ -9,6 +9,10 @@ set -euo pipefail
 KEYRA_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SECRETS="${KEYRA_ROOT}/.keyra-secrets"
 
+# As chaves da Keyra só valem dentro da pasta keyra: chamado de fora, o comando
+# roda nela. Evita usar estas credenciais em outro projeto por engano.
+case "${PWD}/" in "${KEYRA_ROOT}"/*) ;; *) cd "${KEYRA_ROOT}" ;; esac
+
 if [[ $# -eq 0 ]]; then
   echo "Uso: $0 <comando> [args...]"
   exit 1
@@ -28,6 +32,7 @@ PUB=$(read_token supabase-publishable.key)
 SR=$(read_token supabase-service-role.key)
 SEC=$(read_token supabase-secret.key)
 CEK=$(read_token column-encryption-key.txt)
+DBP=$(read_token supabase-db-password.txt)
 
 env_args=()
 [[ -n "${GH}" ]]   && env_args+=("GH_TOKEN=${GH}" "GITHUB_TOKEN=${GH}")
@@ -39,5 +44,6 @@ env_args=()
 [[ -n "${SR}" ]]   && env_args+=("SUPABASE_SERVICE_ROLE_KEY=${SR}")
 [[ -n "${SEC}" ]]  && env_args+=("SUPABASE_SECRET_KEY=${SEC}")
 [[ -n "${CEK}" ]]  && env_args+=("COLUMN_ENCRYPTION_KEY=${CEK}")
+[[ -n "${DBP}" ]]  && env_args+=("SUPABASE_DB_PASSWORD=${DBP}")
 
 exec env "${env_args[@]}" "$@"

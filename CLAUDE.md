@@ -59,7 +59,7 @@ pnpm lint         # ESLint --max-warnings 0 (zero warnings tolerados)
 pnpm typecheck    # tsc --noEmit
 pnpm format       # Prettier write
 pnpm format:check # Prettier check (CI)
-pnpm typegen      # Regenera apps/web/src/types/database.types.ts a partir do projeto Supabase remoto
+./scripts/with-env.sh pnpm typegen  # Regenera apps/web/src/types/database.types.ts a partir do projeto Supabase remoto
 ```
 
 ### Banco / migrations / testes RLS
@@ -69,7 +69,7 @@ pnpm typegen      # Regenera apps/web/src/types/database.types.ts a partir do pr
 supabase db push
 
 # Regenerar tipos depois de qualquer migration que altere schema público
-pnpm typegen
+./scripts/with-env.sh pnpm typegen
 
 # Suíte completa de testes RLS contra Postgres 17 efêmero (Docker)
 ./scripts/run-rls-tests.sh
@@ -105,6 +105,7 @@ Todo desenvolvimento parte de uma story em `docs/stories/{epic}.{n}.story.md`. E
 4. **`server-only` é literal:** `lib/supabase/admin.ts` e helpers que tocam `SUPABASE_SERVICE_ROLE_KEY` têm `import 'server-only'`. Qualquer import desses de client component quebra o build — é a barreira intencional, não um erro.
 5. **`proxy.ts` (não `middleware.ts`):** Next 16 renomeou. Manter o nome `proxy.ts` e a `config.matcher` que exclui assets estáticos mas inclui `/api/*` (cookies precisam rotacionar em mutações).
 6. **Princípios UX inegociáveis:** números absolutos, comparativos textuais ("R$ 2.300 a mais que o mês passado"), tela única, zero gráficos no MVP. Se uma story propor gráfico, validar com a idealizadora antes — não é gosto, é tese.
+7. **Chaves da Keyra só na pasta keyra:** os valores moram em `.keyra-secrets/`. Nunca vão para `~/.zshrc`, `~/.claude/secrets.env`, `.mcp.json`, login global (`gh auth login`, `supabase login`, `vercel login`) nem para outra pasta. Quem precisa delas, inclusive sessão aberta em outra pasta, roda `/Users/luizhenrique/Projetos/keyra/scripts/with-env.sh <comando>`, que injeta as chaves só naquele comando e roda dentro da pasta keyra. `secret.env`, na raiz, é só a entrada de chaves novas: depois de validadas, elas vão para `.keyra-secrets/`.
 
 ---
 

@@ -137,5 +137,8 @@ done
 echo "==> Rodando suíte RLS"
 psql -v ON_ERROR_STOP=1 -f supabase/tests/rls_isolation.test.sql
 
+echo "==> Rodando teste do comparativo do painel (Story 4.10)"
+psql -v ON_ERROR_STOP=1 -f supabase/tests/dashboard_period_comparison.test.sql
+
 echo
 echo "✓ TODOS OS TESTES RLS PASSARAM"

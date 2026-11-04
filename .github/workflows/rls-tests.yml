@@ -150,6 +150,10 @@ jobs:
         run: |
           psql -v ON_ERROR_STOP=1 -f supabase/tests/rls_isolation.test.sql
 
+      - name: Run dashboard period comparison suite (Story 4.10)
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/dashboard_period_comparison.test.sql
+
       - name: Summarize
         if: always()
         run: |

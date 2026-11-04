@@ -1894,6 +1894,28 @@ export type Database = {
         Returns: string
       }
       current_org_id: { Args: never; Returns: string }
+      dashboard_period_comparison: {
+        Args: { p_today?: string }
+        Returns: {
+          appointments_closed_current: number
+          appointments_closed_previous: number
+          appointments_done_current: number
+          appointments_done_previous: number
+          current_end: string
+          current_start: string
+          expenses_current_cents: number
+          expenses_previous_cents: number
+          paid_commands_current: number
+          paid_commands_previous: number
+          paid_total_current_cents: number
+          paid_total_previous_cents: number
+          previous_end: string
+          previous_start: string
+          revenue_current_cents: number
+          revenue_previous_cents: number
+          today: string
+        }[]
+      }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       is_org_member: {
         Args: { min_role?: string; target_org_id: string }

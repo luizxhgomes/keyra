@@ -40,7 +40,7 @@ export async function IndicadoresCard() {
               value={formatCentsBRL(i.ticketMedioCents)}
               hint={
                 i.ticketMedioLastMonthCents > 0
-                  ? `vs ${formatCentsBRL(i.ticketMedioLastMonthCents)} no mês passado`
+                  ? `vs ${formatCentsBRL(i.ticketMedioLastMonthCents)} ${i.periodLabel}`
                   : '—'
               }
             />
@@ -49,7 +49,7 @@ export async function IndicadoresCard() {
               value={`${i.attendanceRate.toFixed(1)}%`}
               hint={
                 i.attendanceRateLastMonth > 0
-                  ? `vs ${i.attendanceRateLastMonth.toFixed(1)}% no mês passado`
+                  ? `vs ${i.attendanceRateLastMonth.toFixed(1)}% ${i.periodLabel}`
                   : '—'
               }
             />
